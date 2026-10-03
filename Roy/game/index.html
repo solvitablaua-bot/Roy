@@ -1,0 +1,744 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Roy's Dino Park</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Baloo+2:wght@500;700;800&display=swap">
+<style>
+/* Layout: one night-jungle screen. Top bar, guide, the giant park gate in the middle,
+   and the park map buttons rising up from the ground once the gate opens. */
+:root {
+  --night: #0e1c16;
+  --canopy: #173326;
+  --leaf: #2e5b3a;
+  --amber: #f2a93b;
+  --ember: #e4572a;
+  --bone: #f4e8cc;
+  --wood: #6e4524;
+  --wood-dark: #3b2413;
+  --stone: #5d625c;
+  --stone-light: #8a8f86;
+  --font-sign: "Alfa Slab One", "Rockwell", "Georgia", serif;
+  --font-body: "Baloo 2", "Chalkboard SE", "Trebuchet MS", sans-serif;
+  color-scheme: dark;
+}
+html, body { height: 100%; }
+body {
+  margin: 0;
+  background: var(--night);
+  color: var(--bone);
+  font-family: var(--font-body);
+  overflow: hidden;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+button { font: inherit; color: inherit; cursor: pointer; }
+button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
+
+#sky { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; }
+
+.app {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-inline: max(16px, env(safe-area-inset-left, 0px));
+  padding-block: max(12px, env(safe-area-inset-top, 0px)) max(12px, env(safe-area-inset-bottom, 0px));
+  pointer-events: none; /* let taps reach the jungle secrets behind */
+}
+.stars, .icon-btn, .guide-dino, .bubble, .gate, .menu { pointer-events: auto; }
+
+/* ---------- top bar ---------- */
+.topbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.stars {
+  display: flex; align-items: center; gap: 8px;
+  background: rgba(14, 28, 22, .75);
+  border: 3px solid var(--amber);
+  border-radius: 999px;
+  padding: 4px 18px 4px 8px;
+  font-size: 1.8rem; font-weight: 800; line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.stars svg { width: 40px; height: 40px; }
+.stars.pop { animation: pop .5s ease; }
+.icon-btn {
+  width: 60px; height: 60px; border-radius: 50%;
+  background: rgba(14, 28, 22, .75);
+  border: 3px solid var(--stone-light);
+  display: grid; place-items: center;
+}
+.icon-btn svg { width: 32px; height: 32px; }
+
+/* ---------- guide ---------- */
+.guide { display: flex; align-items: flex-end; gap: 10px; max-width: 640px; }
+.guide-dino { width: 92px; flex: 0 0 auto; background: none; border: 0; padding: 0; }
+.guide-dino svg { width: 100%; height: auto; display: block; }
+.guide-dino.talk svg { animation: bob .35s ease-in-out 4 alternate; }
+.bubble {
+  position: relative; min-width: 0;
+  background: var(--bone); color: var(--wood-dark);
+  border-radius: 22px;
+  padding: 10px 56px 10px 18px;
+  font-size: clamp(1.15rem, 2.6vw, 1.5rem); font-weight: 700; line-height: 1.25;
+  margin-bottom: 18px;
+}
+.bubble::before {
+  content: ""; position: absolute; left: -12px; bottom: 14px;
+  border: 12px solid transparent; border-right-color: var(--bone); border-left: 0;
+}
+.bubble .say-again {
+  position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+  width: 42px; height: 42px; border-radius: 50%;
+  background: var(--leaf); border: 0; display: grid; place-items: center;
+}
+.bubble .say-again svg { width: 24px; height: 24px; }
+
+/* ---------- stage + gate ---------- */
+.stage { flex: 1; min-height: 0; display: grid; place-items: end center; position: relative; container-type: size; }
+.gate {
+  position: relative;
+  width: min(100cqw, 115cqh, 600px);
+  aspect-ratio: 1.15;
+  background: none; border: 0; padding: 0;
+}
+.gate.shake { animation: shake .6s ease; }
+.gate svg.frame { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.doorway {
+  position: absolute; left: 17%; right: 17%; top: 27%; bottom: 0;
+  perspective: 900px;
+  background: radial-gradient(ellipse at 50% 100%, #f9d27a 0%, #c9772b 30%, #2a4a2f 70%, #13281d 100%);
+  overflow: hidden;
+}
+.doorway .path {
+  position: absolute; left: 30%; right: 30%; bottom: 0; height: 60%;
+  background: linear-gradient(#e0b56a00, #e0b56a99);
+  clip-path: polygon(40% 0, 60% 0, 100% 100%, 0 100%);
+}
+.door {
+  position: absolute; top: 0; bottom: 0; width: 50%;
+  background:
+    linear-gradient(transparent 14%, var(--wood-dark) 14% 19%, transparent 19% 78%, var(--wood-dark) 78% 83%, transparent 83%),
+    repeating-linear-gradient(90deg, var(--wood) 0 18%, var(--wood-dark) 18% 20%);
+  box-shadow: inset 0 0 0 4px var(--wood-dark);
+  transition: transform 1.4s cubic-bezier(.3, .1, .2, 1);
+}
+.door.left { left: 0; transform-origin: left center; }
+.door.right { right: 0; transform-origin: right center; }
+.door .ring {
+  position: absolute; top: 48%; width: 26px; height: 26px; border-radius: 50%;
+  border: 5px solid #2b2b28; box-sizing: border-box;
+}
+.door.left .ring { right: 10px; }
+.door.right .ring { left: 10px; }
+.door .warn {
+  position: absolute; left: 14%; right: 14%; top: 28%; height: 13%;
+  background: repeating-linear-gradient(-45deg, var(--amber) 0 12px, #1d1d1b 12px 24px);
+  border: 3px solid #1d1d1b;
+}
+.gate.open .door.left { transform: rotateY(-105deg); }
+.gate.open .door.right { transform: rotateY(105deg); }
+.tap-hint {
+  position: absolute; left: 50%; bottom: 8%; transform: translateX(-50%);
+  width: 84px; height: 84px; pointer-events: none;
+  animation: tap 1.4s ease-in-out infinite;
+}
+.gate.open .tap-hint { display: none; }
+
+.flame { transform-box: fill-box; transform-origin: 50% 100%; animation: flicker .25s ease-in-out infinite alternate; }
+
+/* ---------- hidden secrets in the scene ---------- */
+.secret { position: absolute; background: none; border: 0; padding: 0; z-index: 1; pointer-events: auto; }
+.gate { z-index: 1; }
+.moon { top: 8%; right: 8%; width: 70px; height: 70px; }
+.moon svg { width: 100%; height: 100%; }
+.volcano { right: 0; bottom: 8%; width: min(26vw, 260px); z-index: 0; }
+.volcano svg { width: 100%; height: auto; display: block; overflow: visible; }
+.volcano.erupt .lava { animation: glow 1.6s ease; }
+.volcano .smoke { opacity: 0; transform-box: fill-box; transform-origin: center; }
+.volcano.erupt .smoke { animation: puff 1.8s ease-out; }
+.volcano.erupt .smoke:nth-of-type(2) { animation-delay: .2s; }
+.volcano.erupt .smoke:nth-of-type(3) { animation-delay: .4s; }
+.bush { left: 0; bottom: -6px; width: min(20vw, 160px); z-index: 2; }
+.bush svg { width: 100%; height: auto; display: block; overflow: hidden; }
+.bush .eyes { animation: blink 4s infinite; transform-box: fill-box; transform-origin: center; }
+.bush .peek { transform: translateY(70px); transition: transform .4s cubic-bezier(.3, 1.6, .5, 1); }
+.bush.peekaboo .peek { transform: translateY(0); }
+.flyer {
+  position: fixed; top: 16%; left: -180px; width: 160px; z-index: 3; pointer-events: none;
+}
+.flyer.go { animation: fly 3.2s linear; }
+.flyer .wing { transform-box: fill-box; transform-origin: 50% 100%; animation: flap .3s ease-in-out infinite alternate; }
+
+/* ---------- park map menu ---------- */
+.menu[hidden] { display: none; }
+.menu {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(118px, 1fr));
+  gap: 10px;
+  padding: 12px;
+  background: linear-gradient(var(--stone), #474b46);
+  border: 4px solid #2e312d;
+  border-radius: 20px;
+  box-shadow: 0 -6px 30px rgba(0, 0, 0, .5);
+  animation: rise .6s cubic-bezier(.3, 1.4, .5, 1);
+}
+.place {
+  position: relative;
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  background: var(--canopy);
+  border: 4px solid var(--leaf);
+  border-radius: 16px;
+  padding: 10px 6px 8px;
+  font-size: 1.2rem; font-weight: 800; line-height: 1.1;
+  min-height: 120px;
+}
+.place svg { width: 64px; height: 64px; }
+.place .soon {
+  position: absolute; top: -10px; right: -6px;
+  width: 36px; height: 36px; border-radius: 50%;
+  background: var(--amber); display: grid; place-items: center;
+  border: 3px solid var(--wood-dark);
+}
+.place .soon svg { width: 18px; height: 18px; }
+.place.next { border-color: var(--amber); animation: nudge 2s ease-in-out infinite; }
+.place.wiggle { animation: wiggle .5s ease; }
+.place:active, .icon-btn:active { transform: scale(.94); }
+
+/* ---------- star burst + badge ---------- */
+.burst {
+  position: fixed; z-index: 10; width: 90px; height: 90px; pointer-events: none;
+  animation: burst 1s ease-in forwards;
+}
+.badge {
+  position: fixed; z-index: 11; left: 50%; top: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  background: var(--bone); color: var(--wood-dark);
+  border: 6px solid var(--amber); border-radius: 28px;
+  padding: 18px 28px; text-align: center;
+  box-shadow: 0 10px 50px rgba(0, 0, 0, .6);
+  pointer-events: none;
+}
+.badge.show { animation: badge 2.8s ease forwards; }
+.badge svg { width: 110px; height: 110px; }
+.badge strong { font-family: var(--font-sign); font-size: 1.6rem; font-weight: 400; }
+.badge span { font-size: 1.2rem; font-weight: 700; }
+
+@keyframes pop { 50% { transform: scale(1.3); } }
+@keyframes bob { to { transform: translateY(-6px) rotate(-3deg); } }
+@keyframes shake { 15%, 45%, 75% { transform: translateX(-7px); } 30%, 60%, 90% { transform: translateX(7px); } }
+@keyframes tap { 0%, 100% { transform: translateX(-50%) scale(1); opacity: .9; } 50% { transform: translateX(-50%) scale(.82); opacity: .6; } }
+@keyframes flicker { to { transform: scaleY(1.15) scaleX(.9); } }
+@keyframes glow { 30% { filter: brightness(1.8); } }
+@keyframes puff { 0% { opacity: .9; transform: translateY(0) scale(.5); } 100% { opacity: 0; transform: translateY(-90px) scale(1.8); } }
+@keyframes blink { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(.1); } }
+@keyframes fly { to { transform: translate(calc(100vw + 360px), -40px); } }
+@keyframes flap { to { transform: scaleY(-.6); } }
+@keyframes rise { from { transform: translateY(120%); } }
+@keyframes nudge { 50% { transform: translateY(-5px); } }
+@keyframes wiggle { 25% { transform: rotate(-6deg); } 50% { transform: rotate(6deg); } 75% { transform: rotate(-3deg); } }
+@keyframes burst { 0% { transform: scale(.4); opacity: 1; } 40% { transform: scale(1.4); } 100% { transform: translate(var(--dx), var(--dy)) scale(.3); opacity: .2; } }
+@keyframes badge { 0% { transform: translate(-50%, -50%) scale(0) rotate(-20deg); } 15% { transform: translate(-50%, -50%) scale(1.1) rotate(4deg); } 22%, 85% { transform: translate(-50%, -50%) scale(1); } 100% { transform: translate(-50%, -50%) scale(0); } }
+
+@media (max-width: 560px) {
+  .guide-dino { width: 70px; }
+  .volcano { width: 96px; bottom: -4px; z-index: 2; }
+  .bush { width: 104px; }
+  .moon { top: 14px; right: auto; left: calc(50% - 26px); width: 52px; height: 52px; }
+  .menu { grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 8px; }
+  .place { min-height: 96px; font-size: 1rem; }
+  .place svg { width: 46px; height: 46px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
+</style>
+</head>
+<body>
+<canvas id="sky" aria-hidden="true"></canvas>
+
+<!-- hidden secrets in the scene -->
+<button class="secret moon" id="moon" aria-label="Moon">
+  <svg viewBox="0 0 70 70"><circle cx="35" cy="35" r="30" fill="#f6efd3"/><circle cx="26" cy="28" r="6" fill="#e2d7b0"/><circle cx="44" cy="44" r="8" fill="#e2d7b0"/><circle cx="46" cy="22" r="3" fill="#e2d7b0"/></svg>
+</button>
+<svg class="flyer" id="flyer" viewBox="0 0 160 80" aria-hidden="true">
+  <path class="wing" d="M70 42 L20 6 L86 36 Z" fill="#8a4f2e"/>
+  <path d="M40 44 Q80 30 120 40 L150 34 L124 48 Q80 56 40 44 Z" fill="#a3603a"/>
+  <path d="M120 40 L138 22 L128 42 Z" fill="#c9793f"/>
+  <circle cx="128" cy="40" r="2.5" fill="#1d1d1b"/>
+  <path class="wing" d="M76 44 L124 4 L92 42 Z" fill="#b8693e"/>
+</svg>
+
+<div class="app">
+  <header class="topbar">
+    <div class="stars" id="stars" aria-label="Stars">
+      <svg viewBox="0 0 40 40"><path d="M20 3l5 11 12 1-9 8 3 12-11-6-11 6 3-12-9-8 12-1z" fill="#f2a93b" stroke="#3b2413" stroke-width="2" stroke-linejoin="round"/></svg>
+      <span id="star-count">0</span>
+    </div>
+    <button class="icon-btn" id="sound" aria-label="Sound on">
+      <svg viewBox="0 0 32 32" id="sound-icon"></svg>
+    </button>
+  </header>
+
+  <div class="guide">
+    <button class="guide-dino" id="guide-dino" aria-label="Tops the guide">
+      <svg viewBox="0 0 100 90">
+        <path d="M14 70 Q4 66 6 58 L20 62 Z" fill="#4f9a6a"/>
+        <ellipse cx="44" cy="62" rx="32" ry="22" fill="#5fb37c"/>
+        <rect x="24" y="72" width="11" height="16" rx="5" fill="#4f9a6a"/>
+        <rect x="52" y="72" width="11" height="16" rx="5" fill="#4f9a6a"/>
+        <path d="M58 22 Q74 6 92 22 Q96 40 84 46 L62 46 Z" fill="#f2a93b"/>
+        <circle cx="66" cy="20" r="3" fill="#e4572a"/><circle cx="78" cy="14" r="3" fill="#e4572a"/><circle cx="88" cy="22" r="3" fill="#e4572a"/>
+        <ellipse cx="74" cy="48" rx="20" ry="16" fill="#6cc48a"/>
+        <path d="M70 34 L66 18 L76 32 Z" fill="#f4e8cc"/>
+        <path d="M86 36 L92 22 L90 38 Z" fill="#f4e8cc"/>
+        <path d="M90 50 L100 46 L92 56 Z" fill="#f4e8cc"/>
+        <circle cx="78" cy="44" r="5" fill="#fff"/><circle cx="79.5" cy="44.5" r="2.6" fill="#1d1d1b"/>
+        <path d="M70 56 Q80 62 88 56" stroke="#1d1d1b" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <!-- ranger hat -->
+        <path d="M60 30 Q74 18 90 28 L96 32 Q76 30 56 34 Z" fill="#a8844f"/>
+        <path d="M66 28 Q74 14 86 26 Z" fill="#c29c62"/>
+      </svg>
+    </button>
+    <p class="bubble" id="bubble"><span id="bubble-text">Hi Roy! I'm Tops. Tap the big gate to open your park!</span>
+      <button class="say-again" id="say-again" aria-label="Say it again">
+        <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 4V5L7 9H3z" fill="#f4e8cc"/><path d="M16 8q3 4 0 8M18.5 5.5q5 6.5 0 13" stroke="#f4e8cc" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+      </button>
+    </p>
+  </div>
+
+  <main class="stage">
+    <button class="secret volcano" id="volcano" aria-label="Volcano">
+  <svg viewBox="0 0 260 170">
+    <circle class="smoke" cx="128" cy="30" r="22" fill="#6d6a66"/>
+    <circle class="smoke" cx="112" cy="24" r="18" fill="#7a7672"/>
+    <circle class="smoke" cx="146" cy="20" r="16" fill="#625f5b"/>
+    <path d="M0 170 L100 46 Q130 34 160 46 L260 170 Z" fill="#26342b"/>
+    <path class="lava" d="M104 46 Q130 36 156 46 L150 60 L140 54 L134 84 L124 58 L112 66 Z" fill="#e4572a"/>
+    <path class="lava" d="M118 50 Q130 44 142 50 L136 56 L130 52 L124 56 Z" fill="#f2a93b"/>
+  </svg>
+</button>
+    <button class="secret bush" id="bush" aria-label="Bush">
+  <svg viewBox="0 0 170 120">
+    <g class="peek">
+      <ellipse cx="85" cy="58" rx="30" ry="26" fill="#6aa84f"/>
+      <circle cx="74" cy="52" r="7" fill="#fff"/><circle cx="96" cy="52" r="7" fill="#fff"/>
+      <circle cx="76" cy="53" r="3.5" fill="#1d1d1b"/><circle cx="98" cy="53" r="3.5" fill="#1d1d1b"/>
+      <path d="M72 68 Q85 78 98 68" stroke="#1d1d1b" stroke-width="3" fill="none" stroke-linecap="round"/>
+    </g>
+    <ellipse cx="40" cy="92" rx="42" ry="30" fill="#1f4a2c"/>
+    <ellipse cx="128" cy="92" rx="44" ry="32" fill="#1f4a2c"/>
+    <ellipse cx="85" cy="100" rx="58" ry="30" fill="#2a5e37"/>
+    <g class="eyes"><circle cx="68" cy="96" r="5" fill="#f2d24b"/><circle cx="86" cy="96" r="5" fill="#f2d24b"/><circle cx="68" cy="96" r="2" fill="#1d1d1b"/><circle cx="86" cy="96" r="2" fill="#1d1d1b"/></g>
+  </svg>
+</button>
+    <button class="gate" id="gate" aria-label="Park gate">
+      <div class="doorway">
+        <div class="path"></div>
+        <div class="door left"><div class="warn"></div><div class="ring"></div></div>
+        <div class="door right"><div class="warn"></div><div class="ring"></div></div>
+      </div>
+      <svg class="frame" viewBox="0 0 460 400" preserveAspectRatio="none" aria-hidden="true">
+        <!-- posts -->
+        <rect x="18" y="70" width="62" height="330" fill="#6e4524"/>
+        <rect x="380" y="70" width="62" height="330" fill="#6e4524"/>
+        <rect x="18" y="70" width="10" height="330" fill="#8a5a31"/>
+        <rect x="380" y="70" width="10" height="330" fill="#8a5a31"/>
+        <rect x="70" y="70" width="10" height="330" fill="#3b2413"/>
+        <rect x="432" y="70" width="10" height="330" fill="#3b2413"/>
+        <!-- vines -->
+        <path d="M24 150 q20 20 0 40 q-16 22 6 46 q20 24 -2 50" stroke="#2e5b3a" stroke-width="7" fill="none" stroke-linecap="round"/>
+        <path d="M436 120 q-20 26 0 52 q18 26 -4 56" stroke="#2e5b3a" stroke-width="7" fill="none" stroke-linecap="round"/>
+        <ellipse cx="28" cy="190" rx="10" ry="5" fill="#3f7a4c"/><ellipse cx="44" cy="244" rx="10" ry="5" fill="#3f7a4c"/>
+        <ellipse cx="426" cy="170" rx="10" ry="5" fill="#3f7a4c"/><ellipse cx="440" cy="222" rx="10" ry="5" fill="#3f7a4c"/>
+        <!-- torches -->
+        <rect x="42" y="38" width="14" height="34" fill="#3b2413"/>
+        <rect x="404" y="38" width="14" height="34" fill="#3b2413"/>
+        <path class="flame" d="M49 40 q-14 -14 0 -36 q14 22 0 36 Z" fill="#e4572a"/>
+        <path class="flame" d="M49 38 q-7 -8 0 -20 q7 12 0 20 Z" fill="#f9d27a"/>
+        <path class="flame" d="M411 40 q-14 -14 0 -36 q14 22 0 36 Z" fill="#e4572a"/>
+        <path class="flame" d="M411 38 q-7 -8 0 -20 q7 12 0 20 Z" fill="#f9d27a"/>
+        <!-- top beam + sign -->
+        <rect x="0" y="66" width="460" height="22" fill="#3b2413"/>
+        <path d="M40 66 L60 16 L400 16 L420 66 Z" fill="#6e4524" stroke="#3b2413" stroke-width="6" stroke-linejoin="round"/>
+        <text x="230" y="44" text-anchor="middle" font-family="Alfa Slab One, Rockwell, Georgia, serif" font-size="26" fill="#f2a93b" stroke="#3b2413" stroke-width="1.5" paint-order="stroke" letter-spacing="1">ROY'S DINO PARK</text>
+        <text x="230" y="60" text-anchor="middle" font-family="Baloo 2, Trebuchet MS, sans-serif" font-weight="800" font-size="11" fill="#f4e8cc" letter-spacing="3">PARK CREATOR: ROY</text>
+        <!-- spikes -->
+        <path d="M18 70 l10 -14 l10 14 l10 -14 l10 14 l10 -14 l12 14 Z" fill="#3b2413"/>
+        <path d="M380 70 l10 -14 l10 14 l10 -14 l10 14 l10 -14 l12 14 Z" fill="#3b2413"/>
+      </svg>
+      <svg class="tap-hint" viewBox="0 0 84 84" aria-hidden="true">
+        <circle cx="42" cy="42" r="38" fill="none" stroke="#f4e8cc" stroke-width="5" stroke-dasharray="10 8"/>
+        <path d="M36 62 V30 q0 -6 5 -6 q5 0 5 6 v14 l12 2 q6 1 5 8 l-3 12 q-1 4 -5 4 H44 Z" fill="#f4e8cc" stroke="#3b2413" stroke-width="2.5" stroke-linejoin="round"/>
+      </svg>
+    </button>
+  </main>
+
+  <nav class="menu" id="menu" hidden aria-label="Park map">
+    <button class="place next" data-place="egg">
+      <svg viewBox="0 0 64 64"><ellipse cx="32" cy="36" rx="20" ry="25" fill="#f4e8cc"/><circle cx="24" cy="28" r="4" fill="#6cc48a"/><circle cx="40" cy="40" r="5" fill="#6cc48a"/><circle cx="28" cy="48" r="3" fill="#6cc48a"/><path d="M16 30 l6 4 l5 -5 l6 6 l5 -5 l6 4" stroke="#3b2413" stroke-width="2.5" fill="none" stroke-linejoin="round"/></svg>
+      Egg Lab
+      <span class="soon" aria-label="Coming soon"><svg viewBox="0 0 18 18"><rect x="3" y="8" width="12" height="9" rx="2" fill="#3b2413"/><path d="M5.5 8V6a3.5 3.5 0 0 1 7 0v2" stroke="#3b2413" stroke-width="2.4" fill="none"/></svg></span>
+    </button>
+    <button class="place" data-place="book">
+      <svg viewBox="0 0 64 64"><rect x="10" y="10" width="44" height="46" rx="4" fill="#a3603a"/><rect x="16" y="10" width="38" height="46" rx="3" fill="#c9793f"/><path d="M30 42 q-4 -8 2 -10 q6 2 2 10 Z M26 30 a3 3 0 1 0 0.1 0 M33 26 a3 3 0 1 0 0.1 0 M40 30 a3 3 0 1 0 0.1 0" fill="#3b2413"/></svg>
+      Dino Book
+      <span class="soon" aria-label="Coming soon"><svg viewBox="0 0 18 18"><rect x="3" y="8" width="12" height="9" rx="2" fill="#3b2413"/><path d="M5.5 8V6a3.5 3.5 0 0 1 7 0v2" stroke="#3b2413" stroke-width="2.4" fill="none"/></svg></span>
+    </button>
+    <button class="place" data-place="care">
+      <svg viewBox="0 0 64 64"><path d="M32 54 C10 40 8 22 20 16 C27 13 31 18 32 22 C33 18 37 13 44 16 C56 22 54 40 32 54 Z" fill="#e4572a"/><path d="M26 30 q6 -10 14 -6 q-2 10 -14 6 Z" fill="#6cc48a"/></svg>
+      Dino Care
+      <span class="soon" aria-label="Coming soon"><svg viewBox="0 0 18 18"><rect x="3" y="8" width="12" height="9" rx="2" fill="#3b2413"/><path d="M5.5 8V6a3.5 3.5 0 0 1 7 0v2" stroke="#3b2413" stroke-width="2.4" fill="none"/></svg></span>
+    </button>
+    <button class="place" data-place="build">
+      <svg viewBox="0 0 64 64"><rect x="29" y="30" width="6" height="22" fill="#6e4524"/><circle cx="32" cy="22" r="14" fill="#5fb37c"/><circle cx="24" cy="28" r="9" fill="#4f9a6a"/><circle cx="41" cy="28" r="9" fill="#4f9a6a"/><path d="M6 52 h52 M6 42 h52" stroke="#a8844f" stroke-width="4"/><path d="M10 38 v18 M22 38 v18 M42 38 v18 M54 38 v18" stroke="#c29c62" stroke-width="5"/></svg>
+      Build Park
+      <span class="soon" aria-label="Coming soon"><svg viewBox="0 0 18 18"><rect x="3" y="8" width="12" height="9" rx="2" fill="#3b2413"/><path d="M5.5 8V6a3.5 3.5 0 0 1 7 0v2" stroke="#3b2413" stroke-width="2.4" fill="none"/></svg></span>
+    </button>
+    <button class="place" data-place="missions">
+      <svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="24" fill="#f4e8cc" stroke="#a8844f" stroke-width="5"/><path d="M32 14 L38 32 L32 50 L26 32 Z" fill="#e4572a"/><path d="M32 32 L38 32 L32 50 L26 32 Z" fill="#5d625c"/><circle cx="32" cy="32" r="4" fill="#3b2413"/></svg>
+      Missions
+      <span class="soon" aria-label="Coming soon"><svg viewBox="0 0 18 18"><rect x="3" y="8" width="12" height="9" rx="2" fill="#3b2413"/><path d="M5.5 8V6a3.5 3.5 0 0 1 7 0v2" stroke="#3b2413" stroke-width="2.4" fill="none"/></svg></span>
+    </button>
+  </nav>
+</div>
+
+<div class="badge" id="badge" aria-live="polite">
+  <svg viewBox="0 0 110 110" id="badge-art"></svg>
+  <strong id="badge-title"></strong>
+  <span id="badge-text"></span>
+</div>
+
+<script>
+(function () {
+  // ---------- saved progress (on this device only) ----------
+  var SAVE_KEY = "roys-dino-park";
+  var state = { stars: 0, found: {}, sound: true };
+  try {
+    var saved = JSON.parse(localStorage.getItem(SAVE_KEY) || "null");
+    if (saved) state = Object.assign(state, saved);
+  } catch (e) {}
+  function save() {
+    try { localStorage.setItem(SAVE_KEY, JSON.stringify(state)); } catch (e) {}
+  }
+
+  var $ = function (id) { return document.getElementById(id); };
+  var gate = $("gate"), menu = $("menu"), starsEl = $("stars"), starCount = $("star-count");
+  starCount.textContent = state.stars;
+
+  // ---------- sound ----------
+  var audio = null;
+  function ac() {
+    if (!state.sound) return null;
+    if (!audio) {
+      var AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return null;
+      audio = new AC();
+    }
+    if (audio.state === "suspended") audio.resume();
+    return audio;
+  }
+  function noiseBuffer(ctx, seconds) {
+    var buf = ctx.createBuffer(1, ctx.sampleRate * seconds, ctx.sampleRate);
+    var d = buf.getChannelData(0);
+    for (var i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    return buf;
+  }
+  function roar() {
+    var ctx = ac(); if (!ctx) return;
+    var t = ctx.currentTime, dur = 1.7;
+    var out = ctx.createGain();
+    out.gain.setValueAtTime(0.0001, t);
+    out.gain.exponentialRampToValueAtTime(0.9, t + 0.15);
+    out.gain.setValueAtTime(0.9, t + 0.9);
+    out.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    out.connect(ctx.destination);
+    // growl: a buzzing low voice with a fast wobble
+    var growl = ctx.createOscillator();
+    growl.type = "sawtooth";
+    growl.frequency.setValueAtTime(95, t);
+    growl.frequency.linearRampToValueAtTime(140, t + 0.35);
+    growl.frequency.exponentialRampToValueAtTime(48, t + dur);
+    var wobble = ctx.createOscillator(), wobbleGain = ctx.createGain();
+    wobble.frequency.value = 28; wobbleGain.gain.value = 18;
+    wobble.connect(wobbleGain).connect(growl.frequency);
+    var low = ctx.createBiquadFilter();
+    low.type = "lowpass"; low.frequency.value = 700;
+    var growlGain = ctx.createGain(); growlGain.gain.value = 0.55;
+    growl.connect(low).connect(growlGain).connect(out);
+    // breath: filtered noise sweeping down
+    var breath = ctx.createBufferSource();
+    breath.buffer = noiseBuffer(ctx, dur);
+    var band = ctx.createBiquadFilter();
+    band.type = "bandpass"; band.Q.value = 1.2;
+    band.frequency.setValueAtTime(1100, t);
+    band.frequency.exponentialRampToValueAtTime(260, t + dur);
+    var breathGain = ctx.createGain(); breathGain.gain.value = 0.7;
+    breath.connect(band).connect(breathGain).connect(out);
+    [growl, wobble, breath].forEach(function (n) { n.start(t); n.stop(t + dur); });
+  }
+  function rumble() {
+    var ctx = ac(); if (!ctx) return;
+    var t = ctx.currentTime, dur = 1.6;
+    var src = ctx.createBufferSource(); src.buffer = noiseBuffer(ctx, dur);
+    var low = ctx.createBiquadFilter(); low.type = "lowpass"; low.frequency.value = 140;
+    var g = ctx.createGain();
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(1.6, t + 0.3);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    src.connect(low).connect(g).connect(ctx.destination);
+    src.start(t); src.stop(t + dur);
+  }
+  function tone(freq, start, len, type, vol, slideTo) {
+    var ctx = ac(); if (!ctx) return;
+    var t = ctx.currentTime + start;
+    var o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = type || "sine";
+    o.frequency.setValueAtTime(freq, t);
+    if (slideTo) o.frequency.exponentialRampToValueAtTime(slideTo, t + len);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(vol || 0.3, t + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + len);
+    o.connect(g).connect(ctx.destination);
+    o.start(t); o.stop(t + len + 0.05);
+  }
+  function chime() { tone(784, 0, 0.25, "triangle", 0.3); tone(1175, 0.12, 0.4, "triangle", 0.3); }
+  function fanfare() { [523, 659, 784, 1047].forEach(function (f, i) { tone(f, i * 0.13, 0.35, "square", 0.12); }); }
+  function screech() { tone(1400, 0, 0.25, "sawtooth", 0.08, 2600); tone(1800, 0.3, 0.3, "sawtooth", 0.08, 900); }
+  function boing() { tone(220, 0, 0.35, "sine", 0.4, 660); }
+  function clunk() { tone(140, 0, 0.12, "square", 0.15, 90); tone(110, 0.1, 0.15, "square", 0.12, 70); }
+
+  // ---------- Tops the guide talks (and reads out loud) ----------
+  var bubbleText = $("bubble-text"), guideDino = $("guide-dino");
+  var lastLine = bubbleText.textContent;
+  function say(text) {
+    lastLine = text;
+    bubbleText.textContent = text;
+    guideDino.classList.remove("talk"); void guideDino.offsetWidth; guideDino.classList.add("talk");
+    if (!state.sound || !window.speechSynthesis) return;
+    try {
+      speechSynthesis.cancel();
+      var u = new SpeechSynthesisUtterance(text.replace("Roy's", "Roys"));
+      u.rate = 0.95; u.pitch = 1.25; u.lang = "en-US";
+      speechSynthesis.speak(u);
+    } catch (e) {}
+  }
+  $("say-again").addEventListener("click", function (e) { e.stopPropagation(); say(lastLine); });
+  guideDino.addEventListener("click", function () {
+    var lines = [
+      "I'm Tops, your park ranger helper!",
+      "Psst! Some things in the jungle are secret. Try tapping them!",
+      "Triceratops have three horns. Just like me!",
+      "You are the boss of this park, Roy!"
+    ];
+    say(lines[Math.floor(Math.random() * lines.length)]);
+  });
+
+  // ---------- stars and badges ----------
+  function addStar(fromEl) {
+    state.stars += 1; save();
+    var r = fromEl.getBoundingClientRect(), target = starsEl.getBoundingClientRect();
+    var b = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    b.setAttribute("viewBox", "0 0 40 40"); b.setAttribute("class", "burst");
+    b.innerHTML = '<path d="M20 3l5 11 12 1-9 8 3 12-11-6-11 6 3-12-9-8 12-1z" fill="#f2a93b" stroke="#3b2413" stroke-width="2" stroke-linejoin="round"/>';
+    var x = r.left + r.width / 2 - 45, y = r.top + r.height / 2 - 45;
+    b.style.left = x + "px"; b.style.top = y + "px";
+    b.style.setProperty("--dx", (target.left + 20 - (x + 45)) + "px");
+    b.style.setProperty("--dy", (target.top + 20 - (y + 45)) + "px");
+    document.body.appendChild(b);
+    chime();
+    setTimeout(function () {
+      b.remove();
+      starCount.textContent = state.stars;
+      starsEl.classList.remove("pop"); void starsEl.offsetWidth; starsEl.classList.add("pop");
+    }, 950);
+  }
+  var badgeEl = $("badge");
+  function showBadge(title, text, art) {
+    $("badge-title").textContent = title;
+    $("badge-text").textContent = text;
+    $("badge-art").innerHTML = art;
+    badgeEl.classList.remove("show"); void badgeEl.offsetWidth; badgeEl.classList.add("show");
+    fanfare();
+  }
+  var GATE_BADGE =
+    '<circle cx="55" cy="55" r="50" fill="#f2a93b" stroke="#3b2413" stroke-width="5"/>' +
+    '<circle cx="55" cy="55" r="38" fill="#173326"/>' +
+    '<rect x="30" y="40" width="10" height="42" fill="#6e4524"/><rect x="70" y="40" width="10" height="42" fill="#6e4524"/>' +
+    '<path d="M24 42 L32 26 L78 26 L86 42 Z" fill="#6e4524"/>' +
+    '<path d="M40 50 h30 v32 h-30 Z" fill="#f9d27a"/>';
+  var EXPLORER_BADGE =
+    '<circle cx="55" cy="55" r="50" fill="#6cc48a" stroke="#3b2413" stroke-width="5"/>' +
+    '<circle cx="55" cy="55" r="38" fill="#f4e8cc"/>' +
+    '<path d="M55 24 L63 55 L55 86 L47 55 Z" fill="#e4572a"/><circle cx="55" cy="55" r="6" fill="#3b2413"/>';
+
+  function discover(key, el, line) {
+    if (state.found[key]) return false;
+    state.found[key] = true; save();
+    addStar(el);
+    var secrets = ["volcano", "flyer", "peekaboo"];
+    if (secrets.every(function (s) { return state.found[s]; }) && !state.found.explorer) {
+      state.found.explorer = true; save();
+      setTimeout(function () {
+        addStar(starsEl);
+        showBadge("Jungle Explorer", "You found all the secrets!", EXPLORER_BADGE);
+        say("Wow, Roy! You found all the jungle secrets! You are a Jungle Explorer!");
+      }, 1400);
+    } else if (line) {
+      say(line);
+    }
+    return true;
+  }
+
+  // ---------- the park gate ----------
+  var opening = false;
+  gate.addEventListener("click", function () {
+    if (opening) return;
+    roar();
+    gate.classList.remove("shake"); void gate.offsetWidth; gate.classList.add("shake");
+    if (gate.classList.contains("open")) {
+      opening = true;
+      gate.classList.remove("open");
+      menu.hidden = true;
+      say("Roar! The gate is closed. Tap it to open it again!");
+      setTimeout(function () { opening = false; }, 1400);
+      return;
+    }
+    opening = true;
+    gate.classList.add("open");
+    setTimeout(function () {
+      menu.hidden = false;
+      opening = false;
+      if (!state.found.gate) {
+        state.found.gate = true; save();
+        addStar(gate);
+        showBadge("Park Opener", "You opened your park!", GATE_BADGE);
+        say("Roar! Welcome to your park, Roy! You got a star! Next we will build the Egg Lab.");
+      } else {
+        say("Welcome back, boss! Pick a place to explore.");
+      }
+    }, 1200);
+  });
+
+  // ---------- places on the park map ----------
+  var placeLines = {
+    egg: "The Egg Lab is next! Soon you will hatch your very own dinosaur!",
+    book: "The Dino Book is coming soon. It will keep all your dinosaurs!",
+    care: "Dino Care is coming soon. You will feed and wash your dinosaurs!",
+    build: "Build Park is coming soon. You will build fences, trees and ponds!",
+    missions: "Ranger Missions are coming soon. Big adventures!"
+  };
+  menu.addEventListener("click", function (e) {
+    var btn = e.target.closest(".place");
+    if (!btn) return;
+    clunk();
+    btn.classList.remove("wiggle"); void btn.offsetWidth; btn.classList.add("wiggle");
+    say(placeLines[btn.dataset.place]);
+  });
+
+  // ---------- jungle secrets ----------
+  var volcano = $("volcano");
+  volcano.addEventListener("click", function () {
+    rumble();
+    volcano.classList.remove("erupt"); void volcano.offsetWidth; volcano.classList.add("erupt");
+    discover("volcano", volcano, "Rumble rumble! The volcano is waking up! You found a secret!") ||
+      say("Rumble rumble! Hot lava!");
+  });
+  var flyer = $("flyer"), moon = $("moon");
+  moon.addEventListener("click", function () {
+    screech();
+    flyer.classList.remove("go"); void flyer.offsetWidth; flyer.classList.add("go");
+    discover("flyer", moon, "Look up! A flying dinosaur! It is called a Pteranodon. You found a secret!") ||
+      say("Whoosh! There goes the Pteranodon!");
+  });
+  var bush = $("bush");
+  bush.addEventListener("click", function () {
+    boing();
+    bush.classList.add("peekaboo");
+    setTimeout(function () { bush.classList.remove("peekaboo"); }, 1600);
+    discover("peekaboo", bush, "Peekaboo! A baby dinosaur was hiding in the bush! You found a secret!") ||
+      say("Peekaboo! Hee hee!");
+  });
+
+  // ---------- sound on and off ----------
+  var soundBtn = $("sound"), soundIcon = $("sound-icon");
+  function drawSound() {
+    soundIcon.innerHTML = '<path d="M4 12v8h5l7 6V6l-7 6H4z" fill="#f4e8cc"/>' + (state.sound
+      ? '<path d="M21 11q3 5 0 10M24.5 7.5q6 8.5 0 17" stroke="#f4e8cc" stroke-width="2.5" fill="none" stroke-linecap="round"/>'
+      : '<path d="M21 12l8 8M29 12l-8 8" stroke="#e4572a" stroke-width="3" stroke-linecap="round"/>');
+    soundBtn.setAttribute("aria-label", state.sound ? "Sound on" : "Sound off");
+  }
+  drawSound();
+  soundBtn.addEventListener("click", function () {
+    state.sound = !state.sound; save(); drawSound();
+    if (!state.sound && window.speechSynthesis) speechSynthesis.cancel();
+    if (state.sound) chime();
+  });
+
+  // ---------- night jungle background ----------
+  var sky = $("sky"), g = sky.getContext("2d");
+  var seed = 7;
+  function rand() { seed = (seed * 16807) % 2147483647; return seed / 2147483647; }
+  function palm(x, base, h, lean, color) {
+    g.strokeStyle = color; g.fillStyle = color; g.lineWidth = Math.max(4, h * 0.05); g.lineCap = "round";
+    var topX = x + lean, topY = base - h;
+    g.beginPath(); g.moveTo(x, base); g.quadraticCurveTo(x + lean * 0.2, base - h * 0.5, topX, topY); g.stroke();
+    for (var i = 0; i < 7; i++) {
+      var a = -Math.PI + (i / 6) * Math.PI, len = h * (0.45 + rand() * 0.2);
+      var ex = topX + Math.cos(a) * len, ey = topY + Math.sin(a) * len * 0.5 + len * 0.35;
+      g.beginPath(); g.moveTo(topX, topY);
+      g.quadraticCurveTo(topX + Math.cos(a) * len * 0.5, topY - len * 0.25, ex, ey);
+      g.lineWidth = Math.max(3, h * 0.035); g.stroke();
+    }
+  }
+  function drawSky() {
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var w = window.innerWidth, h = window.innerHeight;
+    sky.width = w * dpr; sky.height = h * dpr;
+    g.setTransform(dpr, 0, 0, dpr, 0, 0);
+    seed = 7;
+    var grad = g.createLinearGradient(0, 0, 0, h);
+    grad.addColorStop(0, "#0a1420"); grad.addColorStop(0.55, "#163126"); grad.addColorStop(1, "#0e1c16");
+    g.fillStyle = grad; g.fillRect(0, 0, w, h);
+    for (var i = 0; i < 90; i++) {
+      g.fillStyle = "rgba(244,232,204," + (0.3 + rand() * 0.6) + ")";
+      g.beginPath(); g.arc(rand() * w, rand() * h * 0.45, rand() * 1.6 + 0.3, 0, Math.PI * 2); g.fill();
+    }
+    // far hills
+    g.fillStyle = "#132a20";
+    g.beginPath(); g.moveTo(0, h);
+    for (var x = 0; x <= w + 40; x += 40) g.lineTo(x, h * 0.62 - Math.sin(x / 140) * 30 - rand() * 20);
+    g.lineTo(w, h); g.fill();
+    // jungle layers
+    var layers = [["#16352a", 0.72, 0.28], ["#102a20", 0.84, 0.22], ["#0b1f17", 0.96, 0.18]];
+    layers.forEach(function (L) {
+      var base = h * L[1], count = Math.ceil(w / 120) + 2;
+      for (var p = 0; p < count; p++) {
+        palm(p * 120 + rand() * 60 - 30, base + 20, h * L[2] * (0.7 + rand() * 0.6), rand() * 60 - 30, L[0]);
+      }
+      g.fillStyle = L[0];
+      g.beginPath(); g.moveTo(0, h);
+      for (var x2 = 0; x2 <= w + 30; x2 += 30) g.lineTo(x2, base - rand() * 26);
+      g.lineTo(w, h); g.fill();
+    });
+    // mist
+    var mist = g.createLinearGradient(0, h * 0.6, 0, h);
+    mist.addColorStop(0, "rgba(160,200,170,0)"); mist.addColorStop(1, "rgba(160,200,170,0.12)");
+    g.fillStyle = mist; g.fillRect(0, h * 0.6, w, h * 0.4);
+  }
+  drawSky();
+  var resizeTimer;
+  window.addEventListener("resize", function () { clearTimeout(resizeTimer); resizeTimer = setTimeout(drawSky, 120); });
+})();
+</script>
+</body>
+</html>
