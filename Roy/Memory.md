@@ -102,6 +102,7 @@ Keep Memory.md up to date at all times. Every time we start a new session, read 
   12. Bath Day: wash 3 dinosaurs today (in the park).
   13. Giant Footprints: follow 3 huge footprints (rumble and shake) to a giant leg, tap it and "look up" to find Argentinosaurus.
   - All 11 adventure missions were played through from start to finish in a test browser on iPad and phone sizes. Preview updated at the same link.
+- 2026-10-03: Roy's parent asked to publish the game live so Roy can share the link with his friends. Recommended way: share the existing preview from its Share menu with "anyone with the link" (only the account owner can do this; Claude cannot change sharing). Alternative offered: a free GitHub Pages website, which needs the repository to be public and Pages switched on in the repository settings.
 - **Next:** Check with Roy that the shop and the new missions work on his iPad. Then ask what he wants next.
 
 ## Important decisions
@@ -132,3 +133,4 @@ Keep Memory.md up to date at all times. Every time we start a new session, read 
 - 2026-10-03: Pet Shop pets are babies of park dinosaurs with clear features (Blue, Triceratops, Stegosaurus, Compsognathus, Ankylosaurus, Parasaurolophus, Brachiosaurus, Pachycephalosaurus, Dilophosaurus, Gallimimus). Each customer asks for one feature, and any pet with that feature is right.
 - 2026-10-03: Mission play styles are set in `MISSIONS` in `Roy/game/index.html` with a `play` field (search, eggs, trail, listen, decoys, lava, peek) plus options such as `hint`, `size` and `alarm`. New missions can reuse these.
 - 2026-10-03: New mission layouts use plain percentage sizes instead of container units, which older iPads may not support.
+- 2026-10-03: Sharing the game publicly is safe for friends to play: there are no accounts, no chat, no ads, and nothing is sent anywhere. Each player's stars and dinosaurs are saved only on their own device. The game shows Roy's first name ("ROY'S DINO PARK") but nothing else about him.
