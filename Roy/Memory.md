@@ -40,6 +40,8 @@ Keep Memory.md up to date at all times. Every time we start a new session, read 
 - Roy's sixth idea (spoken): "In the Dino Book, collect all the missions. Think of at least 10 missions that are described in the Dino Book, and you can go through the book and choose which mission you want to complete and what's good in that mission." This turned the Dino Book into a book of missions.
 - Roy likes choosing for himself: the book lets him pick any mission in any order, and each page shows what he can win.
 - Mystery silhouettes (a dark shadow of the dinosaur until it is found) make Roy curious about who is hiding.
+- Roy's seventh idea (spoken): "You need to create a pet shop where there's going to be pet dinosaurs and people can come buy their own pet dinosaur." This became the Pet Shop, where Roy is the shopkeeper.
+- Listening to what each customer wants and finding the matching pet is a gentle matching game that practises noticing features (horns, crests, long necks, colours, what they eat).
 - Empty cages are a good way to keep Roy's ideas coming: each one has a "?" sign, and Tops asks "Roy, which dinosaur should live here?"
 - Idea: the game itself could listen to Roy too, for example saying a name out loud to name a new dinosaur.
 
@@ -78,7 +80,8 @@ Keep Memory.md up to date at all times. Every time we start a new session, read 
   12. Bath Day (Your Park): wash 3 dinosaurs today, every day
   13. Giant Footprints (Swamp): find Argentinosaurus
   - Each mission gives 3 stars the first time. Mystery dinosaurs show as dark shadows until found. Missions happen in different places that look different: jungle bushes, tall trees, swamp reeds, desert rocks and dark volcano rocks. Finishing every mission gives the Mission Master badge. Tested at iPad and phone sizes. Preview updated at the same link.
-- **Next:** Ask Roy what he wants next. All areas of the park are now open. Roy can invent new missions or new species for the Dino Book.
+- 2026-10-03: **Built the Pet Shop, from Roy's idea** (new Pet Shop button on the park map, so there are now 6 areas). "ROY'S PET SHOP" has a striped awning and 6 glass tanks with baby dinosaurs. People walk in one at a time (different faces, skin tones, hair and clothes) and say what pet they want, with a picture to help: "I want a pet with three horns!", "I want a blue pet!", "I want a pet that eats leaves!", "I want a teeny tiny pet!" and more. Roy taps the matching pet: it flies to the customer, who smiles and holds it, says thank you and walks out. Roy gets a star. A new baby dinosaur pops into the empty tank. Wrong pet: the customer shakes their head and says "Hmm, not that one" (no losing). Badges: Shopkeeper (first sale) and Pet Shop Star (10 sales). Tested at iPad (both ways round) and phone sizes. Preview updated at the same link.
+- **Next:** Ask Roy what he wants next. All areas are open. Roy can invent new missions, species or pet-shop customers.
 
 ## Important decisions
 
@@ -104,3 +107,5 @@ Keep Memory.md up to date at all times. Every time we start a new session, read 
 - 2026-10-03: The Dino Book is a book of missions (Roy's idea), not a sticker book as first planned. The Missions button on the park map opens the same book. Missions are listed in `MISSIONS` in `Roy/game/index.html` and can be added there.
 - 2026-10-03: "Feeding Time" and "Bath Day" are daily missions that link to Dino Care, so the book also reminds Roy to look after his dinosaurs every day.
 - 2026-10-03: Missions have no way to fail: every bush shows something fun, and footprints give a hint to the right bush.
+- 2026-10-03: The Pet Shop is pretend: no real money and nothing to buy. Customers "pay" by making Roy's shop a success, and Roy earns stars, keeping the rule of no payments. Roy is the shopkeeper, as in his idea of people coming to buy pets.
+- 2026-10-03: Pet Shop pets are babies of park dinosaurs with clear features (Blue, Triceratops, Stegosaurus, Compsognathus, Ankylosaurus, Parasaurolophus, Brachiosaurus, Pachycephalosaurus, Dilophosaurus, Gallimimus). Each customer asks for one feature, and any pet with that feature is right.

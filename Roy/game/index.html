@@ -593,6 +593,82 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
 .expedition[data-place="desert"] .tint { background: linear-gradient(rgba(201, 139, 74, .3), rgba(160, 100, 50, .7)); }
 .expedition[data-place="volcano"] .tint { background: radial-gradient(ellipse at 80% 0%, rgba(228, 87, 42, .55), transparent 55%), linear-gradient(rgba(30, 20, 20, .3), rgba(30, 20, 20, .7)); }
 @keyframes flip { from { transform: perspective(900px) rotateY(-30deg); opacity: .2; } }
+/* ---------- Pet Shop: people buy baby pet dinosaurs (Roy's idea) ---------- */
+.shop {
+  flex: 1; min-height: 0; pointer-events: auto;
+  display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr);
+  background: linear-gradient(#f4e8cc, #e8d3a6);
+  border: 4px solid var(--wood-dark); border-radius: 20px; overflow: hidden;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, .55);
+  color: var(--wood-dark);
+}
+.awning {
+  grid-column: 1 / -1;
+  height: 58px; display: grid; place-items: center;
+  background: repeating-linear-gradient(90deg, var(--ember) 0 40px, var(--bone) 40px 80px);
+  border-bottom: 4px solid var(--wood-dark);
+  position: relative;
+}
+.awning span {
+  background: var(--wood); color: var(--amber); border: 3px solid var(--wood-dark); border-radius: 10px;
+  font-family: var(--font-sign); font-size: clamp(1.1rem, 3vw, 1.6rem); padding: 0 18px;
+}
+.tanks {
+  min-height: 0; padding: 14px;
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-auto-rows: minmax(0, 1fr); gap: 12px;
+  background: linear-gradient(transparent 48%, #a8844f 48% 52%, transparent 52%), linear-gradient(transparent 97%, #a8844f 97%);
+}
+.tank {
+  position: relative; min-height: 0;
+  background: linear-gradient(160deg, rgba(207, 230, 239, .7), rgba(127, 176, 220, .35));
+  border: 4px solid #5d625c; border-radius: 12px;
+  box-shadow: inset 0 -18px 0 #d9b77a;
+  display: grid; place-items: end center; padding: 6px 6px 18px;
+}
+.tank::after { content: ""; position: absolute; top: 8px; left: 10px; width: 14%; height: 40%; border-radius: 10px; background: rgba(255, 255, 255, .45); pointer-events: none; }
+.tank .pet { width: 82%; max-height: 100%; display: block; overflow: visible; }
+.tank.empty .pet { visibility: hidden; }
+.tank.hop .pet { animation: hop .55s cubic-bezier(.3, 1.4, .5, 1); }
+.tank.nope .pet { animation: nope .5s ease; }
+.tank.restock .pet { animation: hatch .6s cubic-bezier(.3, 1.5, .5, 1); }
+.tank .tag {
+  position: absolute; bottom: -12px; left: 50%; transform: translateX(-50%);
+  background: var(--bone); border: 2px solid var(--wood-dark); border-radius: 8px;
+  font-size: .85rem; font-weight: 800; padding: 0 8px; white-space: nowrap; max-width: 96%; overflow: hidden; text-overflow: ellipsis;
+}
+.counter-side {
+  position: relative; min-height: 0; overflow: hidden;
+  border-left: 4px solid var(--wood-dark);
+  background: linear-gradient(transparent 70%, #8a5a31 70% 74%, #6e4524 74%);
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+  padding: 8px 8px 0;
+}
+.wish {
+  position: relative; z-index: 2;
+  background: #fff; border: 3px solid var(--wood-dark); border-radius: 18px;
+  padding: 8px 12px; margin-bottom: 8px;
+  display: flex; align-items: center; gap: 8px;
+  font-weight: 800; font-size: clamp(1rem, 2.4vw, 1.25rem); line-height: 1.2;
+  max-width: 100%;
+}
+.wish svg { width: 52px; height: 52px; flex: 0 0 auto; }
+.wish::after { content: ""; position: absolute; left: 50%; bottom: -14px; border: 12px solid transparent; border-top-color: var(--wood-dark); border-bottom: 0; transform: translateX(-50%); }
+.customer { width: min(70%, 190px); background: none; border: 0; padding: 0; }
+.customer svg { width: 100%; height: auto; display: block; }
+.customer.walkin { animation: walkin .9s ease-out; }
+.customer.walkout { animation: walkout .9s ease-in forwards; }
+.customer.shakehead svg { animation: nope .5s ease; }
+@keyframes walkin { from { transform: translateX(120%); } }
+@keyframes walkout { to { transform: translateX(130%); } }
+@media (max-width: 700px) {
+  .shop { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1.25fr) minmax(0, 1fr); }
+  .counter-side { border-left: 0; border-top: 4px solid var(--wood-dark); flex-direction: row; align-items: flex-end; gap: 6px; }
+  .customer { width: 36%; flex: 0 0 auto; }
+  .wish { margin-bottom: 30%; font-size: 1rem; }
+  .wish::after { left: auto; right: -14px; bottom: 16px; border: 10px solid transparent; border-left-color: var(--wood-dark); border-right: 0; transform: none; }
+  .tanks { padding: 10px; gap: 8px; }
+  .tank .tag { font-size: .72rem; padding: 0 5px; }
+}
 @keyframes swipe { 0% { transform: translateX(40px); opacity: 0; } 20% { opacity: 1; } 100% { transform: translateX(-90px); opacity: 0; } }
 @keyframes warm { to { opacity: .7; } }
 @keyframes wobble { 20% { transform: rotate(-9deg); } 45% { transform: rotate(8deg); } 70% { transform: rotate(-4deg); } }
@@ -918,6 +994,10 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
       <svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="24" fill="#f4e8cc" stroke="#a8844f" stroke-width="5"/><path d="M32 14 L38 32 L32 50 L26 32 Z" fill="#e4572a"/><path d="M32 32 L38 32 L32 50 L26 32 Z" fill="#5d625c"/><circle cx="32" cy="32" r="4" fill="#3b2413"/></svg>
       Missions
 </button>
+    <button class="place" data-place="shop" id="place-shop">
+      <svg viewBox="0 0 64 64"><rect x="10" y="26" width="44" height="30" rx="3" fill="#f4e8cc" stroke="#3b2413" stroke-width="3"/><path d="M6 26 L12 12 H52 L58 26 Z" fill="#e4572a"/><path d="M18 12 L16 26 M30 12 V26 M42 12 L44 26" stroke="#f4e8cc" stroke-width="4"/><rect x="16" y="34" width="14" height="14" rx="2" fill="#7fb0dc"/><circle cx="24" cy="42" r="4" fill="#5fb37c"/><rect x="36" y="34" width="12" height="22" fill="#a8844f"/></svg>
+      Pet Shop
+</button>
   </nav>
   </section>
 
@@ -930,6 +1010,17 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
         <path d="M36 62 V30 q0 -6 5 -6 q5 0 5 6 v14 l12 2 q6 1 5 8 l-3 12 q-1 4 -5 4 H44 Z" fill="#f4e8cc" stroke="#3b2413" stroke-width="2.5" stroke-linejoin="round"/>
         <path d="M8 20 h22 M8 20 l8 -6 M8 20 l8 6" stroke="#f4e8cc" stroke-width="4" fill="none" stroke-linecap="round"/>
       </svg>
+    </div>
+  </section>
+
+  <section class="view" id="view-shop" hidden>
+    <div class="shop">
+      <div class="awning"><span>ROY'S PET SHOP</span></div>
+      <div class="tanks" id="tanks"></div>
+      <div class="counter-side" id="counter-side">
+        <div class="wish" id="wish" hidden></div>
+        <button class="customer" id="customer" aria-label="Customer"></button>
+      </div>
     </div>
   </section>
 
@@ -1440,6 +1531,7 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
     if (btn.dataset.place === "build") { openMap(); return; }
     if (btn.dataset.place === "care") { openMap(true); return; }
     if (btn.dataset.place === "missions" || btn.dataset.place === "book") { openBook(); return; }
+    if (btn.dataset.place === "shop") { openShop(); return; }
     clunk();
     btn.classList.remove("wiggle"); void btn.offsetWidth; btn.classList.add("wiggle");
     say(placeLines[btn.dataset.place]);
@@ -1462,6 +1554,7 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
     $("place-build").classList.toggle("next", !!state.found.hatch && !state.found.map);
     $("place-care").classList.toggle("next", !!state.found.map && !state.found.chef);
     $("place-missions").classList.remove("next");
+    $("place-shop").classList.toggle("next", !!state.found.bookOpened && !state.found.sales);
   }
   updateBook();
 
@@ -1481,7 +1574,7 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
     else say("This is the Egg Lab! Something is inside this egg. Tap it to help it hatch!");
   }
   homeBtn.addEventListener("click", function () {
-    viewLab.hidden = true; viewMap.hidden = true; viewMission.hidden = true; viewBook.hidden = true; foundBox.hidden = true; viewPark.hidden = false; homeBtn.hidden = true;
+    viewLab.hidden = true; viewMap.hidden = true; viewMission.hidden = true; viewBook.hidden = true; foundBox.hidden = true; viewShop.hidden = true; shopOpen = false; viewPark.hidden = false; homeBtn.hidden = true;
     say("Welcome back to the park gate! Where shall we go?");
   });
 
@@ -2474,6 +2567,147 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
     say(t.name + " is in cage " + (idx + 1) + "! Tap the cage to say hello.");
   });
   $("again-btn").addEventListener("click", function () { openBook(); });
+
+  // ---------- Pet Shop: people come in and buy baby pet dinosaurs (Roy's idea) ----------
+  var viewShop = $("view-shop"), tanksEl = $("tanks"), wishEl = $("wish"), customerEl = $("customer");
+  var PETS = {
+    blue: ["blue", "meat", "fast"], trike: ["horns", "leaves"], stego: ["plates", "leaves"],
+    compy: ["tiny", "meat"], ankylo: ["armor", "leaves"], para: ["crest", "leaves"],
+    brachio: ["longneck", "leaves"], pachy: ["bumpyhead", "leaves"], dilo: ["crest", "meat"],
+    galli: ["fast", "leaves"]
+  };
+  var WISH = {
+    blue: ["I want a blue pet!", '<circle cx="26" cy="26" r="20" fill="#4a86c8" stroke="#24456f" stroke-width="3"/>'],
+    meat: ["I want a pet that eats meat!", '<path d="M18 36 Q6 24 18 12 Q34 4 42 18 Q46 34 30 36 Z" fill="#c0452c"/><path d="M20 34 L10 44" stroke="#f4e8cc" stroke-width="6" stroke-linecap="round"/><circle cx="8" cy="45" r="4" fill="#f4e8cc"/>'],
+    leaves: ["I want a pet that eats leaves!", '<path d="M26 48 Q24 24 8 10 Q32 8 36 28 Q38 38 26 48 Z" fill="#5fb37c"/><path d="M28 48 Q34 28 46 22 Q48 42 28 48 Z" fill="#3f7a4c"/>'],
+    horns: ["I want a pet with three horns!", '<circle cx="26" cy="32" r="16" fill="#c27a45"/><path d="M14 22 L8 4 L20 20 Z M24 18 L26 2 L30 18 Z M34 22 L44 6 L38 24 Z" fill="#f4e8cc" stroke="#3b2413" stroke-width="1.5"/>'],
+    plates: ["I want a pet with big plates on its back!", '<path d="M4 44 H48" stroke="#8a9a4a" stroke-width="8" stroke-linecap="round"/><path d="M6 40 L12 22 L18 40 Z M18 40 L26 10 L34 40 Z M32 40 L40 22 L46 40 Z" fill="#e0763a" stroke="#a84a24" stroke-width="2"/>'],
+    tiny: ["I want a teeny tiny pet!", '<circle cx="22" cy="22" r="14" fill="none" stroke="#3b2413" stroke-width="5"/><path d="M32 32 L46 46" stroke="#3b2413" stroke-width="7" stroke-linecap="round"/><circle cx="22" cy="22" r="4" fill="#d9a441"/>'],
+    armor: ["I want a pet with armor and a tail club!", '<path d="M6 40 Q26 8 46 40 Z" fill="#9a7a52"/><circle cx="16" cy="32" r="4" fill="#c9a36a"/><circle cx="26" cy="24" r="4" fill="#c9a36a"/><circle cx="36" cy="32" r="4" fill="#c9a36a"/><circle cx="6" cy="42" r="6" fill="#7a5c3a"/>'],
+    crest: ["I want a pet with a crest on its head!", '<ellipse cx="30" cy="36" rx="16" ry="11" fill="#6aa86a"/><path d="M30 28 Q14 6 4 8 Q14 20 24 34 Z" fill="#e4572a"/>'],
+    longneck: ["I want a pet with a long, long neck!", '<path d="M8 46 Q10 34 22 34 L28 34 Q32 20 38 6 L46 8 Q40 22 38 40 Q36 48 26 48 Z" fill="#8fa9bd"/>'],
+    bumpyhead: ["I want a pet with a thick, bumpy head!", '<ellipse cx="26" cy="30" rx="20" ry="16" fill="#c49870"/><circle cx="12" cy="26" r="3" fill="#84593c"/><circle cx="18" cy="18" r="3" fill="#84593c"/><circle cx="26" cy="15" r="3" fill="#84593c"/><circle cx="34" cy="18" r="3" fill="#84593c"/><circle cx="40" cy="26" r="3" fill="#84593c"/>'],
+    fast: ["I want a super fast pet!", '<path d="M28 4 L10 30 H24 L20 48 L42 20 H28 Z" fill="#f2a93b" stroke="#3b2413" stroke-width="2" stroke-linejoin="round"/>']
+  };
+  var SKIN = ["#f1c27d", "#8d5524", "#e0ac69", "#c68642", "#ffdbac"];
+  var HAIR = ["#3b2413", "#1d1d1b", "#c9793f", "#f2d24b", "#8a8f86"];
+  var SHIRT = ["#e4572a", "#4a86c8", "#5fb37c", "#f2a93b", "#9b6fc4", "#e08ab0"];
+  function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+  function personSvg(p, happy) {
+    var hair = p.style === 0 ? '<path d="M32 46 Q34 18 60 18 Q86 18 88 46 Q78 32 60 32 Q42 32 32 46 Z" fill="' + p.hair + '"/>'
+      : p.style === 1 ? '<path d="M30 50 Q30 16 60 16 Q90 16 90 50 L92 92 L80 92 L78 46 Q60 34 42 46 L40 92 L28 92 Z" fill="' + p.hair + '"/>'
+      : p.style === 2 ? '<circle cx="60" cy="14" r="12" fill="' + p.hair + '"/><path d="M32 46 Q34 22 60 22 Q86 22 88 46 Q76 34 60 34 Q44 34 32 46 Z" fill="' + p.hair + '"/>'
+      : '<path d="M26 40 Q60 34 94 40 L90 46 Q60 40 30 46 Z" fill="#a8844f"/><path d="M38 40 Q40 14 60 14 Q80 14 82 40 Z" fill="#c29c62"/>';
+    return '<svg viewBox="0 0 120 220">' +
+      '<rect x="40" y="160" width="16" height="50" rx="7" fill="#3b4a6b"/><rect x="64" y="160" width="16" height="50" rx="7" fill="#3b4a6b"/>' +
+      '<ellipse cx="48" cy="212" rx="14" ry="6" fill="#3b2413"/><ellipse cx="72" cy="212" rx="14" ry="6" fill="#3b2413"/>' +
+      '<path d="M30 100 Q60 86 90 100 L94 170 H26 Z" fill="' + p.shirt + '"/>' +
+      '<path d="M30 104 L14 150" stroke="' + p.shirt + '" stroke-width="14" stroke-linecap="round"/><path d="M90 104 L106 150" stroke="' + p.shirt + '" stroke-width="14" stroke-linecap="round"/>' +
+      '<circle cx="14" cy="152" r="8" fill="' + p.skin + '"/><circle cx="106" cy="152" r="8" fill="' + p.skin + '"/>' +
+      '<rect x="52" y="76" width="16" height="16" fill="' + p.skin + '"/>' +
+      '<circle cx="60" cy="54" r="28" fill="' + p.skin + '"/>' + hair +
+      '<circle cx="50" cy="56" r="3.5" fill="#1d1d1b"/><circle cx="70" cy="56" r="3.5" fill="#1d1d1b"/>' +
+      '<circle cx="44" cy="66" r="5" fill="#f08aa0" opacity=".5"/><circle cx="76" cy="66" r="5" fill="#f08aa0" opacity=".5"/>' +
+      (happy ? '<path d="M48 66 Q60 80 72 66 Z" fill="#a84a24"/>' : '<path d="M50 68 Q60 74 70 68" stroke="#1d1d1b" stroke-width="3" fill="none" stroke-linecap="round"/>') +
+      '</svg>';
+  }
+  var shopOpen = false, shopPets = [], person = null, wishTag = null, serving = false;
+  var SHOP_BADGE =
+    '<circle cx="55" cy="55" r="50" fill="#e4572a" stroke="#3b2413" stroke-width="5"/><circle cx="55" cy="55" r="38" fill="#f4e8cc"/>' +
+    '<path d="M24 46 L30 32 H80 L86 46 Z" fill="#e4572a"/><rect x="28" y="46" width="54" height="34" fill="#fff" stroke="#3b2413" stroke-width="3"/><circle cx="55" cy="64" r="9" fill="#5fb37c"/>';
+  var SHOPSTAR_BADGE =
+    '<circle cx="55" cy="55" r="50" fill="#f2a93b" stroke="#3b2413" stroke-width="5"/><circle cx="55" cy="55" r="38" fill="#e4572a"/>' +
+    '<path d="M55 24 l8 18 20 2 -15 13 5 20 -18 -11 -18 11 5 -20 -15 -13 20 -2 z" fill="#f4e8cc"/><text x="55" y="66" text-anchor="middle" font-family="Baloo 2, sans-serif" font-weight="800" font-size="16" fill="#e4572a">10</text>';
+  function petIds() { return Object.keys(PETS).filter(function (id) { return dinoById(id); }); }
+  function newPet(exclude) {
+    var pool = petIds().filter(function (id) { return exclude.indexOf(id) === -1; });
+    return pick(pool.length ? pool : petIds());
+  }
+  function drawTank(i, cls) {
+    var id = shopPets[i], d = dinoById(id);
+    var t = tanksEl.children[i];
+    t.className = "tank" + (cls ? " " + cls : "");
+    t.innerHTML = '<svg class="pet"' + d.svg.slice(4) + '<span class="tag">' + shortName(d) + '</span>';
+    t.setAttribute("aria-label", "Baby " + d.name);
+  }
+  function openShop() {
+    viewPark.hidden = true; viewShop.hidden = false; homeBtn.hidden = false;
+    shopOpen = true; serving = false;
+    shopPets = [];
+    for (var i = 0; i < 6; i++) shopPets.push(newPet(shopPets));
+    tanksEl.innerHTML = shopPets.map(function () { return '<button class="tank"></button>'; }).join("");
+    shopPets.forEach(function (_, i) { drawTank(i); });
+    chime();
+    say("Welcome to your Pet Shop, Roy! People want baby dinosaurs. Listen to what they want, and tap the right pet!");
+    customerEl.innerHTML = ""; wishEl.hidden = true;
+    setTimeout(nextCustomer, 2600);
+  }
+  function nextCustomer() {
+    if (!shopOpen) return;
+    serving = false;
+    person = { skin: pick(SKIN), hair: pick(HAIR), shirt: pick(SHIRT), style: Math.floor(Math.random() * 4) };
+    var id = pick(shopPets), tags = PETS[id];
+    wishTag = pick(tags);
+    customerEl.innerHTML = personSvg(person, false);
+    customerEl.classList.remove("walkout", "walkin"); void customerEl.offsetWidth; customerEl.classList.add("walkin");
+    tone(880, 0, 0.12, "triangle", 0.2); tone(1320, 0.12, 0.2, "triangle", 0.2);
+    setTimeout(function () {
+      if (!shopOpen) return;
+      wishEl.innerHTML = '<svg viewBox="0 0 52 52">' + WISH[wishTag][1] + '</svg><span>' + WISH[wishTag][0] + '</span>';
+      wishEl.hidden = false;
+      say(WISH[wishTag][0]);
+    }, 900);
+  }
+  customerEl.addEventListener("click", function () { if (wishTag && !serving) say(WISH[wishTag][0]); });
+  tanksEl.addEventListener("click", function (e) {
+    var t = e.target.closest(".tank");
+    if (!t || t.classList.contains("empty")) return;
+    var i = Array.prototype.indexOf.call(tanksEl.children, t), id = shopPets[i], d = dinoById(id);
+    if (!wishTag || serving) {
+      d.sound();
+      t.classList.remove("hop"); void t.offsetWidth; t.classList.add("hop");
+      return;
+    }
+    if (PETS[id].indexOf(wishTag) === -1) {
+      bleh();
+      t.classList.remove("nope"); void t.offsetWidth; t.classList.add("nope");
+      customerEl.classList.remove("shakehead"); void customerEl.offsetWidth; customerEl.classList.add("shakehead");
+      say("Hmm, not that one. " + WISH[wishTag][0]);
+      return;
+    }
+    serving = true;
+    d.sound();
+    var from = t.getBoundingClientRect(), to = customerEl.getBoundingClientRect();
+    var fly = t.querySelector(".pet").cloneNode(true);
+    fly.setAttribute("class", "flying");
+    fly.style.width = "90px"; fly.style.height = "70px";
+    fly.style.left = (from.left + from.width / 2 - 45) + "px"; fly.style.top = (from.top + from.height / 2 - 35) + "px";
+    document.body.appendChild(fly);
+    void fly.getBoundingClientRect();
+    fly.style.transform = "translate(" + (to.left + to.width / 2 - from.left - from.width / 2) + "px," + (to.top + to.height * 0.6 - from.top - from.height / 2) + "px)";
+    t.classList.add("empty");
+    wishEl.hidden = true;
+    setTimeout(function () {
+      fly.remove();
+      if (!shopOpen) return;
+      customerEl.innerHTML = personSvg(person, true).replace("</svg>", '<g transform="translate(26 112) scale(.32)">' + d.svg.replace(/^<svg[^>]*>|<\/svg>$/g, "") + '</g></svg>');
+      fanfare(); hearts();
+      state.found.sales = (state.found.sales || 0) + 1; save(); updateBook();
+      addStar(customerEl);
+      say(pick(["Thank you! I love my baby " + shortName(d) + "!", "Yay! A baby " + shortName(d) + "! Thank you, Roy!", "Wow! My very own pet dinosaur! Thank you!"]));
+      var sales = state.found.sales;
+      if (sales === 1) setTimeout(function () { showBadge("Shopkeeper", "You sold your first pet!", SHOP_BADGE); }, 1200);
+      if (sales === 10) setTimeout(function () { showBadge("Pet Shop Star", "10 happy customers!", SHOPSTAR_BADGE); }, 1200);
+      setTimeout(function () {
+        if (!shopOpen) return;
+        customerEl.classList.remove("walkin"); void customerEl.offsetWidth; customerEl.classList.add("walkout");
+        shopPets[i] = newPet(shopPets);
+        drawTank(i, "restock");
+        boing();
+      }, 2200);
+      setTimeout(nextCustomer, 3300);
+    }, 520);
+  });
 
   var KEEPER_BADGE =
     '<circle cx="55" cy="55" r="50" fill="#e4572a" stroke="#3b2413" stroke-width="5"/>' +
