@@ -37,6 +37,9 @@ Keep Memory.md up to date at all times. Every time we start a new session, read 
 - Choosing the right food is a gentle guessing game that teaches what each dinosaur ate.
 - Roy's fifth idea (spoken): "I want the people to go to the jungle and find all kinds of new species of dinosaurs. And when they find a new species, we put it in the cage. That will be the ranger adventure." This became Ranger Missions.
 - Roy's ideas now connect into one loop: go on a mission, find a new species, it gets a new cage in the park, then feed and wash it every day.
+- Roy's sixth idea (spoken): "In the Dino Book, collect all the missions. Think of at least 10 missions that are described in the Dino Book, and you can go through the book and choose which mission you want to complete and what's good in that mission." This turned the Dino Book into a book of missions.
+- Roy likes choosing for himself: the book lets him pick any mission in any order, and each page shows what he can win.
+- Mystery silhouettes (a dark shadow of the dinosaur until it is found) make Roy curious about who is hiding.
 - Empty cages are a good way to keep Roy's ideas coming: each one has a "?" sign, and Tops asks "Roy, which dinosaur should live here?"
 - Idea: the game itself could listen to Roy too, for example saying a name out loud to name a new dinosaur.
 
@@ -60,7 +63,22 @@ Keep Memory.md up to date at all times. Every time we start a new session, read 
   - Every new day, all dinosaurs are hungry and muddy again (Roy said they need food every day). New badges: Dino Chef (first feed), Bath Time (first wash) and Happy Park (all 20 fed and washed on the same day).
   - Tested at iPad and phone sizes. Preview updated at the same link.
 - 2026-10-03: **Built Ranger Missions, from Roy's idea** (Missions on the park map). Two rangers drive their jeep into the jungle. Six big bushes hide things: Roy taps them to search and finds butterflies, frogs, birds, and dinosaur footprints (which make the right bush wiggle as a hint). One bush hides a new species: it appears big with its name, sound and fact. Roy taps "Take it to the park": the dinosaur goes in a crate, the jeep drives off, Roy gets a star, and a new cage (21, 22, ...) appears in the park, which grows bigger to fit. "Visit its cage" jumps to it on the map; the new dinosaur is hungry and muddy, ready for Dino Care. There are 8 species to find, one per mission: Styracosaurus, Microraptor, Oviraptor, Corythosaurus, Kentrosaurus, Ceratosaurus, Sinosauropteryx and Argentinosaurus. Badges: Species Finder (first find) and Expedition Master (all 8). When all 8 are found, Tops asks Roy to tell Claude about a brand new dinosaur. Tested at iPad and phone sizes, including that new cages stay after reloading. Preview updated at the same link.
-- **Next:** Ask Roy what he wants next. Only the Dino Book is still locked (all of Roy's dinosaurs in one sticker book). Roy can also invent new species for missions, or swap any of Claude's picks.
+- 2026-10-03: **Built the Dino Book, from Roy's idea** (Dino Book or Missions on the park map; both open the book). An open leather book with two pages side by side on the iPad (one page on a phone) and big arrow buttons to turn pages. Each page is one mission: number, place, picture, title, short description, reward ("what's good"), and a big Start! button. Done missions get a green DONE! stamp and a "Play again" button. Tops reads each page out loud when Roy turns to it or taps the picture. 13 missions:
+  1. Spiky Frill Hunt (Jungle): find Styracosaurus
+  2. Four-Wing Flyer (Tall Trees): find Microraptor
+  3. Egg Rescue (Jungle): find 3 lost eggs, Egg Rescuer badge
+  4. Nest Patrol (Rocky Desert): find Oviraptor
+  5. T-Rex Escape! (Jungle): find T-Rex and take him home, Fence Fixer badge
+  6. Swamp Song (Swamp): find Corythosaurus
+  7. Feeding Time (Your Park): feed 5 dinosaurs today, every day
+  8. Spike Valley (Rocky Desert): find Kentrosaurus
+  9. Volcano Horn (Volcano): find Ceratosaurus
+  10. Where is Blue? (Tall Trees): find Blue playing hide and seek, Raptor Friend badge
+  11. Stripy Tail Trail (Jungle): find Sinosauropteryx
+  12. Bath Day (Your Park): wash 3 dinosaurs today, every day
+  13. Giant Footprints (Swamp): find Argentinosaurus
+  - Each mission gives 3 stars the first time. Mystery dinosaurs show as dark shadows until found. Missions happen in different places that look different: jungle bushes, tall trees, swamp reeds, desert rocks and dark volcano rocks. Finishing every mission gives the Mission Master badge. Tested at iPad and phone sizes. Preview updated at the same link.
+- **Next:** Ask Roy what he wants next. All areas of the park are now open. Roy can invent new missions or new species for the Dino Book.
 
 ## Important decisions
 
@@ -83,4 +101,6 @@ Keep Memory.md up to date at all times. Every time we start a new session, read 
 - 2026-10-03: Feeding and washing happen inside each cage's visit card, as Roy said ("in their cages"). Care resets each day using the iPad's date. Picking the wrong food is never a failure: the dinosaur says "Bleh!" and Roy tries again.
 - 2026-10-03: New species found on missions are real dinosaurs that are less famous, so finding them feels like a discovery and teaches something true (for example, Microraptor had feathers on its arms and legs, and Sinosauropteryx had a stripy ginger tail). They are listed in `SPECIES` in `Roy/game/index.html`; more can be added there, including species Roy invents.
 - 2026-10-03: The "people" in Roy's idea are two park rangers in a jeep, drawn in our own style with different skin tones.
+- 2026-10-03: The Dino Book is a book of missions (Roy's idea), not a sticker book as first planned. The Missions button on the park map opens the same book. Missions are listed in `MISSIONS` in `Roy/game/index.html` and can be added there.
+- 2026-10-03: "Feeding Time" and "Bath Day" are daily missions that link to Dino Care, so the book also reminds Roy to look after his dinosaurs every day.
 - 2026-10-03: Missions have no way to fail: every bush shows something fun, and footprints give a hint to the right bush.
