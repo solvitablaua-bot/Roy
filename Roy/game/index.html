@@ -653,18 +653,26 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
 }
 .wish svg { width: 52px; height: 52px; flex: 0 0 auto; }
 .wish::after { content: ""; position: absolute; left: 50%; bottom: -14px; border: 12px solid transparent; border-top-color: var(--wood-dark); border-bottom: 0; transform: translateX(-50%); }
-.customer { width: min(70%, 190px); background: none; border: 0; padding: 0; }
-.customer svg { width: 100%; height: auto; display: block; }
+.customer {
+  flex: 1; min-height: 0; width: 100%;
+  display: flex; justify-content: center; align-items: flex-end;
+  background: none; border: 0; padding: 0;
+}
+.customer svg { height: 100%; width: auto; max-width: 100%; display: block; }
+.customer .walker { transform-box: fill-box; transform-origin: 50% 100%; }
+.customer.walkin .walker { animation: step .3s ease-in-out 3 alternate; }
+.wish b { display: block; color: var(--ember); font-size: .95em; }
 .customer.walkin { animation: walkin .9s ease-out; }
 .customer.walkout { animation: walkout .9s ease-in forwards; }
 .customer.shakehead svg { animation: nope .5s ease; }
 @keyframes walkin { from { transform: translateX(120%); } }
 @keyframes walkout { to { transform: translateX(130%); } }
-@media (max-width: 700px) {
-  .shop { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1.25fr) minmax(0, 1fr); }
-  .counter-side { border-left: 0; border-top: 4px solid var(--wood-dark); flex-direction: row; align-items: flex-end; gap: 6px; }
-  .customer { width: 36%; flex: 0 0 auto; }
-  .wish { margin-bottom: 30%; font-size: 1rem; }
+@keyframes step { to { transform: translateY(-4%) rotate(2deg); } }
+@media (max-width: 700px), (max-aspect-ratio: 1/1) {
+  .shop { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) minmax(0, 1.15fr); }
+  .counter-side { border-left: 0; border-top: 4px solid var(--wood-dark); flex-direction: row; align-items: flex-end; justify-content: center; gap: 10px; padding-top: 10px; }
+  .customer { flex: 0 1 auto; width: auto; height: 100%; }
+  .wish { flex: 0 1 auto; margin-bottom: 28%; font-size: clamp(1rem, 2.6vw, 1.3rem); }
   .wish::after { left: auto; right: -14px; bottom: 16px; border: 10px solid transparent; border-left-color: var(--wood-dark); border-right: 0; transform: none; }
   .tanks { padding: 10px; gap: 8px; }
   .tank .tag { font-size: .72rem; padding: 0 5px; }
@@ -2589,27 +2597,82 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
     bumpyhead: ["I want a pet with a thick, bumpy head!", '<ellipse cx="26" cy="30" rx="20" ry="16" fill="#c49870"/><circle cx="12" cy="26" r="3" fill="#84593c"/><circle cx="18" cy="18" r="3" fill="#84593c"/><circle cx="26" cy="15" r="3" fill="#84593c"/><circle cx="34" cy="18" r="3" fill="#84593c"/><circle cx="40" cy="26" r="3" fill="#84593c"/>'],
     fast: ["I want a super fast pet!", '<path d="M28 4 L10 30 H24 L20 48 L42 20 H28 Z" fill="#f2a93b" stroke="#3b2413" stroke-width="2" stroke-linejoin="round"/>']
   };
-  var SKIN = ["#f1c27d", "#8d5524", "#e0ac69", "#c68642", "#ffdbac"];
-  var HAIR = ["#3b2413", "#1d1d1b", "#c9793f", "#f2d24b", "#8a8f86"];
-  var SHIRT = ["#e4572a", "#4a86c8", "#5fb37c", "#f2a93b", "#9b6fc4", "#e08ab0"];
+  var SKIN = [["#ffdbac", "#e8b98f"], ["#f1c27d", "#d9a35f"], ["#e0ac69", "#c48e4f"], ["#c68642", "#a86d32"], ["#8d5524", "#6e4019"], ["#5c3a1e", "#462a14"]];
+  var HAIR = ["#3b2413", "#1d1d1b", "#c9793f", "#f2d24b", "#7a3b1e", "#8a8f86"];
+  var CLOTHES = ["#e4572a", "#4a86c8", "#5fb37c", "#f2a93b", "#9b6fc4", "#e08ab0", "#3bb0b0"];
+  var PANTS = ["#3b4a6b", "#2e312d", "#6b5a3a", "#5a7ab0"];
+  var NAMES = ["Mia", "Leo", "Ava", "Sam", "Zoe", "Max", "Lily", "Omar", "Nina", "Ben", "Aisha", "Kai", "Ruby", "Theo"];
   function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
-  function personSvg(p, happy) {
-    var hair = p.style === 0 ? '<path d="M32 46 Q34 18 60 18 Q86 18 88 46 Q78 32 60 32 Q42 32 32 46 Z" fill="' + p.hair + '"/>'
-      : p.style === 1 ? '<path d="M30 50 Q30 16 60 16 Q90 16 90 50 L92 92 L80 92 L78 46 Q60 34 42 46 L40 92 L28 92 Z" fill="' + p.hair + '"/>'
-      : p.style === 2 ? '<circle cx="60" cy="14" r="12" fill="' + p.hair + '"/><path d="M32 46 Q34 22 60 22 Q86 22 88 46 Q76 34 60 34 Q44 34 32 46 Z" fill="' + p.hair + '"/>'
-      : '<path d="M26 40 Q60 34 94 40 L90 46 Q60 40 30 46 Z" fill="#a8844f"/><path d="M38 40 Q40 14 60 14 Q80 14 82 40 Z" fill="#c29c62"/>';
-    return '<svg viewBox="0 0 120 220">' +
-      '<rect x="40" y="160" width="16" height="50" rx="7" fill="#3b4a6b"/><rect x="64" y="160" width="16" height="50" rx="7" fill="#3b4a6b"/>' +
-      '<ellipse cx="48" cy="212" rx="14" ry="6" fill="#3b2413"/><ellipse cx="72" cy="212" rx="14" ry="6" fill="#3b2413"/>' +
-      '<path d="M30 100 Q60 86 90 100 L94 170 H26 Z" fill="' + p.shirt + '"/>' +
-      '<path d="M30 104 L14 150" stroke="' + p.shirt + '" stroke-width="14" stroke-linecap="round"/><path d="M90 104 L106 150" stroke="' + p.shirt + '" stroke-width="14" stroke-linecap="round"/>' +
-      '<circle cx="14" cy="152" r="8" fill="' + p.skin + '"/><circle cx="106" cy="152" r="8" fill="' + p.skin + '"/>' +
-      '<rect x="52" y="76" width="16" height="16" fill="' + p.skin + '"/>' +
-      '<circle cx="60" cy="54" r="28" fill="' + p.skin + '"/>' + hair +
-      '<circle cx="50" cy="56" r="3.5" fill="#1d1d1b"/><circle cx="70" cy="56" r="3.5" fill="#1d1d1b"/>' +
-      '<circle cx="44" cy="66" r="5" fill="#f08aa0" opacity=".5"/><circle cx="76" cy="66" r="5" fill="#f08aa0" opacity=".5"/>' +
-      (happy ? '<path d="M48 66 Q60 80 72 66 Z" fill="#a84a24"/>' : '<path d="M50 68 Q60 74 70 68" stroke="#1d1d1b" stroke-width="3" fill="none" stroke-linecap="round"/>') +
-      '</svg>';
+  function newPerson() {
+    var kind = pick(["kid", "kid", "kid", "grownup", "grownup", "grandma", "grandpa"]);
+    var sk = pick(SKIN);
+    var p = {
+      kind: kind, skin: sk[0], shade: sk[1],
+      hair: kind === "grandma" || kind === "grandpa" ? pick(["#d8d8d0", "#b8b8b0"]) : pick(HAIR),
+      top: pick(CLOTHES), pants: pick(PANTS),
+      outfit: pick(["tee", "dress", "overalls", "hoodie", "ranger"]),
+      style: kind === "grandpa" ? "beard" : kind === "grandma" ? "bun" : pick(["short", "long", "bun", "curly", "pony", "cap"]),
+      glasses: kind === "grandma" || kind === "grandpa" || Math.random() < 0.2,
+      name: kind === "grandma" ? "Grandma " + pick(["Rose", "May", "Lin"]) : kind === "grandpa" ? "Grandpa " + pick(["Joe", "Ali", "Tom"]) : pick(NAMES)
+    };
+    return p;
+  }
+  function personSvg(p, happy, petSvg) {
+    var S = p.skin, H = p.hair, T = p.top;
+    // hair behind the head
+    var back = p.style === "long" ? '<path d="M36 58 Q34 18 70 18 Q106 18 104 58 L110 128 Q70 136 30 128 Z" fill="' + H + '"/>'
+      : p.style === "pony" ? '<ellipse cx="104" cy="72" rx="11" ry="26" fill="' + H + '" transform="rotate(-14 104 72)"/>'
+      : p.outfit === "hoodie" ? '<ellipse cx="70" cy="92" rx="40" ry="18" fill="' + T + '"/>' : '';
+    // hair on top
+    var top = p.style === "short" || p.style === "pony" ? '<path d="M38 56 Q38 20 70 20 Q102 20 102 56 Q94 34 70 36 Q46 34 38 56 Z" fill="' + H + '"/>'
+      : p.style === "long" ? '<path d="M40 52 Q44 24 70 24 Q96 24 100 52 Q86 36 70 40 Q54 36 40 52 Z" fill="' + H + '"/>'
+      : p.style === "bun" ? '<circle cx="70" cy="18" r="14" fill="' + H + '"/><path d="M38 54 Q40 24 70 24 Q100 24 102 54 Q90 36 70 38 Q50 36 38 54 Z" fill="' + H + '"/>'
+      : p.style === "curly" ? [[44, 44], [52, 30], [64, 24], [78, 24], [90, 30], [98, 44], [40, 58], [100, 58]].map(function (c) { return '<circle cx="' + c[0] + '" cy="' + c[1] + '" r="11" fill="' + H + '"/>'; }).join("")
+      : p.style === "cap" ? '<path d="M38 50 Q40 20 70 20 Q100 20 102 50 Z" fill="' + T + '"/><ellipse cx="104" cy="49" rx="22" ry="5" fill="' + T + '"/><circle cx="70" cy="21" r="3" fill="#fff"/>'
+      : p.style === "beard" ? '<path d="M38 60 Q38 44 44 40 L46 60 Z M102 60 Q102 44 96 40 L94 60 Z" fill="' + H + '"/>' : '';
+    var beard = p.style === "beard" ? '<path d="M42 64 Q46 100 70 100 Q94 100 98 64 Q90 82 70 82 Q50 82 42 64 Z" fill="' + H + '"/>' : '';
+    var hat = p.outfit === "ranger" && p.style !== "cap" ? '<ellipse cx="70" cy="36" rx="42" ry="7" fill="#a8844f"/><path d="M48 36 Q50 12 70 12 Q90 12 92 36 Z" fill="#c29c62"/><rect x="48" y="30" width="44" height="5" fill="#6e4524"/>' : '';
+    // clothes
+    var legs, body;
+    if (p.outfit === "dress") {
+      legs = '<rect x="52" y="196" width="13" height="46" rx="6" fill="' + S + '"/><rect x="75" y="196" width="13" height="46" rx="6" fill="' + S + '"/>';
+      body = '<path d="M38 102 Q70 90 102 102 L104 150 L118 206 H22 L36 150 Z" fill="' + T + '"/><path d="M36 150 H104" stroke="rgba(255,255,255,.5)" stroke-width="4"/>';
+    } else {
+      var pants = p.outfit === "overalls" ? "#4a6fa8" : p.outfit === "ranger" ? "#6b5a3a" : p.pants;
+      legs = '<rect x="46" y="170" width="22" height="72" rx="9" fill="' + pants + '"/><rect x="72" y="170" width="22" height="72" rx="9" fill="' + pants + '"/>';
+      var shirt = p.outfit === "ranger" ? "#c9b07a" : T;
+      body = '<path d="M36 102 Q70 90 104 102 L108 180 H32 Z" fill="' + shirt + '"/>';
+      if (p.outfit === "overalls") body += '<rect x="48" y="122" width="44" height="58" rx="4" fill="#4a6fa8"/><path d="M50 124 L44 104 M90 124 L96 104" stroke="#4a6fa8" stroke-width="6"/><circle cx="54" cy="128" r="3" fill="#f2d24b"/><circle cx="86" cy="128" r="3" fill="#f2d24b"/>';
+      if (p.outfit === "hoodie") body += '<rect x="50" y="146" width="40" height="18" rx="6" fill="rgba(0,0,0,.15)"/><path d="M62 104 L60 124 M78 104 L80 124" stroke="#fff" stroke-width="3" stroke-linecap="round"/>';
+      if (p.outfit === "ranger") body += '<path d="M54 118 l3 6 7 1 -5 5 1 7 -6 -3 -6 3 1 -7 -5 -5 7 -1 z" fill="#f2a93b"/><rect x="80" y="116" width="16" height="12" rx="2" fill="#a8844f"/><rect x="32" y="166" width="76" height="8" fill="#6e4524"/>';
+      if (p.outfit === "tee") body += '<path d="M56 102 Q70 112 84 102" stroke="rgba(0,0,0,.18)" stroke-width="4" fill="none"/>';
+    }
+    var sleeve = p.outfit === "ranger" ? "#c9b07a" : p.outfit === "overalls" ? T : p.outfit === "dress" ? T : T;
+    var arms = happy
+      ? '<path d="M38 106 Q22 128 44 150" stroke="' + sleeve + '" stroke-width="16" fill="none" stroke-linecap="round"/><path d="M102 106 Q118 128 96 150" stroke="' + sleeve + '" stroke-width="16" fill="none" stroke-linecap="round"/>'
+      : '<path d="M38 106 L26 150" stroke="' + sleeve + '" stroke-width="16" stroke-linecap="round"/><path d="M102 106 L114 150" stroke="' + sleeve + '" stroke-width="16" stroke-linecap="round"/>' +
+        '<path d="M26 150 L22 168" stroke="' + S + '" stroke-width="11" stroke-linecap="round"/><path d="M114 150 L118 168" stroke="' + S + '" stroke-width="11" stroke-linecap="round"/>' +
+        '<circle cx="22" cy="172" r="8" fill="' + S + '"/><circle cx="118" cy="172" r="8" fill="' + S + '"/>';
+    var hands = happy ? '<circle cx="48" cy="150" r="8" fill="' + S + '"/><circle cx="92" cy="150" r="8" fill="' + S + '"/>' : '';
+    var pet = happy && petSvg ? '<g transform="translate(34 104) scale(.36)">' + petSvg.replace(/^<svg[^>]*>|<\/svg>$/g, "") + '</g>' : '';
+    var face =
+      '<circle cx="40" cy="62" r="8" fill="' + S + '"/><circle cx="100" cy="62" r="8" fill="' + S + '"/><circle cx="40" cy="62" r="4" fill="' + p.shade + '"/><circle cx="100" cy="62" r="4" fill="' + p.shade + '"/>' +
+      '<ellipse cx="70" cy="58" rx="31" ry="32" fill="' + S + '"/>' +
+      top + beard +
+      '<ellipse cx="58" cy="58" rx="6" ry="7" fill="#fff"/><ellipse cx="82" cy="58" rx="6" ry="7" fill="#fff"/>' +
+      '<circle cx="59" cy="' + (happy ? 57 : 59) + '" r="4" fill="#3b2413"/><circle cx="83" cy="' + (happy ? 57 : 59) + '" r="4" fill="#3b2413"/>' +
+      '<circle cx="60.5" cy="' + (happy ? 55.5 : 57.5) + '" r="1.5" fill="#fff"/><circle cx="84.5" cy="' + (happy ? 55.5 : 57.5) + '" r="1.5" fill="#fff"/>' +
+      '<path d="M50 ' + (happy ? 44 : 47) + ' Q58 ' + (happy ? 39 : 44) + ' 65 46 M75 46 Q82 ' + (happy ? 39 : 44) + ' 90 ' + (happy ? 44 : 47) + '" stroke="' + (p.style === "beard" || p.kind === "grandma" ? "#8a8f86" : H) + '" stroke-width="3.5" fill="none" stroke-linecap="round"/>' +
+      '<path d="M70 62 Q66 72 70 74 Q73 75 75 73" stroke="' + p.shade + '" stroke-width="3" fill="none" stroke-linecap="round"/>' +
+      '<ellipse cx="50" cy="72" rx="6" ry="4" fill="#f08aa0" opacity=".45"/><ellipse cx="90" cy="72" rx="6" ry="4" fill="#f08aa0" opacity=".45"/>' +
+      (happy ? '<path d="M56 78 Q70 96 84 78 Z" fill="#7a2a1a"/><path d="M62 87 Q70 92 78 87 Q74 83 70 84 Q66 83 62 87 Z" fill="#f08aa0"/><path d="M57 79 H83" stroke="#fff" stroke-width="3"/>'
+        : '<path d="M60 80 Q70 87 80 80" stroke="#7a2a1a" stroke-width="3.5" fill="none" stroke-linecap="round"/>') +
+      (p.glasses ? '<circle cx="58" cy="58" r="10" fill="none" stroke="#1d1d1b" stroke-width="3"/><circle cx="82" cy="58" r="10" fill="none" stroke="#1d1d1b" stroke-width="3"/><path d="M68 58 H72 M48 56 L40 54 M92 56 L100 54" stroke="#1d1d1b" stroke-width="3"/>' : '') +
+      hat;
+    var shoes = '<ellipse cx="55" cy="244" rx="16" ry="8" fill="#3b2413"/><ellipse cx="85" cy="244" rx="16" ry="8" fill="#3b2413"/>';
+    var all = back + legs + shoes + arms + body + hands + pet + '<rect x="62" y="86" width="16" height="16" fill="' + S + '"/>' + face;
+    var scale = p.kind === "kid" ? 0.8 : 1;
+    return '<svg viewBox="0 0 140 256"><g class="walker"><g transform="translate(70 252) scale(' + scale + ') translate(-70 -252)">' + all + '</g></g></svg>';
   }
   var shopOpen = false, shopPets = [], person = null, wishTag = null, serving = false;
   var SHOP_BADGE =
@@ -2645,7 +2708,7 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
   function nextCustomer() {
     if (!shopOpen) return;
     serving = false;
-    person = { skin: pick(SKIN), hair: pick(HAIR), shirt: pick(SHIRT), style: Math.floor(Math.random() * 4) };
+    person = newPerson();
     var id = pick(shopPets), tags = PETS[id];
     wishTag = pick(tags);
     customerEl.innerHTML = personSvg(person, false);
@@ -2653,9 +2716,9 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
     tone(880, 0, 0.12, "triangle", 0.2); tone(1320, 0.12, 0.2, "triangle", 0.2);
     setTimeout(function () {
       if (!shopOpen) return;
-      wishEl.innerHTML = '<svg viewBox="0 0 52 52">' + WISH[wishTag][1] + '</svg><span>' + WISH[wishTag][0] + '</span>';
+      wishEl.innerHTML = '<svg viewBox="0 0 52 52">' + WISH[wishTag][1] + '</svg><span><b>' + person.name + '</b>' + WISH[wishTag][0] + '</span>';
       wishEl.hidden = false;
-      say(WISH[wishTag][0]);
+      say("Hi! I'm " + person.name + ". " + WISH[wishTag][0]);
     }, 900);
   }
   customerEl.addEventListener("click", function () { if (wishTag && !serving) say(WISH[wishTag][0]); });
@@ -2690,11 +2753,11 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
     setTimeout(function () {
       fly.remove();
       if (!shopOpen) return;
-      customerEl.innerHTML = personSvg(person, true).replace("</svg>", '<g transform="translate(26 112) scale(.32)">' + d.svg.replace(/^<svg[^>]*>|<\/svg>$/g, "") + '</g></svg>');
+      customerEl.innerHTML = personSvg(person, true, d.svg);
       fanfare(); hearts();
       state.found.sales = (state.found.sales || 0) + 1; save(); updateBook();
       addStar(customerEl);
-      say(pick(["Thank you! I love my baby " + shortName(d) + "!", "Yay! A baby " + shortName(d) + "! Thank you, Roy!", "Wow! My very own pet dinosaur! Thank you!"]));
+      say(person.name + " says: " + pick(["Thank you! I love my baby " + shortName(d) + "!", "Yay! A baby " + shortName(d) + "! Thank you, Roy!", "Wow! My very own pet dinosaur! Thank you!"]));
       var sales = state.found.sales;
       if (sales === 1) setTimeout(function () { showBadge("Shopkeeper", "You sold your first pet!", SHOP_BADGE); }, 1200);
       if (sales === 10) setTimeout(function () { showBadge("Pet Shop Star", "10 happy customers!", SHOPSTAR_BADGE); }, 1200);
