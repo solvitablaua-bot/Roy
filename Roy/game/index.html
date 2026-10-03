@@ -623,10 +623,10 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
   background: linear-gradient(160deg, rgba(207, 230, 239, .7), rgba(127, 176, 220, .35));
   border: 4px solid #5d625c; border-radius: 12px;
   box-shadow: inset 0 -18px 0 #d9b77a;
-  display: grid; place-items: end center; padding: 6px 6px 18px;
+  cursor: pointer;
 }
 .tank::after { content: ""; position: absolute; top: 8px; left: 10px; width: 14%; height: 40%; border-radius: 10px; background: rgba(255, 255, 255, .45); pointer-events: none; }
-.tank .pet { width: 82%; max-height: 100%; display: block; overflow: visible; }
+.tank .pet { position: absolute; left: 8%; top: 8%; width: 84%; height: 72%; display: block; overflow: visible; }
 .tank.empty .pet { visibility: hidden; }
 .tank.hop .pet { animation: hop .55s cubic-bezier(.3, 1.4, .5, 1); }
 .tank.nope .pet { animation: nope .5s ease; }
@@ -644,7 +644,7 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
   padding: 8px 8px 0;
 }
 .wish {
-  position: relative; z-index: 2;
+  position: relative; z-index: 2; flex: 0 0 auto;
   background: #fff; border: 3px solid var(--wood-dark); border-radius: 18px;
   padding: 8px 12px; margin-bottom: 8px;
   display: flex; align-items: center; gap: 8px;
@@ -654,11 +654,11 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
 .wish svg { width: 52px; height: 52px; flex: 0 0 auto; }
 .wish::after { content: ""; position: absolute; left: 50%; bottom: -14px; border: 12px solid transparent; border-top-color: var(--wood-dark); border-bottom: 0; transform: translateX(-50%); }
 .customer {
-  flex: 1; min-height: 0; width: 100%;
-  display: flex; justify-content: center; align-items: flex-end;
-  background: none; border: 0; padding: 0;
+  position: relative;
+  flex: 1 1 0; min-height: 0; width: 100%;
+  cursor: pointer;
 }
-.customer svg { height: 100%; width: auto; max-width: 100%; display: block; }
+.customer svg { position: absolute; left: 0; top: 0; width: 100%; height: 100%; display: block; }
 .customer .walker { transform-box: fill-box; transform-origin: 50% 100%; }
 .customer.walkin .walker { animation: step .3s ease-in-out 3 alternate; }
 .wish b { display: block; color: var(--ember); font-size: .95em; }
@@ -671,8 +671,9 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
 @media (max-width: 700px), (max-aspect-ratio: 1/1) {
   .shop { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) minmax(0, 1.15fr); }
   .counter-side { border-left: 0; border-top: 4px solid var(--wood-dark); flex-direction: row; align-items: flex-end; justify-content: center; gap: 10px; padding-top: 10px; }
-  .customer { flex: 0 1 auto; width: auto; height: 100%; }
-  .wish { flex: 0 1 auto; margin-bottom: 28%; font-size: clamp(1rem, 2.6vw, 1.3rem); }
+  .counter-side { align-items: stretch; }
+  .customer { flex: 0 0 42%; width: 42%; height: 100%; }
+  .wish { flex: 1 1 0; min-width: 0; align-self: center; margin-bottom: 0; font-size: clamp(1rem, 2.6vw, 1.3rem); }
   .wish::after { left: auto; right: -14px; bottom: 16px; border: 10px solid transparent; border-left-color: var(--wood-dark); border-right: 0; transform: none; }
   .tanks { padding: 10px; gap: 8px; }
   .tank .tag { font-size: .72rem; padding: 0 5px; }
@@ -1027,7 +1028,7 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
       <div class="tanks" id="tanks"></div>
       <div class="counter-side" id="counter-side">
         <div class="wish" id="wish" hidden></div>
-        <button class="customer" id="customer" aria-label="Customer"></button>
+        <div class="customer" id="customer" role="button" tabindex="0" aria-label="Customer"></div>
       </div>
     </div>
   </section>
@@ -2672,7 +2673,7 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
     var shoes = '<ellipse cx="55" cy="244" rx="16" ry="8" fill="#3b2413"/><ellipse cx="85" cy="244" rx="16" ry="8" fill="#3b2413"/>';
     var all = back + legs + shoes + arms + body + hands + pet + '<rect x="62" y="86" width="16" height="16" fill="' + S + '"/>' + face;
     var scale = p.kind === "kid" ? 0.8 : 1;
-    return '<svg viewBox="0 0 140 256"><g class="walker"><g transform="translate(70 252) scale(' + scale + ') translate(-70 -252)">' + all + '</g></g></svg>';
+    return '<svg viewBox="0 0 140 256" preserveAspectRatio="xMidYMax meet"><g class="walker"><g transform="translate(70 252) scale(' + scale + ') translate(-70 -252)">' + all + '</g></g></svg>';
   }
   var shopOpen = false, shopPets = [], person = null, wishTag = null, serving = false;
   var SHOP_BADGE =
@@ -2690,7 +2691,7 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
     var id = shopPets[i], d = dinoById(id);
     var t = tanksEl.children[i];
     t.className = "tank" + (cls ? " " + cls : "");
-    t.innerHTML = '<svg class="pet"' + d.svg.slice(4) + '<span class="tag">' + shortName(d) + '</span>';
+    t.innerHTML = '<svg class="pet" preserveAspectRatio="xMidYMax meet"' + d.svg.slice(4) + '<span class="tag">' + shortName(d) + '</span>';
     t.setAttribute("aria-label", "Baby " + d.name);
   }
   function openShop() {
@@ -2698,7 +2699,7 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
     shopOpen = true; serving = false;
     shopPets = [];
     for (var i = 0; i < 6; i++) shopPets.push(newPet(shopPets));
-    tanksEl.innerHTML = shopPets.map(function () { return '<button class="tank"></button>'; }).join("");
+    tanksEl.innerHTML = shopPets.map(function () { return '<div class="tank" role="button" tabindex="0"></div>'; }).join("");
     shopPets.forEach(function (_, i) { drawTank(i); });
     chime();
     say("Welcome to your Pet Shop, Roy! People want baby dinosaurs. Listen to what they want, and tap the right pet!");
