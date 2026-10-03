@@ -32,6 +32,9 @@ Keep Memory.md up to date at all times. Every time we start a new session, read 
 - Roy thinks about the whole world of the game, not just the dinosaurs. His ideas are about journeys and places.
 - Roy's third idea (spoken, not finished yet, he paused): "Now we're building the park and in the park there's gonna be 20 cages with dinosaurs. The cages are gonna be big and far away from each other." Then he added: "It's gonna be Triceratops, Spinosaurus, and Dilophosaurus." So the first 7 are Blue the raptor, T-Rex, Brachiosaurus, Compsognathus, Triceratops, Spinosaurus and Dilophosaurus. Then Roy asked: "Can AI find just some other dinosaurs and put them in the rest?" So Claude picked the other 13.
 - Roy is happy to let Claude choose when he runs out of ideas. Claude picked well-known dinosaurs that look different from each other, so each cage is easy to tell apart.
+- Roy's fourth idea (spoken): "Dilophosaurus needs meat every day. Brachiosaurus needs to be fed leaves every day. Ankylosaurus, figure out what kind of food he wants to eat. T-Rex needs meat every day. And the dinosaurs need to be washed, scrubbed in a bath in their cages so they can be clean." This became Dino Care.
+- A daily routine (feed and wash every day) gives Roy a reason to come back each day, like having real pets.
+- Choosing the right food is a gentle guessing game that teaches what each dinosaur ate.
 - Empty cages are a good way to keep Roy's ideas coming: each one has a "?" sign, and Tops asks "Roy, which dinosaur should live here?"
 - Idea: the game itself could listen to Roy too, for example saying a name out loud to name a new dinosaur.
 
@@ -49,7 +52,12 @@ Keep Memory.md up to date at all times. Every time we start a new session, read 
 - 2026-10-03: Roy started describing the Build Park area: 20 big cages, far apart, each with a dinosaur.
 - 2026-10-03: **Built the big park, from Roy's idea** (Build Park on the park map). A big park you swipe around, with 20 big numbered cages far apart, joined by a sandy path, with palm trees and a river with a wooden bridge. Cages 1 to 7 hold Blue, T-Rex, Brachiosaurus, Compsognathus, Triceratops, Spinosaurus and Dilophosaurus (Brachiosaurus's neck sticks out over the fence, Compsognathus is tiny). Tap a cage: the dinosaur appears big with its name, its own sound and a simple fact that Tops reads out. First visit to each gives a star, and visiting all 7 gives the Dino Keeper badge. Cages 8 to 20 are empty with a "?" sign. Tested at iPad and phone sizes. Preview updated at the same link.
 - 2026-10-03: **Filled cages 8 to 20, chosen by Claude because Roy asked.** 8 Stegosaurus, 9 Ankylosaurus, 10 Pteranodon (flying), 11 Parasaurolophus, 12 Pachycephalosaurus, 13 Gallimimus, 14 Carnotaurus, 15 Diplodocus, 16 Allosaurus, 17 Iguanodon, 18 Baryonyx, 19 Therizinosaurus, 20 Mosasaurus (in a water cage). Each has its own drawing, sound and fact. Dino Keeper badge now means visiting all 20. Preview updated at the same link.
-- **Next:** Ask Roy what he wants next. Ideas from the plan: the Dino Book (all of Roy's dinosaurs in one sticker book), Dino Care (feed and wash dinosaurs) and Missions. Roy can also swap any of Claude's 13 picks for dinosaurs he likes better. (all of Roy's dinosaurs in one sticker book), Dino Care and Missions.
+- 2026-10-03: **Built Dino Care, from Roy's idea** (Dino Care on the park map, or any cage). Each cage shows what its dinosaur needs today: a bowl means hungry, a mud drop means muddy, a heart means all done. Tap a cage, then:
+  - **Feed:** pick meat, leaves or fish. The food flies to the dinosaur's mouth. Right food: munch sound, hearts, a star. Wrong food: the dinosaur shakes its head, "Bleh!", and Roy tries again (no losing). For Ankylosaurus, Tops says "Let's figure it out!" and Roy discovers it eats leaves and low plants.
+  - **Wash:** a bath appears with mud blobs on the dinosaur. Roy rubs them off with his finger, with bubbles and pops. When clean: "Squeaky clean!", hearts and a star.
+  - Every new day, all dinosaurs are hungry and muddy again (Roy said they need food every day). New badges: Dino Chef (first feed), Bath Time (first wash) and Happy Park (all 20 fed and washed on the same day).
+  - Tested at iPad and phone sizes. Preview updated at the same link.
+- **Next:** Ask Roy what he wants next. Ideas: the Dino Book (all of Roy's dinosaurs in one sticker book) and Missions. Roy can also swap any of Claude's 13 picks for dinosaurs he likes better.
 
 ## Important decisions
 
@@ -68,3 +76,5 @@ Keep Memory.md up to date at all times. Every time we start a new session, read 
 - 2026-10-03: Dinosaur facts stay true and simple (for example, Compsognathus was about as small as a chicken). Dilophosaurus is drawn with its real head crests, without the made-up neck frill and spitting from the films.
 - 2026-10-03: Pteranodon and Mosasaurus are not dinosaurs (one is a flying reptile, one is a sea reptile), but they are in the park because kids know them from the films, and their facts say what they really are. Mosasaurus has a water cage.
 - 2026-10-03: The new dinosaurs are drawn with two shared shapes (one for dinosaurs on two legs, one for four legs) plus each dinosaur's own features, which keeps the code short and the style the same.
+- 2026-10-03: Dinosaur diets follow real science: meat for Blue, T-Rex, Compsognathus, Dilophosaurus, Carnotaurus and Allosaurus; fish (or meat) for Spinosaurus and Baryonyx; fish for Mosasaurus and Pteranodon; leaves for Brachiosaurus, Triceratops, Stegosaurus, Ankylosaurus, Parasaurolophus, Pachycephalosaurus, Diplodocus, Iguanodon and Therizinosaurus; leaves or meat for Gallimimus.
+- 2026-10-03: Feeding and washing happen inside each cage's visit card, as Roy said ("in their cages"). Care resets each day using the iPad's date. Picking the wrong food is never a failure: the dinosaur says "Bleh!" and Roy tries again.

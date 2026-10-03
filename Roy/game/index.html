@@ -403,7 +403,7 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
   animation: rise .5s cubic-bezier(.3, 1.4, .5, 1);
 }
 .visit-dino { background: none; border: 0; padding: 0; width: min(100%, 440px); }
-.visit-dino svg { width: 100%; height: auto; max-height: 46vh; display: block; overflow: visible; }
+.visit-dino svg { width: 100%; height: auto; max-height: 40vh; display: block; overflow: visible; }
 .visit-dino.hop svg { animation: hop .55s cubic-bezier(.3, 1.4, .5, 1); }
 .visit-name { margin: 0; font-family: var(--font-sign); font-weight: 400; font-size: clamp(1.8rem, 6vw, 2.8rem); color: var(--amber); text-align: center; text-wrap: balance; }
 .visit-fact { margin: 0; font-size: clamp(1.1rem, 3vw, 1.4rem); font-weight: 700; text-align: center; max-width: 30ch; }
@@ -414,6 +414,76 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
   display: grid; place-items: center;
 }
 .visit-close svg { width: 28px; height: 28px; }
+/* ---------- Dino Care: feeding and bath time (Roy's idea) ---------- */
+.needs { position: absolute; top: -14px; right: 26px; display: flex; gap: 6px; pointer-events: none; }
+.need {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: var(--bone); border: 3px solid var(--wood-dark);
+  display: grid; place-items: center;
+  animation: nudge 1.6s ease-in-out infinite;
+}
+.need svg { width: 30px; height: 30px; }
+.dino-stage { position: relative; width: min(100%, 440px); display: grid; place-items: center; }
+.dino-stage .visit-dino svg { max-height: 34vh; }
+.tub {
+  position: absolute; left: 4%; right: 4%; bottom: -4%; height: 30%;
+  background: linear-gradient(#7fb0dc, #3b7ea8);
+  border: 5px solid var(--bone); border-top-width: 3px;
+  border-radius: 12px 12px 50% 50% / 12px 12px 60% 60%;
+  opacity: .9; pointer-events: none;
+}
+.tub::before {
+  content: ""; position: absolute; left: 4%; right: 4%; top: -14px; height: 26px;
+  background: radial-gradient(circle at 10% 60%, #fff 18%, transparent 19%) 0 0 / 34px 26px;
+  opacity: .9;
+}
+.dino-stage.washing { touch-action: none; }
+.mud {
+  position: absolute; width: 17%; aspect-ratio: 1.2;
+  border-radius: 46% 54% 40% 60% / 55% 45% 55% 45%;
+  background: radial-gradient(circle at 35% 35%, #9a6a40, #6b4423 70%);
+  box-shadow: inset -3px -3px 0 rgba(0, 0, 0, .2);
+  transform: translate(-50%, -50%);
+  pointer-events: auto;
+}
+.mud.gone { animation: mudgone .35s ease forwards; pointer-events: none; }
+.bubble-pop {
+  position: fixed; z-index: 9; width: 22px; height: 22px; border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, .9); background: rgba(207, 230, 239, .35);
+  pointer-events: none; animation: floatup 1s ease-out forwards;
+}
+.heart-pop { position: fixed; z-index: 9; width: 36px; pointer-events: none; animation: floatup 1.2s ease-out forwards; }
+.care-bar { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.care-btn {
+  position: relative;
+  display: flex; align-items: center; gap: 8px;
+  background: var(--canopy); border: 4px solid var(--amber); border-radius: 999px;
+  padding: 6px 22px 6px 8px;
+  font-size: 1.35rem; font-weight: 800;
+}
+.care-btn svg { width: 44px; height: 44px; }
+.care-btn.active { background: var(--amber); color: var(--wood-dark); }
+.care-btn .tick {
+  position: absolute; top: -10px; right: -8px;
+  width: 30px; height: 30px; border-radius: 50%;
+  background: #5fb37c; border: 3px solid var(--wood-dark);
+  display: none; place-items: center;
+}
+.care-btn.done .tick { display: grid; }
+.care-btn .tick svg { width: 16px; height: 16px; }
+.food-tray { display: flex; gap: 14px; justify-content: center; }
+.food {
+  width: 84px; height: 84px; border-radius: 22px;
+  background: var(--bone); border: 4px solid var(--wood-dark);
+  display: grid; place-items: center;
+}
+.food svg { width: 60px; height: 60px; }
+.food:active, .care-btn:active { transform: scale(.94); }
+.flying { position: fixed; z-index: 9; width: 64px; height: 64px; pointer-events: none; transition: transform .5s cubic-bezier(.4, 0, .6, 1), opacity .5s; }
+.visit-dino.nope svg { animation: nope .5s ease; }
+@keyframes mudgone { to { transform: translate(-50%, -50%) scale(0); opacity: 0; } }
+@keyframes floatup { to { transform: translateY(-90px) scale(1.3); opacity: 0; } }
+@keyframes nope { 20%, 60% { transform: translateX(-12px) rotate(-3deg); } 40%, 80% { transform: translateX(12px) rotate(3deg); } }
 @keyframes swipe { 0% { transform: translateX(40px); opacity: 0; } 20% { opacity: 1; } 100% { transform: translateX(-90px); opacity: 0; } }
 @keyframes warm { to { opacity: .7; } }
 @keyframes wobble { 20% { transform: rotate(-9deg); } 45% { transform: rotate(8deg); } 70% { transform: rotate(-4deg); } }
@@ -728,11 +798,10 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
       Dino Book
       <span class="soon" aria-label="Coming soon"><svg viewBox="0 0 18 18"><rect x="3" y="8" width="12" height="9" rx="2" fill="#3b2413"/><path d="M5.5 8V6a3.5 3.5 0 0 1 7 0v2" stroke="#3b2413" stroke-width="2.4" fill="none"/></svg></span>
     </button>
-    <button class="place" data-place="care">
+    <button class="place" data-place="care" id="place-care">
       <svg viewBox="0 0 64 64"><path d="M32 54 C10 40 8 22 20 16 C27 13 31 18 32 22 C33 18 37 13 44 16 C56 22 54 40 32 54 Z" fill="#e4572a"/><path d="M26 30 q6 -10 14 -6 q-2 10 -14 6 Z" fill="#6cc48a"/></svg>
       Dino Care
-      <span class="soon" aria-label="Coming soon"><svg viewBox="0 0 18 18"><rect x="3" y="8" width="12" height="9" rx="2" fill="#3b2413"/><path d="M5.5 8V6a3.5 3.5 0 0 1 7 0v2" stroke="#3b2413" stroke-width="2.4" fill="none"/></svg></span>
-    </button>
+</button>
     <button class="place" data-place="build" id="place-build">
       <svg viewBox="0 0 64 64"><rect x="29" y="30" width="6" height="22" fill="#6e4524"/><circle cx="32" cy="22" r="14" fill="#5fb37c"/><circle cx="24" cy="28" r="9" fill="#4f9a6a"/><circle cx="41" cy="28" r="9" fill="#4f9a6a"/><path d="M6 52 h52 M6 42 h52" stroke="#a8844f" stroke-width="4"/><path d="M10 38 v18 M22 38 v18 M42 38 v18 M54 38 v18" stroke="#c29c62" stroke-width="5"/></svg>
       Build Park
@@ -838,9 +907,21 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
     <button class="visit-close" id="visit-close" aria-label="Close">
       <svg viewBox="0 0 28 28"><path d="M6 6 L22 22 M22 6 L6 22" stroke="#f4e8cc" stroke-width="5" stroke-linecap="round"/></svg>
     </button>
-    <button class="visit-dino" id="visit-dino" aria-label="Dinosaur"></button>
+    <div class="dino-stage" id="dino-stage">
+      <div class="tub" id="tub" hidden></div>
+      <button class="visit-dino" id="visit-dino" aria-label="Dinosaur"></button>
+    </div>
     <h2 class="visit-name" id="visit-name"></h2>
     <p class="visit-fact" id="visit-fact"></p>
+    <div class="care-bar">
+      <button class="care-btn" id="feed-btn"><svg viewBox="0 0 40 40"><path d="M4 18 H36 Q34 34 20 34 Q6 34 4 18 Z" fill="#a8844f" stroke="#3b2413" stroke-width="2"/><path d="M8 18 Q20 8 32 18" fill="#5fb37c"/><path d="M14 16 L10 6 M14 16 l-4 -1" stroke="#f4e8cc" stroke-width="3" stroke-linecap="round"/></svg>Feed<span class="tick"><svg viewBox="0 0 16 16"><path d="M3 8 l3 3 l7 -7" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>
+      <button class="care-btn" id="wash-btn"><svg viewBox="0 0 40 40"><path d="M4 20 H36 V24 Q36 34 20 34 Q4 34 4 24 Z" fill="#7fb0dc" stroke="#f4e8cc" stroke-width="2.5"/><circle cx="12" cy="16" r="4" fill="#fff"/><circle cx="20" cy="12" r="5" fill="#fff"/><circle cx="28" cy="15" r="4" fill="#fff"/><path d="M8 34 v4 M32 34 v4" stroke="#f4e8cc" stroke-width="3"/></svg>Wash<span class="tick"><svg viewBox="0 0 16 16"><path d="M3 8 l3 3 l7 -7" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>
+    </div>
+    <div class="food-tray" id="food-tray" hidden>
+      <button class="food" data-food="meat" aria-label="Meat"><svg viewBox="0 0 64 64"><path d="M20 44 Q8 30 22 16 Q40 6 50 22 Q56 40 36 44 Z" fill="#c0452c"/><path d="M24 40 L12 52" stroke="#f4e8cc" stroke-width="7" stroke-linecap="round"/><circle cx="9" cy="53" r="5" fill="#f4e8cc"/><circle cx="14" cy="58" r="4.5" fill="#f4e8cc"/><ellipse cx="34" cy="24" rx="8" ry="5" fill="#e07a5a"/></svg></button>
+      <button class="food" data-food="leaves" aria-label="Leaves"><svg viewBox="0 0 64 64"><path d="M32 58 Q30 30 12 12 Q40 10 44 34 Q46 46 32 58 Z" fill="#5fb37c"/><path d="M32 58 Q26 34 14 14" stroke="#2e5b3a" stroke-width="2.5" fill="none"/><path d="M34 58 Q42 34 56 26 Q58 50 34 58 Z" fill="#3f7a4c"/></svg></button>
+      <button class="food" data-food="fish" aria-label="Fish"><svg viewBox="0 0 64 64"><path d="M8 32 Q28 12 46 32 Q28 52 8 32 Z" fill="#7fb0dc"/><path d="M44 32 L60 18 L57 32 L60 46 Z" fill="#5a86a2"/><circle cx="18" cy="29" r="3.2" fill="#1d1d1b"/><path d="M28 23 q5 9 0 18" stroke="#5a86a2" stroke-width="2.5" fill="none"/></svg></button>
+    </div>
   </div>
 </div>
 
@@ -1100,7 +1181,6 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
   // ---------- places on the park map ----------
   var placeLines = {
     book: "The Dino Book is coming soon. It will keep all your dinosaurs!",
-    care: "Dino Care is coming soon. You will feed and wash your dinosaurs!",
     missions: "Ranger Missions are coming soon. Big adventures!"
   };
   menu.addEventListener("click", function (e) {
@@ -1108,6 +1188,7 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
     if (!btn) return;
     if (btn.dataset.place === "egg") { openLab(); return; }
     if (btn.dataset.place === "build") { openMap(); return; }
+    if (btn.dataset.place === "care") { openMap(true); return; }
     if (btn.dataset.place === "book" && state.found.hatch) {
       clunk();
       btn.classList.remove("wiggle"); void btn.offsetWidth; btn.classList.add("wiggle");
@@ -1135,6 +1216,7 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
     book.classList.remove("next");
     $("place-egg").classList.toggle("next", !state.found.hatch);
     $("place-build").classList.toggle("next", !!state.found.hatch && !state.found.map);
+    $("place-care").classList.toggle("next", !!state.found.map && !state.found.chef);
   }
   updateBook();
 
@@ -1466,16 +1548,23 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
         (d ? '<div class="dino" style="--k:' + d.k + (d.lift ? ';--lift:' + d.lift : '') + '">' + d.svg + '</div>' : '') +
         cageFront(d ? d.name.replace(" the Raptor", "") : "?", k + 1);
       html += '<button class="cage' + (d ? "" : " empty") + (d && state.found["saw-" + d.id] ? " visited" : "") +
-        '" data-cage="' + k + '" style="left:' + pos.x + 'px;top:' + pos.y + 'px" aria-label="' + (d ? d.name : "Empty cage") + '">' + inner + '</button>';
+        '" data-cage="' + k + '" style="left:' + pos.x + 'px;top:' + pos.y + 'px" aria-label="' + (d ? d.name : "Empty cage") + '">' + inner + '<div class="needs"></div></button>';
     }
     world.innerHTML = html;
   }
   buildWorld();
 
-  function openMap() {
+  function openMap(care) {
     viewPark.hidden = true; viewMap.hidden = false; homeBtn.hidden = false;
     boing();
-    if (!state.found.map) {
+    updateNeeds();
+    if (care) {
+      var h = DINOS.filter(isHungry).length, m = DINOS.filter(isDirty).length;
+      say(h || m
+        ? "Time to look after your dinosaurs! A bowl means hungry. A mud drop means muddy. Tap a cage!"
+        : "All your dinosaurs are fed and clean today. Great job, Roy!");
+      state.found.map = true; save(); updateBook();
+    } else if (!state.found.map) {
       state.found.map = true; save(); updateBook();
       say("Welcome to your big park, Roy! There are 20 big cages. Swipe to explore, and tap a cage to visit a dinosaur!");
     } else {
@@ -1503,8 +1592,11 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
     $("visit-name").textContent = d.name;
     $("visit-fact").textContent = d.fact;
     visit.hidden = false;
+    resetCare();
     d.sound();
-    say("This is " + d.name + "! " + d.fact);
+    var status = isHungry(d) && isDirty(d) ? " " + shortName(d) + " is hungry and muddy!" :
+      isHungry(d) ? " " + shortName(d) + " is hungry!" : isDirty(d) ? " " + shortName(d) + " is muddy!" : "";
+    say("This is " + d.name + "! " + d.fact + status);
     if (!state.found["saw-" + d.id]) {
       state.found["saw-" + d.id] = true; save();
       cage.classList.add("visited");
@@ -1525,9 +1617,212 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
     visitDino.classList.remove("hop"); void visitDino.offsetWidth; visitDino.classList.add("hop");
     say(current.fact);
   });
-  function closeVisit() { visit.hidden = true; current = null; }
+  function closeVisit() { visit.hidden = true; current = null; resetCare(); updateNeeds(); }
   $("visit-close").addEventListener("click", closeVisit);
   visit.addEventListener("click", function (e) { if (e.target === visit) closeVisit(); });
+  // ---------- Dino Care: feed every day, wash in a bath (Roy's idea) ----------
+  var DIET = {
+    blue: ["meat"], trex: ["meat"], compy: ["meat"], dilo: ["meat"], carno: ["meat"], allo: ["meat"],
+    spino: ["fish", "meat"], bary: ["fish", "meat"], mosa: ["fish"], ptera: ["fish"],
+    brachio: ["leaves"], trike: ["leaves"], stego: ["leaves"], ankylo: ["leaves"], para: ["leaves"],
+    pachy: ["leaves"], diplo: ["leaves"], iguano: ["leaves"], theri: ["leaves"],
+    galli: ["leaves", "meat"]
+  };
+  var FOOD_WORD = { meat: "meat", leaves: "leaves", fish: "fish" };
+  state.care = state.care || {};
+  function today() { var t = new Date(); return t.getFullYear() + "-" + (t.getMonth() + 1) + "-" + t.getDate(); }
+  function careOf(d) { return state.care[d.id] || (state.care[d.id] = {}); }
+  function isHungry(d) { return careOf(d).fed !== today(); }
+  function isDirty(d) { return careOf(d).washed !== today(); }
+  function shortName(d) { return d.name.replace(" the Raptor", ""); }
+  var ICON_BOWL = '<svg viewBox="0 0 40 40"><path d="M4 18 H36 Q34 34 20 34 Q6 34 4 18 Z" fill="#a8844f" stroke="#3b2413" stroke-width="2"/><path d="M12 13 q3 -4 0 -9 M20 13 q3 -4 0 -9 M28 13 q3 -4 0 -9" stroke="#e4572a" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>';
+  var ICON_MUD = '<svg viewBox="0 0 40 40"><path d="M20 4 Q32 20 30 28 Q28 36 20 36 Q12 36 10 28 Q8 20 20 4 Z" fill="#7a5230"/><circle cx="16" cy="26" r="3.5" fill="#9a6a40"/></svg>';
+  var ICON_HEART = '<svg viewBox="0 0 40 40"><path d="M20 34 C6 24 4 12 12 8 C16 6 19 9 20 12 C21 9 24 6 28 8 C36 12 34 24 20 34 Z" fill="#e4572a"/></svg>';
+  function updateNeeds() {
+    world.querySelectorAll(".cage").forEach(function (c) {
+      var d = DINOS[Number(c.dataset.cage)], box = c.querySelector(".needs");
+      if (!d || !box) return;
+      var h = isHungry(d), m = isDirty(d);
+      box.innerHTML = (h ? '<span class="need">' + ICON_BOWL + '</span>' : '') +
+        (m ? '<span class="need">' + ICON_MUD + '</span>' : '') +
+        (!h && !m ? '<span class="need">' + ICON_HEART + '</span>' : '');
+    });
+  }
+
+  var feedBtn = $("feed-btn"), washBtn = $("wash-btn"), tray = $("food-tray"), tub = $("tub"), stage = $("dino-stage");
+  var washing = false;
+  function resetCare() {
+    washing = false;
+    tray.hidden = true; tub.hidden = true;
+    stage.classList.remove("washing");
+    stage.querySelectorAll(".mud").forEach(function (m) { m.remove(); });
+    feedBtn.classList.remove("active"); washBtn.classList.remove("active");
+    if (current) {
+      feedBtn.classList.toggle("done", !isHungry(current));
+      washBtn.classList.toggle("done", !isDirty(current));
+    }
+  }
+  function munch() {
+    var ctx = ac(); if (!ctx) return;
+    for (var i = 0; i < 3; i++) {
+      var t = ctx.currentTime + i * 0.2;
+      var src = ctx.createBufferSource(); src.buffer = noiseBuffer(ctx, 0.12);
+      var lp = ctx.createBiquadFilter(); lp.type = "lowpass"; lp.frequency.value = 1300;
+      var g = ctx.createGain(); g.gain.setValueAtTime(0.7, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.12);
+      src.connect(lp).connect(g).connect(ctx.destination); src.start(t);
+    }
+  }
+  function bleh() { tone(300, 0, 0.25, "sawtooth", 0.12, 220); tone(250, 0.28, 0.4, "sawtooth", 0.12, 150); }
+  function splash() {
+    var ctx = ac(); if (!ctx) return;
+    var t = ctx.currentTime, dur = 0.9;
+    var src = ctx.createBufferSource(); src.buffer = noiseBuffer(ctx, dur);
+    var bp = ctx.createBiquadFilter(); bp.type = "bandpass"; bp.frequency.value = 1500; bp.Q.value = 0.5;
+    var g = ctx.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.7, t + 0.05); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    src.connect(bp).connect(g).connect(ctx.destination); src.start(t);
+  }
+  function hearts() {
+    var r = visitDino.getBoundingClientRect();
+    for (var i = 0; i < 5; i++) {
+      var h = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      h.setAttribute("viewBox", "0 0 40 40"); h.setAttribute("class", "heart-pop");
+      h.innerHTML = ICON_HEART.replace(/^<svg[^>]*>|<\/svg>$/g, "");
+      h.style.left = (r.left + r.width * (0.25 + Math.random() * 0.5)) + "px";
+      h.style.top = (r.top + r.height * (0.2 + Math.random() * 0.4)) + "px";
+      h.style.animationDelay = (i * 0.12) + "s";
+      document.body.appendChild(h);
+      setTimeout(h.remove.bind(h), 1600);
+    }
+  }
+  function bubbleAt(x, y) {
+    var b = document.createElement("span");
+    b.className = "bubble-pop";
+    b.style.left = (x - 11 + Math.random() * 20 - 10) + "px"; b.style.top = (y - 11) + "px";
+    document.body.appendChild(b);
+    setTimeout(b.remove.bind(b), 1000);
+  }
+  var CHEF_BADGE =
+    '<circle cx="55" cy="55" r="50" fill="#5fb37c" stroke="#3b2413" stroke-width="5"/><circle cx="55" cy="55" r="38" fill="#f4e8cc"/>' +
+    '<path d="M24 56 H86 Q82 82 55 82 Q28 82 24 56 Z" fill="#a8844f" stroke="#3b2413" stroke-width="3"/>' +
+    '<path d="M34 54 Q44 30 56 40 Q58 50 48 54 Z" fill="#5fb37c"/><path d="M60 54 Q62 36 74 36 Q78 48 66 54 Z" fill="#c0452c"/>';
+  var BATH_BADGE =
+    '<circle cx="55" cy="55" r="50" fill="#7fb0dc" stroke="#3b2413" stroke-width="5"/><circle cx="55" cy="55" r="38" fill="#f4e8cc"/>' +
+    '<path d="M24 56 H86 V62 Q86 82 55 82 Q24 82 24 62 Z" fill="#3b7ea8"/>' +
+    '<circle cx="38" cy="50" r="8" fill="#fff" stroke="#7fb0dc" stroke-width="2"/><circle cx="55" cy="42" r="10" fill="#fff" stroke="#7fb0dc" stroke-width="2"/><circle cx="72" cy="50" r="7" fill="#fff" stroke="#7fb0dc" stroke-width="2"/>';
+  var HAPPY_BADGE =
+    '<circle cx="55" cy="55" r="50" fill="#f2a93b" stroke="#3b2413" stroke-width="5"/><circle cx="55" cy="55" r="38" fill="#173326"/>' +
+    '<path d="M55 84 C26 64 24 40 40 34 C48 31 53 37 55 42 C57 37 62 31 70 34 C86 40 84 64 55 84 Z" fill="#e4572a"/>';
+  function checkHappyPark() {
+    var key = "happy-" + today();
+    if (state.found[key]) return;
+    if (DINOS.every(function (d) { return !isHungry(d) && !isDirty(d); })) {
+      state.found[key] = true; save();
+      setTimeout(function () {
+        showBadge("Happy Park", "Every dinosaur is fed and clean!", HAPPY_BADGE);
+        say("Every dinosaur in your park is fed and clean today! Happy Park, Roy!");
+      }, 1600);
+    }
+  }
+
+  feedBtn.addEventListener("click", function () {
+    if (!current) return;
+    resetCare();
+    feedBtn.classList.add("active");
+    tray.hidden = false;
+    boing();
+    say(current.id === "ankylo" && !state.found["diet-ankylo"]
+      ? "What does Ankylosaurus eat? Let's figure it out! Pick a food!"
+      : "What does " + shortName(current) + " eat? Pick a food!");
+  });
+  tray.addEventListener("click", function (e) {
+    var btn = e.target.closest(".food");
+    if (!btn || !current) return;
+    var d = current, food = btn.dataset.food;
+    var from = btn.getBoundingClientRect(), to = visitDino.getBoundingClientRect();
+    var fly = btn.querySelector("svg").cloneNode(true);
+    fly.setAttribute("class", "flying");
+    fly.style.left = (from.left + 10) + "px"; fly.style.top = (from.top + 10) + "px";
+    document.body.appendChild(fly);
+    void fly.getBoundingClientRect();
+    fly.style.transform = "translate(" + (to.left + to.width * 0.78 - from.left - 42) + "px," + (to.top + to.height * 0.25 - from.top - 42) + "px) scale(.6)";
+    fly.style.opacity = "0.2";
+    setTimeout(function () {
+      fly.remove();
+      if (current !== d) return;
+      if (DIET[d.id].indexOf(food) === -1) {
+        bleh();
+        visitDino.classList.remove("nope"); void visitDino.offsetWidth; visitDino.classList.add("nope");
+        say("Bleh! " + shortName(d) + " doesn't eat " + FOOD_WORD[food] + ". Try another food!");
+        return;
+      }
+      munch(); hearts();
+      visitDino.classList.remove("hop"); void visitDino.offsetWidth; visitDino.classList.add("hop");
+      if (!isHungry(d)) { say("Yum! " + shortName(d) + " is full now. Come back tomorrow for more!"); return; }
+      careOf(d).fed = today();
+      var found = d.id === "ankylo" && !state.found["diet-ankylo"];
+      if (found) state.found["diet-ankylo"] = true;
+      save();
+      feedBtn.classList.add("done");
+      addStar(visitDino);
+      say(found ? "You figured it out! Ankylosaurus eats leaves and low plants! Yum yum!"
+        : "Yum yum! " + shortName(d) + " loves " + FOOD_WORD[food] + "!");
+      if (!state.found.chef) {
+        state.found.chef = true; save(); updateBook();
+        setTimeout(function () { showBadge("Dino Chef", "You fed your first dinosaur!", CHEF_BADGE); }, 1200);
+      }
+      checkHappyPark();
+    }, 520);
+  });
+
+  washBtn.addEventListener("click", function () {
+    if (!current) return;
+    resetCare();
+    washBtn.classList.add("active");
+    washing = true;
+    tub.hidden = false;
+    stage.classList.add("washing");
+    splash();
+    if (isDirty(current)) {
+      for (var i = 0; i < 6; i++) {
+        var m = document.createElement("span");
+        m.className = "mud";
+        m.style.left = (24 + (i % 3) * 24 + Math.random() * 8) + "%";
+        m.style.top = (28 + Math.floor(i / 3) * 24 + Math.random() * 8) + "%";
+        stage.appendChild(m);
+      }
+      say("Bath time! Scrub scrub! Rub the mud off " + shortName(current) + " with your finger!");
+    } else {
+      say(shortName(current) + " is already clean today! Splash splash, more bubbles!");
+    }
+  });
+  var lastBubble = 0;
+  function scrubAt(x, y) {
+    if (!washing || !current) return;
+    var now = Date.now();
+    if (now - lastBubble > 70) { bubbleAt(x, y); lastBubble = now; }
+    var el = document.elementFromPoint(x, y);
+    if (!el || !el.classList.contains("mud") || el.classList.contains("gone")) return;
+    el.classList.add("gone");
+    tone(700 + Math.random() * 500, 0, 0.08, "sine", 0.18, 1500);
+    setTimeout(el.remove.bind(el), 360);
+    if (stage.querySelectorAll(".mud:not(.gone)").length) return;
+    var d = current;
+    splash(); chime(); hearts();
+    careOf(d).washed = today(); save();
+    washBtn.classList.add("done");
+    addStar(visitDino);
+    say("Squeaky clean! " + shortName(d) + " smells like flowers now!");
+    if (!state.found.bath) {
+      state.found.bath = true; save();
+      setTimeout(function () { showBadge("Bath Time", "You washed your first dinosaur!", BATH_BADGE); }, 1200);
+    }
+    checkHappyPark();
+  }
+  stage.addEventListener("pointerdown", function (e) { scrubAt(e.clientX, e.clientY); });
+  stage.addEventListener("pointermove", function (e) { if (e.buttons || e.pointerType === "touch") scrubAt(e.clientX, e.clientY); });
+  visitDino.addEventListener("click", function (e) { if (washing) e.stopImmediatePropagation(); }, true);
+  updateNeeds();
+
   var KEEPER_BADGE =
     '<circle cx="55" cy="55" r="50" fill="#e4572a" stroke="#3b2413" stroke-width="5"/>' +
     '<circle cx="55" cy="55" r="38" fill="#3d7a46"/>' +
