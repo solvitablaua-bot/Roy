@@ -44,6 +44,8 @@ Keep Memory.md up to date at all times. Every time we start a new session, read 
 - Roy's seventh idea (spoken): "You need to create a pet shop where there's going to be pet dinosaurs and people can come buy their own pet dinosaur." This became the Pet Shop, where Roy is the shopkeeper.
 - Listening to what each customer wants and finding the matching pet is a gentle matching game that practises noticing features (horns, crests, long necks, colours, what they eat).
 - Roy's feedback on the Pet Shop (spoken): "I want to see the people who are coming inside the pet shop. I want to see their faces and their whole body." Roy cares about the people in his world, not only the dinosaurs, and wants them big and detailed.
+- Roy's eighth idea (spoken): "Now from the Dino Book, build all the missions that are described in the Dino Book." Roy noticed the missions all played the same way (tap the bushes). Each mission should do what its page says.
+- Different kinds of play keep missions fresh for Roy: following footprints, listening for a sound, watching for someone peeking, hopping across stones, and spotting the odd one out.
 - Empty cages are a good way to keep Roy's ideas coming: each one has a "?" sign, and Tops asks "Roy, which dinosaur should live here?"
 - Idea: the game itself could listen to Roy too, for example saying a name out loud to name a new dinosaur.
 
@@ -85,7 +87,22 @@ Keep Memory.md up to date at all times. Every time we start a new session, read 
 - 2026-10-03: **Built the Pet Shop, from Roy's idea** (new Pet Shop button on the park map, so there are now 6 areas). "ROY'S PET SHOP" has a striped awning and 6 glass tanks with baby dinosaurs. People walk in one at a time (different faces, skin tones, hair and clothes) and say what pet they want, with a picture to help: "I want a pet with three horns!", "I want a blue pet!", "I want a pet that eats leaves!", "I want a teeny tiny pet!" and more. Roy taps the matching pet: it flies to the customer, who smiles and holds it, says thank you and walks out. Roy gets a star. A new baby dinosaur pops into the empty tank. Wrong pet: the customer shakes their head and says "Hmm, not that one" (no losing). Badges: Shopkeeper (first sale) and Pet Shop Star (10 sales). Tested at iPad (both ways round) and phone sizes. Preview updated at the same link.
 - 2026-10-03: **Bigger, more detailed Pet Shop customers, from Roy's feedback.** Customers now fill the height of the shop counter, so Roy sees their whole body from hair to shoes. Faces have ears, eyes with pupils and sparkles, eyebrows, a nose, rosy cheeks and a mouth that changes to a big open smile when they get their pet. Lots of different people: kids (shorter), grown-ups, grandmas and grandpas, with 6 skin tones, hairstyles (short, long, bun, curly, ponytail, cap, grey beard), glasses, and outfits (t-shirt, dress, overalls, hoodie, ranger uniform with hat and badge). Each customer says their name ("Hi! I'm Mia..."), which also shows in the wish bubble. When served, they hug the baby dinosaur in their arms. They bob as they walk in. On an iPad held upright, the shop now stacks the tanks on top and the customer below, so customers are big there too. Tested at iPad (both ways round) and phone sizes. Preview updated at the same link.
 - 2026-10-03: **Fixed the Pet Shop, from Roy's report** (spoken: "In the shop something doesn't work right. We cannot see what the buyer is asking, and also all the pictures, it's like something broke. Can you fix it?"). On Roy's iPad the customer picture could grow too big and push the wish bubble out of sight, and the pets in the tanks didn't sit right. Fix: the customer and every pet now sit inside boxes with a fixed size, and the picture fills its box. The tanks and the customer are plain boxes instead of buttons (they still work when tapped). Checked at 5 screen sizes (iPad landscape and portrait, iPad mini, a narrow panel and a phone): the wish bubble, all 6 pets and the whole customer show every time. Preview updated at the same link.
-- **Next:** Check with Roy that the shop looks right on his iPad now. Then ask what he wants next.
+- 2026-10-03: **Every Dino Book mission now plays the way its page says, from Roy's idea.**
+  1. Spiky Frill Hunt: search the jungle bushes; after a wrong guess, white spikes poke out of the right bush.
+  2. Four-Wing Flyer: blue feathers keep falling from one tall tree; tap that tree.
+  3. Egg Rescue: find all 3 eggs in the bushes.
+  4. Nest Patrol: search the desert rocks; after a wrong guess, bits of eggshell appear by the right rock.
+  5. T-Rex Escape!: red alarm lights and a siren, then follow T-Rex's big footprints one by one (the ground shakes with each stomp) to the bush where he is hiding, then take him home.
+  6. Swamp Song: listen! Every few seconds a trumpet sound plays and one reed clump wiggles. Tapping the others plays a frog, bird or bee sound instead.
+  7. Feeding Time: feed 5 dinosaurs today (in the park).
+  8. Spike Valley: every rock has spikes: cactus, crystals, sticks, and one with white dinosaur spikes and orange plates. Find the dinosaur ones.
+  9. Volcano Horn: a ranger hops across hot lava on 4 glowing stepping stones, then searches the volcano rocks.
+  10. Where is Blue?: hide and seek. Blue peeks out of a different tree every few seconds; tap the tree while she is peeking, 3 times.
+  11. Stripy Tail Trail: a little stripy-tailed dinosaur runs past, then follow its 8 tiny footprints to its bush.
+  12. Bath Day: wash 3 dinosaurs today (in the park).
+  13. Giant Footprints: follow 3 huge footprints (rumble and shake) to a giant leg, tap it and "look up" to find Argentinosaurus.
+  - All 11 adventure missions were played through from start to finish in a test browser on iPad and phone sizes. Preview updated at the same link.
+- **Next:** Check with Roy that the shop and the new missions work on his iPad. Then ask what he wants next.
 
 ## Important decisions
 
@@ -113,3 +130,5 @@ Keep Memory.md up to date at all times. Every time we start a new session, read 
 - 2026-10-03: Missions have no way to fail: every bush shows something fun, and footprints give a hint to the right bush.
 - 2026-10-03: The Pet Shop is pretend: no real money and nothing to buy. Customers "pay" by making Roy's shop a success, and Roy earns stars, keeping the rule of no payments. Roy is the shopkeeper, as in his idea of people coming to buy pets.
 - 2026-10-03: Pet Shop pets are babies of park dinosaurs with clear features (Blue, Triceratops, Stegosaurus, Compsognathus, Ankylosaurus, Parasaurolophus, Brachiosaurus, Pachycephalosaurus, Dilophosaurus, Gallimimus). Each customer asks for one feature, and any pet with that feature is right.
+- 2026-10-03: Mission play styles are set in `MISSIONS` in `Roy/game/index.html` with a `play` field (search, eggs, trail, listen, decoys, lava, peek) plus options such as `hint`, `size` and `alarm`. New missions can reuse these.
+- 2026-10-03: New mission layouts use plain percentage sizes instead of container units, which older iPads may not support.

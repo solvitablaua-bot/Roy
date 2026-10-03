@@ -487,7 +487,7 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
 /* ---------- Ranger Missions: find new species (Roy's idea) ---------- */
 .expedition { flex: 1; min-height: 0; position: relative; container-type: size; }
 .bush-spot {
-  position: absolute; width: min(30cqw, 33cqh, 230px);
+  position: absolute; width: 27%; max-width: 230px;
   transform: translate(-50%, -50%);
   background: none; border: 0; padding: 0; pointer-events: auto;
 }
@@ -503,7 +503,7 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
 .critter.show { animation: critter 1.8s ease forwards; }
 .critter.stay { animation: critterstay .5s cubic-bezier(.3, 1.6, .5, 1) forwards; }
 .jeep {
-  position: absolute; left: 0; bottom: 0; width: min(34cqw, 260px);
+  position: absolute; left: 0; bottom: 0; width: 28%; max-width: 260px;
   pointer-events: none;
 }
 .jeep svg { width: 100%; height: auto; display: block; }
@@ -513,6 +513,39 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
 .crate { width: 120px; }
 .visit-dino.boxed svg { animation: boxed .6s ease forwards; }
 @keyframes critter { 0% { transform: translateX(-50%) scale(0); } 20% { transform: translateX(-50%) translateY(-30%) scale(1.1); } 30%, 75% { transform: translateX(-50%) translateY(-30%) scale(1); opacity: 1; } 100% { transform: translateX(-50%) translateY(-120%) scale(.8); opacity: 0; } }
+/* each mission plays the way its Dino Book page says */
+.print { position: absolute; transform: translate(-50%, -50%) rotate(var(--r, 0deg)); background: none; border: 0; padding: 0; pointer-events: auto; opacity: .3; z-index: 3; }
+.print svg { width: 100%; height: auto; display: block; }
+.print.small { width: 6%; min-width: 44px; } .print.big { width: 10%; min-width: 60px; } .print.giant { width: 17%; min-width: 90px; }
+.print.next { opacity: 1; animation: pulse 1s ease-in-out infinite; }
+.print.done { opacity: .85; }
+.alarm { position: absolute; inset: 0; pointer-events: none; z-index: 4; animation: alarm .45s ease-in-out 6 alternate; }
+.expedition.stomp { animation: shake .4s ease; }
+.feather { position: absolute; width: 5%; pointer-events: none; z-index: 3; animation: featherfall 3.2s linear forwards; }
+.critter.peekup { animation: peek 1.9s ease forwards; }
+.lava {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 32%; z-index: 2;
+  background: linear-gradient(#f9d27a, #f2a93b 18%, #e4572a 55%, #a8301a);
+  border-top: 6px solid #3a3430;
+  box-shadow: 0 -20px 40px rgba(228, 87, 42, .5);
+  transition: opacity .6s;
+}
+.lava.cool { opacity: 0; pointer-events: none; }
+.stone { position: absolute; bottom: 22%; width: 13%; transform: translateX(-50%); background: none; border: 0; padding: 0; pointer-events: auto; z-index: 3; }
+.stone svg { width: 100%; height: auto; display: block; }
+.stone.next { animation: pulse2 1s ease-in-out infinite; }
+.hopper { position: absolute; bottom: 30%; width: 7%; transform: translateX(-50%); transition: left .45s cubic-bezier(.3, 1.4, .5, 1); pointer-events: none; z-index: 3; }
+.hopper svg { width: 100%; height: auto; display: block; }
+.runner { position: absolute; top: 46%; left: -20%; width: 16%; pointer-events: none; z-index: 3; animation: run 1.6s linear forwards; }
+.runner svg { width: 100%; height: auto; display: block; }
+.giant-leg { position: absolute; top: 0; width: 20%; transform: translateX(-50%); background: none; border: 0; padding: 0; pointer-events: auto; z-index: 3; animation: hatch .8s cubic-bezier(.3, 1.4, .5, 1); }
+.giant-leg svg { width: 100%; height: auto; display: block; }
+@keyframes pulse { 50% { transform: translate(-50%, -50%) rotate(var(--r, 0deg)) scale(1.2); } }
+@keyframes pulse2 { 50% { transform: translateX(-50%) scale(1.12); filter: drop-shadow(0 0 10px #f9d27a); } }
+@keyframes alarm { from { background: rgba(228, 87, 42, 0); } to { background: rgba(228, 87, 42, .35); } }
+@keyframes featherfall { 0% { transform: translate(0, 0) rotate(0); opacity: 0; } 10% { opacity: 1; } 100% { transform: translate(40px, 220px) rotate(220deg); opacity: 0; } }
+@keyframes peek { 0% { transform: translateX(-50%) scale(0); } 18%, 78% { transform: translateX(-50%) translateY(-18%) scale(1); } 100% { transform: translateX(-50%) scale(0); } }
+@keyframes run { to { left: 110%; } }
 @keyframes critterstay { to { transform: translateX(-50%) translateY(-20%) scale(1); } }
 @keyframes drive { from { transform: translateX(-110%); } }
 @keyframes leave { to { transform: translateX(-120%); } }
@@ -1583,6 +1616,7 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
     else say("This is the Egg Lab! Something is inside this egg. Tap it to help it hatch!");
   }
   homeBtn.addEventListener("click", function () {
+    clearMission(true); activeMission = null;
     viewLab.hidden = true; viewMap.hidden = true; viewMission.hidden = true; viewBook.hidden = true; foundBox.hidden = true; viewShop.hidden = true; shopOpen = false; viewPark.hidden = false; homeBtn.hidden = true;
     say("Welcome back to the park gate! Where shall we go?");
   });
@@ -2296,35 +2330,35 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
     '<rect x="32" y="30" width="46" height="52" rx="4" fill="#a3603a"/><rect x="38" y="30" width="40" height="52" rx="3" fill="#c9793f"/>' +
     '<path d="M48 52 l6 6 l12 -14" stroke="#3f8a4a" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>';
   var MISSIONS = [
-    { id: "styraco", type: "species", target: "styraco", place: "jungle", title: "Spiky Frill Hunt",
-      text: "A dinosaur with a crown of spikes is hiding in the jungle. Find it!" },
-    { id: "micro", type: "species", target: "micro", place: "forest", title: "Four-Wing Flyer",
-      text: "Something with feathers is flapping in the tall trees. What can it be?" },
-    { id: "eggs", type: "eggs", place: "jungle", title: "Egg Rescue",
+    { id: "styraco", type: "species", target: "styraco", place: "jungle", title: "Spiky Frill Hunt", play: "search", hint: "spikes",
+      text: "A dinosaur with a crown of spikes is hiding in the jungle. Look for spikes poking out!" },
+    { id: "micro", type: "species", target: "micro", place: "forest", title: "Four-Wing Flyer", play: "search", hint: "feathers",
+      text: "Feathers are falling from one of the tall trees. Which tree is it?" },
+    { id: "eggs", type: "eggs", place: "jungle", title: "Egg Rescue", play: "eggs",
       text: "Oh no! Three dinosaur eggs rolled away into the jungle. Find all three!",
       reward: "Egg Rescuer badge", badge: ["Egg Rescuer", "You saved all the eggs!", EGG_BADGE] },
-    { id: "ovi", type: "species", target: "ovi", place: "desert", title: "Nest Patrol",
-      text: "Someone is sitting on a nest in the rocky desert. Go and look!" },
-    { id: "trex", type: "escape", target: "trex", place: "jungle", title: "T-Rex Escape!",
-      text: "Alarm! T-Rex got out of his cage! Find him and take him home.",
+    { id: "ovi", type: "species", target: "ovi", place: "desert", title: "Nest Patrol", play: "search", hint: "eggshell",
+      text: "Someone is sitting on a nest in the rocky desert. Look for bits of eggshell!" },
+    { id: "trex", type: "escape", target: "trex", place: "jungle", title: "T-Rex Escape!", play: "trail", size: "big", alarm: true,
+      text: "Alarm! T-Rex got out of his cage! Follow his big footprints and take him home.",
       reward: "Fence Fixer badge", badge: ["Fence Fixer", "T-Rex is safe at home!", FENCE_BADGE] },
-    { id: "corytho", type: "species", target: "corytho", place: "swamp", title: "Swamp Song",
-      text: "A trumpet sound is coming from the swamp. Who is singing?" },
+    { id: "corytho", type: "species", target: "corytho", place: "swamp", title: "Swamp Song", play: "listen",
+      text: "A trumpet sound is coming from the swamp. Listen carefully! Who is singing?" },
     { id: "feed", type: "care", care: "fed", goal: 5, place: "park", title: "Feeding Time",
       text: "Your dinosaurs are hungry! Feed 5 dinosaurs today.", reward: "Every day!" },
-    { id: "kentro", type: "species", target: "kentro", place: "desert", title: "Spike Valley",
-      text: "Lots of spikes are poking out of the rocks. Find the spiky dinosaur!" },
-    { id: "cerato", type: "species", target: "cerato", place: "volcano", title: "Volcano Horn",
-      text: "A dinosaur with a horn on its nose lives near the volcano. Be brave!" },
-    { id: "blue", type: "escape", target: "blue", place: "forest", title: "Where is Blue?",
-      text: "Blue is playing hide and seek in the tall trees. Can you find her?",
+    { id: "kentro", type: "species", target: "kentro", place: "desert", title: "Spike Valley", play: "decoys",
+      text: "Lots of spikes are poking out of the rocks. Which spikes belong to a dinosaur?" },
+    { id: "cerato", type: "species", target: "cerato", place: "volcano", title: "Volcano Horn", play: "lava",
+      text: "A dinosaur with a horn on its nose lives near the volcano. Hop across the hot lava. Be brave!" },
+    { id: "blue", type: "escape", target: "blue", place: "forest", title: "Where is Blue?", play: "peek",
+      text: "Blue is playing hide and seek in the tall trees. Tap the tree when she peeks out!",
       reward: "Raptor Friend badge", badge: ["Raptor Friend", "You found Blue!", RAPTOR_BADGE] },
-    { id: "sino", type: "species", target: "sino", place: "jungle", title: "Stripy Tail Trail",
-      text: "A little dinosaur with a stripy tail ran past. Follow the trail!" },
+    { id: "sino", type: "species", target: "sino", place: "jungle", title: "Stripy Tail Trail", play: "trail", size: "small", runner: true,
+      text: "A little dinosaur with a stripy tail ran past. Follow its tiny footprints!" },
     { id: "bath", type: "care", care: "washed", goal: 3, place: "park", title: "Bath Day",
       text: "Muddy dinosaurs everywhere! Give 3 dinosaurs a bath today.", reward: "Every day!" },
-    { id: "argentino", type: "species", target: "argentino", place: "swamp", title: "Giant Footprints",
-      text: "Huge footprints, bigger than a car! Who made them? Let's find out!" }
+    { id: "argentino", type: "species", target: "argentino", place: "swamp", title: "Giant Footprints", play: "trail", size: "giant",
+      text: "Huge footprints, bigger than a car! Follow them and find out who made them!" }
   ];
   function careCount(m) { return DINOS.filter(function (d) { return careOf(d)[m.care] === today(); }).length; }
   function missionDone(m) {
@@ -2345,7 +2379,7 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
   }
   function missionSay(m) {
     var r = m.type === "species" ? missionReward(m) : m.type === "care" ? "3 stars, every day!" : "3 stars and the " + m.reward + "!";
-    return m.title + "! " + m.text + " You win: " + r;
+    return m.title + (/[!?]$/.test(m.title) ? " " : "! ") + m.text + " You win: " + r;
   }
 
   var viewBook = $("view-book"), bookEl = $("book");
@@ -2404,6 +2438,7 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
     var m = MISSIONS[Number(go.dataset.go)];
     viewBook.hidden = true;
     if (m.type === "care") {
+      clearMission(true);
       openMap(true);
       say(m.text + " You did " + Math.min(careCount(m), m.goal) + " so far. Tap a cage!");
       return;
@@ -2436,61 +2471,341 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
     }, 1800);
   }
 
-  // ---------- playing a mission ----------
-  var activeMission = null, eggsFound = 0;
+  // ---------- playing a mission: each one plays the way its Dino Book page says ----------
+  var activeMission = null, eggsFound = 0, mode = "search", hintShown = false;
+  var expedition = $("expedition");
   var BUSH_SVG = spots[0].firstElementChild.outerHTML;
-  function openMission() { openBook(); }
-  function startMission(m) {
-    activeMission = m;
-    foundBox.hidden = true;
-    eggsFound = 0;
-    $("expedition").dataset.place = m.place;
-    var art = PLACES[m.place].hide === "bush" ? BUSH_SVG : HIDE[PLACES[m.place].hide];
+  var SPOT_POS = spots.map(function (sp) { return [sp.style.left, sp.style.top]; });
+  var missionTimers = [];
+  function later(fn, ms) { missionTimers.push(setTimeout(fn, ms)); }
+  function every(fn, ms) { missionTimers.push(setInterval(fn, ms)); }
+  function clearMission(removeLayers) {
+    missionTimers.forEach(function (t) { clearTimeout(t); clearInterval(t); });
+    missionTimers = [];
+    if (removeLayers) expedition.querySelectorAll(".mlayer").forEach(function (el) { el.remove(); });
+  }
+  function layer(html) {
+    var w = document.createElement("div");
+    w.innerHTML = html;
+    var el = w.firstElementChild;
+    el.classList.add("mlayer");
+    expedition.appendChild(el);
+    return el;
+  }
+  function shakeGround() { expedition.classList.remove("stomp"); void expedition.offsetWidth; expedition.classList.add("stomp"); }
+
+  var PRINT = '<svg viewBox="0 0 40 40"><ellipse cx="20" cy="27" rx="9" ry="10" fill="#3b2413"/><path d="M17 20 L7 4 M20 18 L20 1 M23 20 L33 4" stroke="#3b2413" stroke-width="6" stroke-linecap="round"/></svg>';
+  var HINTS = {
+    spikes: '<path d="M10 58 L4 22 L20 52 Z M22 56 L20 10 L32 52 Z M36 54 L40 4 L46 52 Z M50 54 L60 10 L58 54 Z M62 56 L76 22 L68 58 Z" fill="#f4e8cc" stroke="#3b2413" stroke-width="2"/>',
+    eggshell: '<path d="M8 52 l8 -14 l6 8 l6 -10 l6 16 Z" fill="#f4e8cc" stroke="#a8844f" stroke-width="2"/><path d="M44 54 l6 -12 l5 6 l7 -9 l6 15 Z" fill="#f4e8cc" stroke="#a8844f" stroke-width="2"/><circle cx="24" cy="46" r="2.5" fill="#3b7ea8"/><circle cx="56" cy="48" r="2.5" fill="#3b7ea8"/>',
+    feather: '<path d="M8 54 Q18 12 52 4 Q42 34 8 54 Z" fill="#4b6fa0"/><path d="M8 54 L48 8" stroke="#2e3a4f" stroke-width="2"/>'
+  };
+  var DECOYS = {
+    cactus: ['<rect x="34" y="14" width="12" height="44" rx="6" fill="#5f9a4a"/><path d="M34 34 H24 V22" stroke="#5f9a4a" stroke-width="10" fill="none" stroke-linecap="round"/><path d="M46 30 H56 V18" stroke="#5f9a4a" stroke-width="10" fill="none" stroke-linecap="round"/><path d="M30 20 l-4 -2 M50 26 l4 -2 M30 42 l-4 0 M50 44 l4 0" stroke="#f4e8cc" stroke-width="2"/>',
+      "That's a cactus! Ouch, prickly! Not a dinosaur."],
+    crystal: ['<path d="M20 58 L26 18 L34 58 Z M34 58 L42 6 L50 58 Z M50 58 L58 22 L64 58 Z" fill="#9b6fc4" stroke="#5a3a80" stroke-width="2"/><path d="M42 12 L44 40" stroke="#e0c8f4" stroke-width="3"/>',
+      "Those are shiny crystals! Pretty, but not a dinosaur."],
+    sticks: ['<path d="M20 58 L28 10 M36 58 L36 4 M50 58 L58 14 M44 30 l8 -6" stroke="#6e4524" stroke-width="5" stroke-linecap="round"/>',
+      "Just some old sticks! Keep looking."],
+    target: '<path d="M10 58 L14 18 L22 58 Z M22 58 L28 10 L36 58 Z" fill="#f4e8cc" stroke="#3b2413" stroke-width="2"/><path d="M38 58 L46 34 L54 58 Z M54 58 L62 38 L70 58 Z" fill="#e0763a" stroke="#a84a24" stroke-width="2"/>'
+  };
+  var SOUNDS = {
+    frog: ["Ribbit ribbit! That's a frog, not a trumpet!", function () { tone(130, 0, 0.14, "square", 0.15, 90); tone(130, 0.22, 0.14, "square", 0.15, 90); }],
+    bird: ["Tweet tweet! That's a bird, not a trumpet!", function () { chirp(); }],
+    bee: ["Bzzzz! That's a bee, not a trumpet!", function () { tone(220, 0, 0.7, "sawtooth", 0.06, 240); }]
+  };
+  var BEE = '<ellipse cx="40" cy="36" rx="16" ry="11" fill="#f2d24b"/><path d="M34 26 V46 M44 26 V46" stroke="#1d1d1b" stroke-width="5"/><ellipse cx="34" cy="20" rx="9" ry="7" fill="#cfe6ef" opacity=".9"/><ellipse cx="48" cy="20" rx="9" ry="7" fill="#cfe6ef" opacity=".9"/><circle cx="56" cy="34" r="2.5" fill="#1d1d1b"/>';
+  var BLUE_PEEK = '<ellipse cx="38" cy="38" rx="22" ry="17" fill="#4a86c8"/><path d="M44 30 Q72 28 78 40 Q74 50 54 50 Z" fill="#4a86c8"/><path d="M18 30 Q30 18 56 22" stroke="#24456f" stroke-width="5" fill="none" stroke-linecap="round"/><circle cx="44" cy="32" r="8" fill="#fff"/><circle cx="46" cy="32" r="5.5" fill="#f2a93b"/><ellipse cx="46.5" cy="32" rx="1.8" ry="4.5" fill="#1d1d1b"/><path d="M56 46 Q66 48 74 42" stroke="#1d1d1b" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M22 24 q3 -10 9 -3 q3 -9 9 -1" fill="#3c70ac"/>';
+  var STONE = '<svg viewBox="0 0 100 50"><ellipse cx="50" cy="30" rx="48" ry="18" fill="#5d5550"/><ellipse cx="46" cy="24" rx="36" ry="12" fill="#7a716b"/></svg>';
+  var GIANT_LEG = '<svg viewBox="0 0 100 260"><rect x="26" y="0" width="48" height="236" rx="18" fill="#8c7a68"/><path d="M30 0 V230" stroke="#6f604f" stroke-width="6"/><ellipse cx="50" cy="238" rx="44" ry="20" fill="#6f604f"/><path d="M14 246 l-6 10 M40 252 l-2 8 M62 252 l2 8 M86 246 l6 10" stroke="#f4e8cc" stroke-width="5" stroke-linecap="round"/></svg>';
+  var TRAILS = {
+    big: { pts: [[34, 86], [44, 74], [54, 63], [63, 53], [71, 44]], end: [84, 30] },
+    small: { pts: [[30, 88], [37, 80], [44, 73], [51, 66], [58, 60], [65, 54], [72, 48], [78, 42]], end: [88, 28] },
+    giant: { pts: [[38, 78], [56, 64], [72, 50]], end: [86, 0] }
+  };
+
+  function shuffledCritters() {
     var bag = ["butterfly", "frog", "bird", "butterfly", "frog", "bird"];
     for (var i = bag.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), t = bag[i]; bag[i] = bag[j]; bag[j] = t; }
+    return bag;
+  }
+  function critterOn(sp, html, cls) {
+    var c = sp.querySelector(".critter");
+    c.innerHTML = html;
+    c.classList.remove("show", "stay", "peekup"); void c.offsetWidth;
+    if (cls) c.classList.add(cls);
+  }
+  function openMission() { openBook(); }
+  function startMission(m) {
+    clearMission(true);
+    activeMission = m;
+    foundBox.hidden = true;
+    eggsFound = 0; hintShown = false;
+    mode = m.play || (m.type === "eggs" ? "eggs" : "search");
+    expedition.dataset.place = m.place;
+    var art = PLACES[m.place].hide === "bush" ? BUSH_SVG : HIDE[PLACES[m.place].hide];
+    hidden = shuffledCritters();
     dinoSpot = -1;
-    if (m.type === "eggs") {
-      var order = [0, 1, 2, 3, 4, 5].sort(function () { return Math.random() - 0.5; });
-      bag[order[0]] = bag[order[1]] = bag[order[2]] = "egg";
-    } else {
-      dinoSpot = Math.floor(Math.random() * spots.length);
-      bag[dinoSpot] = "dino";
-      bag[(dinoSpot + 1 + Math.floor(Math.random() * (spots.length - 1))) % spots.length] = "tracks";
-    }
-    hidden = bag;
-    spots.forEach(function (sp) {
+    spots.forEach(function (sp, i) {
       sp.firstElementChild.outerHTML = art;
+      sp.hidden = false;
+      sp.style.left = SPOT_POS[i][0]; sp.style.top = SPOT_POS[i][1];
       sp.classList.remove("shake", "hint", "parted", "opened");
-      var c = sp.querySelector(".critter"); c.classList.remove("show", "stay"); c.innerHTML = "";
+      critterOn(sp, "", null);
     });
     jeep.classList.remove("drive", "leave"); void jeep.offsetWidth; jeep.classList.add("drive");
     chug();
-    say(m.title + "! " + m.text + " Tap to search!");
+    var intro = m.title + (/[!?]$/.test(m.title) ? " " : "! ") + m.text;
+    if (mode === "eggs") {
+      var order = [0, 1, 2, 3, 4, 5].sort(function () { return Math.random() - 0.5; });
+      hidden[order[0]] = hidden[order[1]] = hidden[order[2]] = "egg";
+      say(intro);
+    } else if (mode === "search") {
+      dinoSpot = Math.floor(Math.random() * spots.length);
+      hidden[dinoSpot] = "dino";
+      if (m.hint === "feathers") {
+        every(function () { dropFeather(spots[dinoSpot]); }, 1100);
+        dropFeather(spots[dinoSpot]);
+      } else {
+        hidden[(dinoSpot + 1 + Math.floor(Math.random() * (spots.length - 1))) % spots.length] = "tracks";
+      }
+      say(intro);
+    } else if (mode === "decoys") {
+      dinoSpot = Math.floor(Math.random() * spots.length);
+      var kinds = ["cactus", "crystal", "sticks", "cactus", "crystal", "sticks"];
+      spots.forEach(function (sp, i) {
+        hidden[i] = i === dinoSpot ? "dino" : kinds[i];
+        critterOn(sp, i === dinoSpot ? DECOYS.target : DECOYS[kinds[i]][0], "stay");
+      });
+      say(intro + " Dinosaur spikes are white, with orange plates!");
+    } else if (mode === "listen") {
+      dinoSpot = Math.floor(Math.random() * spots.length);
+      var noises = ["frog", "bird", "bee", "frog", "bird", "bee"];
+      spots.forEach(function (sp, i) { hidden[i] = i === dinoSpot ? "dino" : noises[i]; });
+      say(intro + " Tap the reeds to hear who is in there!");
+      every(function () {
+        trumpet();
+        var sp = spots[dinoSpot];
+        sp.classList.remove("shake"); void sp.offsetWidth; sp.classList.add("shake");
+      }, 4500);
+      later(trumpet, 1800);
+    } else if (mode === "peek") {
+      spots.forEach(function (_, i) { hidden[i] = "tree"; });
+      peekCount = 0; peekSpot = -1; peeking = false;
+      say(intro + " Watch carefully!");
+      later(peekLoop, 2600);
+    } else if (mode === "trail") {
+      spots.forEach(function (sp) { sp.hidden = true; });
+      var go = function () { buildTrail(m.size); };
+      if (m.alarm) {
+        layer('<div class="alarm"></div>');
+        siren();
+        say("Alarm! Alarm! T-Rex got out! Follow his big footprints!");
+        later(go, 2600);
+      } else if (m.runner) {
+        var sino = speciesById("sino");
+        layer('<div class="runner">' + sino.svg + '</div>');
+        chirp();
+        say(intro);
+        later(go, 1500);
+      } else {
+        say(intro);
+        go();
+      }
+    } else if (mode === "lava") {
+      spots.forEach(function (sp) { sp.hidden = true; });
+      buildLava();
+      say(intro + " Tap the shiny stones to hop across!");
+    }
   }
+
+  function dropFeather(sp) {
+    if (!sp || sp.hidden) return;
+    var f = layer('<svg class="feather" viewBox="0 0 60 60">' + HINTS.feather + '</svg>');
+    f.style.left = "calc(" + sp.style.left + " - 2%)";
+    f.style.top = "calc(" + sp.style.top + " - 8%)";
+    setTimeout(function () { f.remove(); }, 3300);
+  }
+  function siren() {
+    for (var i = 0; i < 4; i++) { tone(600, i * 0.6, 0.3, "square", 0.08, 900); tone(900, i * 0.6 + 0.3, 0.3, "square", 0.08, 600); }
+  }
+
+  // footprints to follow
+  var trailNext = 0, trailSize = "big";
+  function buildTrail(size) {
+    trailSize = size; trailNext = 0;
+    var t = TRAILS[size];
+    t.pts.forEach(function (p, i) {
+      var q = t.pts[i + 1] || t.end;
+      var ang = Math.atan2(q[1] - p[1], (q[0] - p[0]) * 1.4) * 180 / Math.PI + 90;
+      var el = layer('<button class="print ' + size + (i === 0 ? " next" : "") + '" data-print="' + i + '" aria-label="Footprint">' + PRINT + '</button>');
+      el.style.left = p[0] + "%"; el.style.top = p[1] + "%";
+      el.style.setProperty("--r", ang + "deg");
+    });
+    if (activeMission.alarm) say("Look! Big footprints! Tap them one by one to follow T-Rex!");
+    else if (size === "small") say("Tiny footprints! Tap them one by one to follow the trail!");
+    else if (size === "giant") say("Whoa! These footprints are huge! Tap them to follow!");
+  }
+  function stepTrail(el) {
+    var i = Number(el.dataset.print);
+    if (i !== trailNext) { say("Tap the footprint that is glowing!"); return; }
+    el.classList.remove("next"); el.classList.add("done");
+    trailNext += 1;
+    if (trailSize === "small") tone(700 + trailNext * 60, 0, 0.08, "triangle", 0.2);
+    else { tone(60, 0, 0.3, "square", 0.2, 40); if (trailSize === "giant") rumble(); shakeGround(); }
+    var nextEl = expedition.querySelector('.print[data-print="' + trailNext + '"]');
+    if (nextEl) { nextEl.classList.add("next"); return; }
+    var t = TRAILS[trailSize];
+    if (trailSize === "giant") {
+      var leg = layer('<button class="giant-leg" aria-label="Giant leg">' + GIANT_LEG + '</button>');
+      leg.style.left = t.end[0] + "%";
+      rumble(); shakeGround();
+      say("The footprints stop at this giant leg! Tap it and look up, way up!");
+      return;
+    }
+    dinoSpot = 0;
+    hidden[0] = "dino";
+    var sp = spots[0];
+    sp.hidden = false;
+    sp.style.left = t.end[0] + "%"; sp.style.top = t.end[1] + "%";
+    sp.classList.add("hint");
+    say(trailSize === "small" ? "The trail goes into this bush! Tap it!" : "The footprints stop here! Something big is in this bush! Tap it!");
+  }
+
+  // stepping stones over the lava
+  var stoneNext = 0, hopper = null;
+  var STONE_X = [22, 40, 58, 76];
+  function buildLava() {
+    stoneNext = 0;
+    layer('<div class="lava"></div>');
+    STONE_X.forEach(function (x, i) {
+      var st = layer('<button class="stone' + (i === 0 ? " next" : "") + '" data-stone="' + i + '" aria-label="Stepping stone">' + STONE + '</button>');
+      st.style.left = x + "%";
+    });
+    var ranger = newPerson(); ranger.outfit = "ranger"; ranger.kind = "grownup"; ranger.style = "short";
+    hopper = layer('<div class="hopper">' + personSvg(ranger, true) + '</div>');
+    hopper.style.left = "7%";
+  }
+  function stepStone(el) {
+    var i = Number(el.dataset.stone);
+    if (i !== stoneNext) { say("Tap the shiny stone!"); return; }
+    el.classList.remove("next");
+    hopper.style.left = STONE_X[i] + "%";
+    boing();
+    stoneNext += 1;
+    var nx = expedition.querySelector('.stone[data-stone="' + stoneNext + '"]');
+    if (nx) { nx.classList.add("next"); say(["Hop!", "Hop! Hot hot hot!", "Hop! Nearly there!"][Math.min(i, 2)]); return; }
+    later(function () {
+      hopper.style.left = "92%";
+      fanfare();
+      say("You crossed the lava! So brave! Now search the volcano rocks!");
+      expedition.querySelectorAll(".lava, .stone").forEach(function (x) { x.classList.add("cool"); x.style.pointerEvents = "none"; x.style.opacity = "0"; });
+      later(function () {
+        expedition.querySelectorAll(".lava, .stone, .hopper").forEach(function (x) { x.remove(); });
+        dinoSpot = Math.floor(Math.random() * spots.length);
+        hidden = shuffledCritters();
+        hidden[dinoSpot] = "dino";
+        hidden[(dinoSpot + 1 + Math.floor(Math.random() * (spots.length - 1))) % spots.length] = "tracks";
+        mode = "search";
+        spots.forEach(function (sp) { sp.hidden = false; });
+      }, 900);
+    }, 500);
+  }
+
+  // hide and seek with Blue
+  var peekSpot = -1, peeking = false, peekCount = 0;
+  function peekLoop() {
+    if (mode !== "peek" || !activeMission) return;
+    var n;
+    do { n = Math.floor(Math.random() * spots.length); } while (n === peekSpot);
+    peekSpot = n; peeking = true;
+    critterOn(spots[n], BLUE_PEEK, "peekup");
+    tone(1600, 0, 0.08, "sine", 0.15, 2200);
+    later(function () { peeking = false; }, 1900);
+    later(peekLoop, 2700);
+  }
+
   function foundTarget() {
     var m = activeMission;
     if (m.type === "species") return speciesById(m.target);
     if (m.type === "escape") return dinoById(m.target);
     return { name: "All 3 eggs!", fact: "Every egg is safe. Great job, ranger!", svg: EGGS_SVG, sound: chime };
   }
+  function revealDino(sp, line) {
+    sp.classList.add("opened", "parted");
+    sp.classList.remove("hint");
+    clearMission(false);
+    say(line || "Shh! Something big is moving in here...");
+    setTimeout(function () { showFound(foundTarget()); }, 900);
+  }
+  function showHint() {
+    if (hintShown || dinoSpot < 0) return;
+    var m = activeMission;
+    if (m.hint !== "spikes" && m.hint !== "eggshell") return;
+    hintShown = true;
+    var sp = spots[dinoSpot];
+    critterOn(sp, HINTS[m.hint], "stay");
+    sp.classList.add("hint");
+    boing();
+    later(function () { say(m.hint === "spikes" ? "Look! Spikes are poking out of one bush! Tap that one!" : "Look! Bits of eggshell next to one rock! Tap that one!"); }, 1600);
+  }
+
   viewMission.addEventListener("click", function (e) {
+    if (!activeMission) return;
+    var pr = e.target.closest(".print");
+    if (pr) { stepTrail(pr); return; }
+    var st = e.target.closest(".stone");
+    if (st) { stepStone(st); return; }
+    if (e.target.closest(".giant-leg")) {
+      rumble(); shakeGround();
+      clearMission(false);
+      say("Look up! Way, way up! It's a giant dinosaur!");
+      setTimeout(function () { showFound(foundTarget()); }, 900);
+      return;
+    }
     var sp = e.target.closest(".bush-spot");
-    if (!sp || !activeMission) return;
-    var n = Number(sp.dataset.spot), what = hidden[n], c = sp.querySelector(".critter");
+    if (!sp) return;
+    var n = Number(sp.dataset.spot), what = hidden[n];
     rustle();
-    sp.classList.remove("shake", "hint"); void sp.offsetWidth; sp.classList.add("shake");
+    sp.classList.remove("shake"); void sp.offsetWidth; sp.classList.add("shake");
+
+    if (mode === "peek") {
+      if (n === peekSpot && peeking) {
+        peeking = false;
+        peekCount += 1;
+        chirp();
+        critterOn(sp, BLUE_PEEK, "stay");
+        if (peekCount >= 3) { clearMission(false); say("Found you, Blue! Hee hee!"); setTimeout(function () { showFound(foundTarget()); }, 1000); return; }
+        say("Found you! Hee hee! Blue ran to another tree. Find her " + (3 - peekCount) + " more " + (3 - peekCount === 1 ? "time!" : "times!"));
+        later(function () { critterOn(sp, "", null); }, 1200);
+      } else {
+        say("Not this tree! Watch for Blue to peek out!");
+      }
+      return;
+    }
     if (what === "dino") {
       if (sp.classList.contains("opened")) return;
-      sp.classList.add("opened", "parted");
-      say("Shh! Something big is moving in here...");
-      setTimeout(function () { showFound(foundTarget()); }, 900);
+      if (mode === "listen") { trumpet(); revealDino(sp, "Toot toot! That's the trumpet sound! Who is it?"); return; }
+      if (mode === "decoys") { grunt(); revealDino(sp, "Those are dinosaur spikes! It's moving!"); return; }
+      revealDino(sp);
+      return;
+    }
+    if (mode === "listen") {
+      var snd = SOUNDS[what];
+      critterOn(sp, what === "bee" ? BEE : CRITTERS[what], "show");
+      snd[1]();
+      say(snd[0]);
+      return;
+    }
+    if (mode === "decoys") {
+      bleh();
+      say(DECOYS[what][1]);
       return;
     }
     if (what === "egg") {
       if (sp.classList.contains("opened")) { say("You already found this egg!"); return; }
       sp.classList.add("opened");
-      c.innerHTML = EGG_ONE;
-      c.classList.remove("show"); void c.offsetWidth; c.classList.add("stay");
+      critterOn(sp, EGG_ONE, "stay");
       chime();
       eggsFound += 1;
       if (eggsFound < 3) { say("You found an egg! " + (3 - eggsFound) + " more to find!"); return; }
@@ -2498,9 +2813,8 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
       setTimeout(function () { showFound(foundTarget()); }, 900);
       return;
     }
-    c.innerHTML = CRITTERS[what];
     if (what === "tracks") {
-      c.classList.remove("show"); void c.offsetWidth; c.classList.add("stay");
+      critterOn(sp, CRITTERS.tracks, "stay");
       if (!sp.classList.contains("opened")) {
         boing();
         if (dinoSpot >= 0 && !spots[dinoSpot].classList.contains("opened")) spots[dinoSpot].classList.add("hint");
@@ -2510,9 +2824,10 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
       return;
     }
     sp.classList.add("opened");
-    c.classList.remove("show"); void c.offsetWidth; c.classList.add("show");
+    critterOn(sp, CRITTERS[what], "show");
     if (what === "frog") boing(); else if (what === "bird") chirp(); else chime();
     say(CRITTER_LINES[what]);
+    showHint();
   });
 
   function showFound(t) {
@@ -2553,6 +2868,7 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
     setTimeout(chug, 300);
     if (first) for (var k = 0; k < 3; k++) setTimeout(function () { addStar($("take-btn")); }, k * 300);
     if (m.type === "species") say(newSpecies ? "The rangers are taking " + t.name + " to the park! It lives in cage " + DINOS.length + " now! Mission complete!" : t.name + " goes back to the park. Mission complete!");
+    else if (m.id === "blue") say("Blue had so much fun playing hide and seek! She is back home now. Mission complete!");
     else if (m.type === "escape") say(shortName(t) + " is back home, and the fence is fixed! Mission complete!");
     else say("The eggs are safe and warm in the Egg Lab! Mission complete!");
     $("take-btn").hidden = true;
@@ -2575,7 +2891,7 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
     setTimeout(function () { mapScroll.scrollTo({ left: Math.max(0, pos.x - 120), top: Math.max(0, pos.y - 80), behavior: "smooth" }); }, 200);
     say(t.name + " is in cage " + (idx + 1) + "! Tap the cage to say hello.");
   });
-  $("again-btn").addEventListener("click", function () { openBook(); });
+  $("again-btn").addEventListener("click", function () { clearMission(true); openBook(); });
 
   // ---------- Pet Shop: people come in and buy baby pet dinosaurs (Roy's idea) ----------
   var viewShop = $("view-shop"), tanksEl = $("tanks"), wishEl = $("wish"), customerEl = $("customer");
