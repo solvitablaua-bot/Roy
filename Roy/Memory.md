@@ -28,6 +28,8 @@ Keep Memory.md up to date at all times. Every time we start a new session, read 
 - Hidden secrets make exploring fun: tapping the volcano, the moon and the bush each gives a star, and finding all three gives the Jungle Explorer badge. More secrets can be added in each new area.
 - Roy's first big idea (spoken): "When I tap on that egg, it should hatch and a baby raptor Blue would come out." This became the Egg Lab.
 - Tapping the egg 3 times (crack, crack, hatch) is more exciting for Roy than hatching on the first tap.
+- Roy's second idea (spoken): "Jurassic World should be on an island surrounded by water. To get to the island, you have to take a boat and then go through the jungle. Then you can go through the gates." This became the trip at the start of the game.
+- Roy thinks about the whole world of the game, not just the dinosaurs. His ideas are about journeys and places.
 - Idea: the game itself could listen to Roy too, for example saying a name out loud to name a new dinosaur.
 
 ## Progress
@@ -40,6 +42,7 @@ Keep Memory.md up to date at all times. Every time we start a new session, read 
 - 2026-10-03: **Step 1 done: Park Gate home screen** (`Roy/game/index.html`). Night jungle with a giant wooden gate, torches and a "ROY'S DINO PARK" sign. Tapping the gate roars, shakes and swings it open, then the park map appears with Egg Lab, Dino Book, Dino Care, Build Park and Missions (all locked for now, Egg Lab glowing as next). Tops, a baby triceratops ranger, talks in a speech bubble and out loud. Stars counter, Park Opener badge, 3 hidden secrets and the Jungle Explorer badge. Sound on/off button. Progress saves on the device. Tested at iPad and phone sizes.
 - 2026-10-03: Published a playable preview at https://claude.ai/artifact/1j9X2trZp4YDxJJUj44Ec3 (private to Roy's parent's account).
 - 2026-10-03: **Step 2 done: Egg Lab, from Roy's own idea.** Tap the Egg Lab on the park map to go inside: a warm lamp shines on a spotted egg in a nest. Tap it: crack, crack, then it hatches, eggshell bits fly, and a baby blue raptor called Blue pops out with a squeak. Roy gets a star and the First Hatch badge. Tap Blue to make her hop, squeak and say fun things. "Hatch again" replays it (no extra stars). A home button goes back to the gate. Blue is saved, so she is there next time. Tested at iPad (both ways round) and phone sizes. Preview updated at the same link.
+- 2026-10-03: **Added the trip to the island, from Roy's idea.** The game now starts at sea at night: the park island (volcano, palm trees, a tiny glowing gate and a dock) sits on the water. Tap the boat 3 times: chug chug, it sails closer and the island grows, then the horn toots: "Land ho!" First time gives a star and the Boat Captain badge. Then the jungle: tap 3 layers of big leaves to swish them aside (a little dinosaur peeks out after the second), the gate appears, and you arrive at the Park Gate. Tested at iPad (both ways round) and phone sizes. Preview updated at the same link.
 - **Next:** Step 3, the Dino Book: Blue becomes the first dinosaur in Roy's collection. Dino Book now glows on the park map as next.
 
 ## Important decisions
@@ -54,3 +57,4 @@ Keep Memory.md up to date at all times. Every time we start a new session, read 
 - 2026-10-03: The guide character is Tops, a friendly baby triceratops in a ranger hat. Original design.
 - 2026-10-03: The game lives in `Roy/game/`, with `index.html` as the start page. Progress (stars, badges, secrets found, sound setting) is saved in the browser on the iPad.
 - 2026-10-03: The first dinosaur is Blue, a baby blue raptor, because Roy asked for it. She is our own drawing (blue body, dark stripe, big orange eyes, fluffy head), not a copy of the movie character.
+- 2026-10-03: The game always starts with the boat trip and jungle walk, then the gate. It takes 6 taps. If it starts to feel too long for Roy, we can add a shortcut later. The Egg Lab home button goes straight back to the gate, not to the boat.
