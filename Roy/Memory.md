@@ -30,6 +30,7 @@ Keep Memory.md up to date at all times. Every time we start a new session, read 
 - Tapping the egg 3 times (crack, crack, hatch) is more exciting for Roy than hatching on the first tap.
 - Roy's second idea (spoken): "Jurassic World should be on an island surrounded by water. To get to the island, you have to take a boat and then go through the jungle. Then you can go through the gates." This became the trip at the start of the game.
 - Roy thinks about the whole world of the game, not just the dinosaurs. His ideas are about journeys and places.
+- Roy's third idea (spoken, not finished yet, he paused): "Now we're building the park and in the park there's gonna be 20 cages with dinosaurs. The cages are gonna be big and far away from each other." So far: Blue the raptor in one cage, then T-Rex, Brachiosaurus and Compsognathus. Roy will tell us the rest.
 - Idea: the game itself could listen to Roy too, for example saying a name out loud to name a new dinosaur.
 
 ## Progress
@@ -43,6 +44,7 @@ Keep Memory.md up to date at all times. Every time we start a new session, read 
 - 2026-10-03: Published a playable preview at https://claude.ai/artifact/1j9X2trZp4YDxJJUj44Ec3 (private to Roy's parent's account).
 - 2026-10-03: **Step 2 done: Egg Lab, from Roy's own idea.** Tap the Egg Lab on the park map to go inside: a warm lamp shines on a spotted egg in a nest. Tap it: crack, crack, then it hatches, eggshell bits fly, and a baby blue raptor called Blue pops out with a squeak. Roy gets a star and the First Hatch badge. Tap Blue to make her hop, squeak and say fun things. "Hatch again" replays it (no extra stars). A home button goes back to the gate. Blue is saved, so she is there next time. Tested at iPad (both ways round) and phone sizes. Preview updated at the same link.
 - 2026-10-03: **Added the trip to the island, from Roy's idea.** The game now starts at sea at night: the park island (volcano, palm trees, a tiny glowing gate and a dock) sits on the water. Tap the boat 3 times: chug chug, it sails closer and the island grows, then the horn toots: "Land ho!" First time gives a star and the Boat Captain badge. Then the jungle: tap 3 layers of big leaves to swish them aside (a little dinosaur peeks out after the second), the gate appears, and you arrive at the Park Gate. Tested at iPad (both ways round) and phone sizes. Preview updated at the same link.
+- 2026-10-03: Roy started describing the Build Park area: 20 big cages, far apart, each with a dinosaur. Waiting for him to finish his list before building.
 - **Next:** Step 3, the Dino Book: Blue becomes the first dinosaur in Roy's collection. Dino Book now glows on the park map as next.
 
 ## Important decisions
