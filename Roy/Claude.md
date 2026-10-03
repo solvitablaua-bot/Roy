@@ -15,7 +15,8 @@ A website where Roy builds his own dinosaur park game, step by step. It should b
 
 ## Rules for working on this project
 
-- Read `Memory.md` before starting and add a dated entry to it after every change.
+- At the start of every session, read `Claude.md` and `Memory.md` to gain full project context.
+- Keep `Memory.md` up to date at all times: what we are learning, key takeaways and ideas, progress, and important decisions.
 - Design for a six-year-old: big buttons, pictures and sounds over text, very short words, no failure states that feel like losing.
 - It must work on an iPad in Safari with touch. No mouse-only or hover-only interactions.
 - No accounts, ads, chat, payments or external links. Save progress on the device only.
