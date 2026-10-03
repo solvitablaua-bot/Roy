@@ -35,6 +35,8 @@ Keep Memory.md up to date at all times. Every time we start a new session, read 
 - Roy's fourth idea (spoken): "Dilophosaurus needs meat every day. Brachiosaurus needs to be fed leaves every day. Ankylosaurus, figure out what kind of food he wants to eat. T-Rex needs meat every day. And the dinosaurs need to be washed, scrubbed in a bath in their cages so they can be clean." This became Dino Care.
 - A daily routine (feed and wash every day) gives Roy a reason to come back each day, like having real pets.
 - Choosing the right food is a gentle guessing game that teaches what each dinosaur ate.
+- Roy's fifth idea (spoken): "I want the people to go to the jungle and find all kinds of new species of dinosaurs. And when they find a new species, we put it in the cage. That will be the ranger adventure." This became Ranger Missions.
+- Roy's ideas now connect into one loop: go on a mission, find a new species, it gets a new cage in the park, then feed and wash it every day.
 - Empty cages are a good way to keep Roy's ideas coming: each one has a "?" sign, and Tops asks "Roy, which dinosaur should live here?"
 - Idea: the game itself could listen to Roy too, for example saying a name out loud to name a new dinosaur.
 
@@ -57,7 +59,8 @@ Keep Memory.md up to date at all times. Every time we start a new session, read 
   - **Wash:** a bath appears with mud blobs on the dinosaur. Roy rubs them off with his finger, with bubbles and pops. When clean: "Squeaky clean!", hearts and a star.
   - Every new day, all dinosaurs are hungry and muddy again (Roy said they need food every day). New badges: Dino Chef (first feed), Bath Time (first wash) and Happy Park (all 20 fed and washed on the same day).
   - Tested at iPad and phone sizes. Preview updated at the same link.
-- **Next:** Ask Roy what he wants next. Ideas: the Dino Book (all of Roy's dinosaurs in one sticker book) and Missions. Roy can also swap any of Claude's 13 picks for dinosaurs he likes better.
+- 2026-10-03: **Built Ranger Missions, from Roy's idea** (Missions on the park map). Two rangers drive their jeep into the jungle. Six big bushes hide things: Roy taps them to search and finds butterflies, frogs, birds, and dinosaur footprints (which make the right bush wiggle as a hint). One bush hides a new species: it appears big with its name, sound and fact. Roy taps "Take it to the park": the dinosaur goes in a crate, the jeep drives off, Roy gets a star, and a new cage (21, 22, ...) appears in the park, which grows bigger to fit. "Visit its cage" jumps to it on the map; the new dinosaur is hungry and muddy, ready for Dino Care. There are 8 species to find, one per mission: Styracosaurus, Microraptor, Oviraptor, Corythosaurus, Kentrosaurus, Ceratosaurus, Sinosauropteryx and Argentinosaurus. Badges: Species Finder (first find) and Expedition Master (all 8). When all 8 are found, Tops asks Roy to tell Claude about a brand new dinosaur. Tested at iPad and phone sizes, including that new cages stay after reloading. Preview updated at the same link.
+- **Next:** Ask Roy what he wants next. Only the Dino Book is still locked (all of Roy's dinosaurs in one sticker book). Roy can also invent new species for missions, or swap any of Claude's picks.
 
 ## Important decisions
 
@@ -78,3 +81,6 @@ Keep Memory.md up to date at all times. Every time we start a new session, read 
 - 2026-10-03: The new dinosaurs are drawn with two shared shapes (one for dinosaurs on two legs, one for four legs) plus each dinosaur's own features, which keeps the code short and the style the same.
 - 2026-10-03: Dinosaur diets follow real science: meat for Blue, T-Rex, Compsognathus, Dilophosaurus, Carnotaurus and Allosaurus; fish (or meat) for Spinosaurus and Baryonyx; fish for Mosasaurus and Pteranodon; leaves for Brachiosaurus, Triceratops, Stegosaurus, Ankylosaurus, Parasaurolophus, Pachycephalosaurus, Diplodocus, Iguanodon and Therizinosaurus; leaves or meat for Gallimimus.
 - 2026-10-03: Feeding and washing happen inside each cage's visit card, as Roy said ("in their cages"). Care resets each day using the iPad's date. Picking the wrong food is never a failure: the dinosaur says "Bleh!" and Roy tries again.
+- 2026-10-03: New species found on missions are real dinosaurs that are less famous, so finding them feels like a discovery and teaches something true (for example, Microraptor had feathers on its arms and legs, and Sinosauropteryx had a stripy ginger tail). They are listed in `SPECIES` in `Roy/game/index.html`; more can be added there, including species Roy invents.
+- 2026-10-03: The "people" in Roy's idea are two park rangers in a jeep, drawn in our own style with different skin tones.
+- 2026-10-03: Missions have no way to fail: every bush shows something fun, and footprints give a hint to the right bush.

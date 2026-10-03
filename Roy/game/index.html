@@ -375,7 +375,7 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
   box-shadow: 0 8px 30px rgba(0, 0, 0, .5);
 }
 .map-scroll { position: absolute; inset: 0; overflow: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
-.world { position: relative; width: 1740px; height: 1270px; background: #2c5a35; }
+.world { position: relative; width: 1740px; height: 1270px; background: #2c5a35; } /* height grows with new cages */
 .world > .ground { position: absolute; inset: 0; width: 100%; height: 100%; }
 .cage { position: absolute; width: 250px; height: 220px; background: none; border: 0; padding: 0; }
 .cage .layer { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
@@ -484,6 +484,39 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
 @keyframes mudgone { to { transform: translate(-50%, -50%) scale(0); opacity: 0; } }
 @keyframes floatup { to { transform: translateY(-90px) scale(1.3); opacity: 0; } }
 @keyframes nope { 20%, 60% { transform: translateX(-12px) rotate(-3deg); } 40%, 80% { transform: translateX(12px) rotate(3deg); } }
+/* ---------- Ranger Missions: find new species (Roy's idea) ---------- */
+.expedition { flex: 1; min-height: 0; position: relative; container-type: size; }
+.bush-spot {
+  position: absolute; width: min(30cqw, 33cqh, 230px);
+  transform: translate(-50%, -50%);
+  background: none; border: 0; padding: 0; pointer-events: auto;
+}
+.bush-spot > svg:first-child { width: 100%; height: auto; display: block; overflow: visible; }
+.bush-spot.shake > svg:first-child { animation: wiggle .5s ease; }
+.bush-spot.hint > svg:first-child { animation: wiggle 1.2s ease-in-out infinite; }
+.bush-spot.parted > svg:first-child { opacity: .35; }
+.critter {
+  position: absolute; left: 50%; bottom: 50%; width: 52%;
+  transform: translateX(-50%) scale(0); transform-origin: 50% 100%;
+  pointer-events: none;
+}
+.critter.show { animation: critter 1.8s ease forwards; }
+.critter.stay { animation: critterstay .5s cubic-bezier(.3, 1.6, .5, 1) forwards; }
+.jeep {
+  position: absolute; left: 0; bottom: 0; width: min(34cqw, 260px);
+  pointer-events: none;
+}
+.jeep svg { width: 100%; height: auto; display: block; }
+.jeep.drive { animation: drive 1.4s cubic-bezier(.2, .7, .3, 1); }
+.jeep.leave { animation: leave 1.2s ease-in forwards; }
+.found-actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+.crate { width: 120px; }
+.visit-dino.boxed svg { animation: boxed .6s ease forwards; }
+@keyframes critter { 0% { transform: translateX(-50%) scale(0); } 20% { transform: translateX(-50%) translateY(-30%) scale(1.1); } 30%, 75% { transform: translateX(-50%) translateY(-30%) scale(1); opacity: 1; } 100% { transform: translateX(-50%) translateY(-120%) scale(.8); opacity: 0; } }
+@keyframes critterstay { to { transform: translateX(-50%) translateY(-20%) scale(1); } }
+@keyframes drive { from { transform: translateX(-110%); } }
+@keyframes leave { to { transform: translateX(-120%); } }
+@keyframes boxed { to { transform: scale(0) rotate(-20deg); opacity: 0; } }
 @keyframes swipe { 0% { transform: translateX(40px); opacity: 0; } 20% { opacity: 1; } 100% { transform: translateX(-90px); opacity: 0; } }
 @keyframes warm { to { opacity: .7; } }
 @keyframes wobble { 20% { transform: rotate(-9deg); } 45% { transform: rotate(8deg); } 70% { transform: rotate(-4deg); } }
@@ -806,11 +839,10 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
       <svg viewBox="0 0 64 64"><rect x="29" y="30" width="6" height="22" fill="#6e4524"/><circle cx="32" cy="22" r="14" fill="#5fb37c"/><circle cx="24" cy="28" r="9" fill="#4f9a6a"/><circle cx="41" cy="28" r="9" fill="#4f9a6a"/><path d="M6 52 h52 M6 42 h52" stroke="#a8844f" stroke-width="4"/><path d="M10 38 v18 M22 38 v18 M42 38 v18 M54 38 v18" stroke="#c29c62" stroke-width="5"/></svg>
       Build Park
 </button>
-    <button class="place" data-place="missions">
+    <button class="place" data-place="missions" id="place-missions">
       <svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="24" fill="#f4e8cc" stroke="#a8844f" stroke-width="5"/><path d="M32 14 L38 32 L32 50 L26 32 Z" fill="#e4572a"/><path d="M32 32 L38 32 L32 50 L26 32 Z" fill="#5d625c"/><circle cx="32" cy="32" r="4" fill="#3b2413"/></svg>
       Missions
-      <span class="soon" aria-label="Coming soon"><svg viewBox="0 0 18 18"><rect x="3" y="8" width="12" height="9" rx="2" fill="#3b2413"/><path d="M5.5 8V6a3.5 3.5 0 0 1 7 0v2" stroke="#3b2413" stroke-width="2.4" fill="none"/></svg></span>
-    </button>
+</button>
   </nav>
   </section>
 
@@ -823,6 +855,110 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
         <path d="M36 62 V30 q0 -6 5 -6 q5 0 5 6 v14 l12 2 q6 1 5 8 l-3 12 q-1 4 -5 4 H44 Z" fill="#f4e8cc" stroke="#3b2413" stroke-width="2.5" stroke-linejoin="round"/>
         <path d="M8 20 h22 M8 20 l8 -6 M8 20 l8 6" stroke="#f4e8cc" stroke-width="4" fill="none" stroke-linecap="round"/>
       </svg>
+    </div>
+  </section>
+
+  <section class="view" id="view-mission" hidden>
+    <div class="expedition" id="expedition">
+      <button class="bush-spot" data-spot="0" style="left:16%;top:24%" aria-label="Bush">
+        <svg viewBox="0 0 200 150" aria-hidden="true">
+          <ellipse cx="100" cy="140" rx="90" ry="10" fill="#0b1f17" opacity=".6"/>
+          <path d="M30 140 Q10 60 60 30 Q50 90 70 140 Z" fill="#2a5e37"/>
+          <path d="M170 140 Q194 64 142 32 Q152 92 132 140 Z" fill="#2a5e37"/>
+          <ellipse cx="60" cy="104" rx="52" ry="40" fill="#24522f"/>
+          <ellipse cx="140" cy="104" rx="54" ry="42" fill="#24522f"/>
+          <ellipse cx="100" cy="82" rx="58" ry="52" fill="#2e6b3d"/>
+          <ellipse cx="80" cy="66" rx="22" ry="14" fill="#3f7a4c"/>
+          <ellipse cx="128" cy="96" rx="20" ry="12" fill="#3f7a4c"/>
+          <path d="M100 140 Q96 70 70 34 M100 140 Q110 76 136 40" stroke="#1d4528" stroke-width="4" fill="none"/>
+        </svg>
+        <svg class="critter" viewBox="0 0 80 60" aria-hidden="true"></svg>
+      </button>
+      <button class="bush-spot" data-spot="1" style="left:50%;top:18%" aria-label="Bush">
+        <svg viewBox="0 0 200 150" aria-hidden="true">
+          <ellipse cx="100" cy="140" rx="90" ry="10" fill="#0b1f17" opacity=".6"/>
+          <path d="M30 140 Q10 60 60 30 Q50 90 70 140 Z" fill="#2a5e37"/>
+          <path d="M170 140 Q194 64 142 32 Q152 92 132 140 Z" fill="#2a5e37"/>
+          <ellipse cx="60" cy="104" rx="52" ry="40" fill="#24522f"/>
+          <ellipse cx="140" cy="104" rx="54" ry="42" fill="#24522f"/>
+          <ellipse cx="100" cy="82" rx="58" ry="52" fill="#2e6b3d"/>
+          <ellipse cx="80" cy="66" rx="22" ry="14" fill="#3f7a4c"/>
+          <ellipse cx="128" cy="96" rx="20" ry="12" fill="#3f7a4c"/>
+          <path d="M100 140 Q96 70 70 34 M100 140 Q110 76 136 40" stroke="#1d4528" stroke-width="4" fill="none"/>
+        </svg>
+        <svg class="critter" viewBox="0 0 80 60" aria-hidden="true"></svg>
+      </button>
+      <button class="bush-spot" data-spot="2" style="left:84%;top:24%" aria-label="Bush">
+        <svg viewBox="0 0 200 150" aria-hidden="true">
+          <ellipse cx="100" cy="140" rx="90" ry="10" fill="#0b1f17" opacity=".6"/>
+          <path d="M30 140 Q10 60 60 30 Q50 90 70 140 Z" fill="#2a5e37"/>
+          <path d="M170 140 Q194 64 142 32 Q152 92 132 140 Z" fill="#2a5e37"/>
+          <ellipse cx="60" cy="104" rx="52" ry="40" fill="#24522f"/>
+          <ellipse cx="140" cy="104" rx="54" ry="42" fill="#24522f"/>
+          <ellipse cx="100" cy="82" rx="58" ry="52" fill="#2e6b3d"/>
+          <ellipse cx="80" cy="66" rx="22" ry="14" fill="#3f7a4c"/>
+          <ellipse cx="128" cy="96" rx="20" ry="12" fill="#3f7a4c"/>
+          <path d="M100 140 Q96 70 70 34 M100 140 Q110 76 136 40" stroke="#1d4528" stroke-width="4" fill="none"/>
+        </svg>
+        <svg class="critter" viewBox="0 0 80 60" aria-hidden="true"></svg>
+      </button>
+      <button class="bush-spot" data-spot="3" style="left:32%;top:52%" aria-label="Bush">
+        <svg viewBox="0 0 200 150" aria-hidden="true">
+          <ellipse cx="100" cy="140" rx="90" ry="10" fill="#0b1f17" opacity=".6"/>
+          <path d="M30 140 Q10 60 60 30 Q50 90 70 140 Z" fill="#2a5e37"/>
+          <path d="M170 140 Q194 64 142 32 Q152 92 132 140 Z" fill="#2a5e37"/>
+          <ellipse cx="60" cy="104" rx="52" ry="40" fill="#24522f"/>
+          <ellipse cx="140" cy="104" rx="54" ry="42" fill="#24522f"/>
+          <ellipse cx="100" cy="82" rx="58" ry="52" fill="#2e6b3d"/>
+          <ellipse cx="80" cy="66" rx="22" ry="14" fill="#3f7a4c"/>
+          <ellipse cx="128" cy="96" rx="20" ry="12" fill="#3f7a4c"/>
+          <path d="M100 140 Q96 70 70 34 M100 140 Q110 76 136 40" stroke="#1d4528" stroke-width="4" fill="none"/>
+        </svg>
+        <svg class="critter" viewBox="0 0 80 60" aria-hidden="true"></svg>
+      </button>
+      <button class="bush-spot" data-spot="4" style="left:68%;top:50%" aria-label="Bush">
+        <svg viewBox="0 0 200 150" aria-hidden="true">
+          <ellipse cx="100" cy="140" rx="90" ry="10" fill="#0b1f17" opacity=".6"/>
+          <path d="M30 140 Q10 60 60 30 Q50 90 70 140 Z" fill="#2a5e37"/>
+          <path d="M170 140 Q194 64 142 32 Q152 92 132 140 Z" fill="#2a5e37"/>
+          <ellipse cx="60" cy="104" rx="52" ry="40" fill="#24522f"/>
+          <ellipse cx="140" cy="104" rx="54" ry="42" fill="#24522f"/>
+          <ellipse cx="100" cy="82" rx="58" ry="52" fill="#2e6b3d"/>
+          <ellipse cx="80" cy="66" rx="22" ry="14" fill="#3f7a4c"/>
+          <ellipse cx="128" cy="96" rx="20" ry="12" fill="#3f7a4c"/>
+          <path d="M100 140 Q96 70 70 34 M100 140 Q110 76 136 40" stroke="#1d4528" stroke-width="4" fill="none"/>
+        </svg>
+        <svg class="critter" viewBox="0 0 80 60" aria-hidden="true"></svg>
+      </button>
+      <button class="bush-spot" data-spot="5" style="left:84%;top:80%" aria-label="Bush">
+        <svg viewBox="0 0 200 150" aria-hidden="true">
+          <ellipse cx="100" cy="140" rx="90" ry="10" fill="#0b1f17" opacity=".6"/>
+          <path d="M30 140 Q10 60 60 30 Q50 90 70 140 Z" fill="#2a5e37"/>
+          <path d="M170 140 Q194 64 142 32 Q152 92 132 140 Z" fill="#2a5e37"/>
+          <ellipse cx="60" cy="104" rx="52" ry="40" fill="#24522f"/>
+          <ellipse cx="140" cy="104" rx="54" ry="42" fill="#24522f"/>
+          <ellipse cx="100" cy="82" rx="58" ry="52" fill="#2e6b3d"/>
+          <ellipse cx="80" cy="66" rx="22" ry="14" fill="#3f7a4c"/>
+          <ellipse cx="128" cy="96" rx="20" ry="12" fill="#3f7a4c"/>
+          <path d="M100 140 Q96 70 70 34 M100 140 Q110 76 136 40" stroke="#1d4528" stroke-width="4" fill="none"/>
+        </svg>
+        <svg class="critter" viewBox="0 0 80 60" aria-hidden="true"></svg>
+      </button>
+      <div class="jeep" id="jeep">
+        <svg viewBox="0 0 230 140">
+          <path d="M150 20 V2" stroke="#3b2413" stroke-width="3"/><path d="M150 3 L172 9 L150 15 Z" fill="#f2a93b"/>
+          <rect x="70" y="30" width="80" height="44" rx="6" fill="none" stroke="#2e312d" stroke-width="5"/>
+          <circle cx="96" cy="52" r="13" fill="#f1c27d"/><path d="M78 46 Q96 30 114 46 Z" fill="#c29c62"/><rect x="74" y="44" width="44" height="5" rx="2" fill="#a8844f"/>
+          <circle cx="92" cy="52" r="1.8" fill="#1d1d1b"/><circle cx="100" cy="52" r="1.8" fill="#1d1d1b"/><path d="M91 58 q5 4 10 0" stroke="#1d1d1b" stroke-width="2" fill="none"/>
+          <circle cx="132" cy="54" r="12" fill="#8d5524"/><path d="M116 48 Q132 34 148 48 Z" fill="#c29c62"/><rect x="113" y="46" width="38" height="5" rx="2" fill="#a8844f"/>
+          <circle cx="128" cy="54" r="1.8" fill="#1d1d1b"/><circle cx="136" cy="54" r="1.8" fill="#1d1d1b"/><path d="M127 60 q5 4 10 0" stroke="#1d1d1b" stroke-width="2" fill="none"/>
+          <path d="M8 74 H200 Q222 74 222 94 V108 H8 Z" fill="#3f6b3a" stroke="#22381f" stroke-width="3"/>
+          <rect x="8" y="84" width="214" height="9" fill="#f2a93b"/>
+          <rect x="196" y="78" width="22" height="10" rx="3" fill="#f9d27a"/>
+          <circle cx="52" cy="112" r="22" fill="#1d1d1b"/><circle cx="52" cy="112" r="9" fill="#8a8f86"/>
+          <circle cx="176" cy="112" r="22" fill="#1d1d1b"/><circle cx="176" cy="112" r="9" fill="#8a8f86"/>
+        </svg>
+      </div>
     </div>
   </section>
 
@@ -900,6 +1036,30 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
       </button>
     </div>
   </section>
+</div>
+
+<div class="visit" id="found" hidden>
+  <div class="visit-card">
+    <div class="dino-stage">
+      <button class="visit-dino" id="found-dino" aria-label="New dinosaur"></button>
+    </div>
+    <h2 class="visit-name" id="found-name"></h2>
+    <p class="visit-fact" id="found-fact"></p>
+    <div class="found-actions">
+      <button class="pill" id="take-btn">
+        <svg viewBox="0 0 40 40"><rect x="4" y="12" width="32" height="24" rx="3" fill="#a8844f" stroke="#3b2413" stroke-width="2.5"/><path d="M4 20 H36 M4 28 H36 M14 12 V36 M26 12 V36" stroke="#6e4524" stroke-width="2"/></svg>
+        Take it to the park
+      </button>
+      <button class="pill" id="see-btn" hidden>
+        <svg viewBox="0 0 40 40"><path d="M6 36 V16 h6 v20 M28 36 V16 h6 v20" fill="#a8844f"/><path d="M4 16 L8 8 H32 L36 16 Z" fill="#6e4524"/><path d="M12 20 h16 v16 h-16 Z" fill="#f9d27a"/></svg>
+        Visit its cage
+      </button>
+      <button class="pill" id="again-btn" hidden>
+        <svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="15" fill="#f4e8cc" stroke="#a8844f" stroke-width="3"/><path d="M20 8 L24 20 L20 32 L16 20 Z" fill="#e4572a"/></svg>
+        New mission
+      </button>
+    </div>
+  </div>
 </div>
 
 <div class="visit" id="visit" hidden>
@@ -1181,7 +1341,6 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
   // ---------- places on the park map ----------
   var placeLines = {
     book: "The Dino Book is coming soon. It will keep all your dinosaurs!",
-    missions: "Ranger Missions are coming soon. Big adventures!"
   };
   menu.addEventListener("click", function (e) {
     var btn = e.target.closest(".place");
@@ -1189,6 +1348,7 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
     if (btn.dataset.place === "egg") { openLab(); return; }
     if (btn.dataset.place === "build") { openMap(); return; }
     if (btn.dataset.place === "care") { openMap(true); return; }
+    if (btn.dataset.place === "missions") { openMission(); return; }
     if (btn.dataset.place === "book" && state.found.hatch) {
       clunk();
       btn.classList.remove("wiggle"); void btn.offsetWidth; btn.classList.add("wiggle");
@@ -1217,6 +1377,7 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
     $("place-egg").classList.toggle("next", !state.found.hatch);
     $("place-build").classList.toggle("next", !!state.found.hatch && !state.found.map);
     $("place-care").classList.toggle("next", !!state.found.map && !state.found.chef);
+    $("place-missions").classList.toggle("next", !!state.found.chef && !state.found.finder);
   }
   updateBook();
 
@@ -1236,7 +1397,7 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
     else say("This is the Egg Lab! Something is inside this egg. Tap it to help it hatch!");
   }
   homeBtn.addEventListener("click", function () {
-    viewLab.hidden = true; viewMap.hidden = true; viewPark.hidden = false; homeBtn.hidden = true;
+    viewLab.hidden = true; viewMap.hidden = true; viewMission.hidden = true; viewPark.hidden = false; homeBtn.hidden = true;
     say("Welcome back to the park gate! Where shall we go?");
   });
 
@@ -1475,7 +1636,62 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
         '<path d="M80 44 l6 -8 M100 40 l6 -8 M120 40 l6 -8" stroke="#46708a" stroke-width="5" stroke-linecap="round"/>' +
         '</svg>' }
   );
-  var CAGE_COUNT = 20;
+  // ---------- new species the rangers can find on missions ----------
+  function fan(cx, cy, r1, r2, from, to, n, fill) {
+    var o = '';
+    for (var i = 0; i < n; i++) {
+      var a = (from + (to - from) * i / (n - 1)) * Math.PI / 180, w = 0.12;
+      o += '<path d="M' + (cx + Math.cos(a - w) * r1) + ' ' + (cy + Math.sin(a - w) * r1) + ' L' + (cx + Math.cos(a) * r2) + ' ' + (cy + Math.sin(a) * r2) + ' L' + (cx + Math.cos(a + w) * r1) + ' ' + (cy + Math.sin(a + w) * r1) + ' Z" fill="' + fill + '"/>';
+    }
+    return o;
+  }
+  var SPECIES = [
+    { id: "styraco", name: "Styracosaurus", k: 0.95, sound: grunt,
+      fact: "Styracosaurus has a crown of long spikes on its frill!",
+      svg: quad({ c: "#b5894a", d: "#8f6a34", b: "#e6cf9e", neckUp: 4,
+        pre: function (hx, hy) { return fan(hx - 4, hy - 4, 22, 48, 190, 290, 6, "#f4e8cc") + '<ellipse cx="' + (hx - 6) + '" cy="' + (hy - 8) + '" rx="24" ry="22" fill="#d9a35a"/>'; },
+        x: function (hx, hy) { return '<path d="M' + (hx + 18) + ' ' + (hy - 6) + ' L' + (hx + 26) + ' ' + (hy - 34) + ' L' + (hx + 30) + ' ' + (hy - 4) + ' Z" fill="#f4e8cc"/>'; } }) },
+    { id: "micro", name: "Microraptor", k: 0.6, sound: function () { chirp(); },
+      fact: "Microraptor had feathers on its arms and legs, like four wings!",
+      svg: biped({ c: "#2e3a4f", d: "#1f2838", b: "#5b6f8f", snout: 4, headR: 0.75, neck: 6,
+        x: function () { return '<path d="M132 100 L192 126 L176 134 L186 146 L166 146 L170 158 L134 120 Z" fill="#4b6fa0"/><path d="M84 138 L54 164 L70 164 L60 176 L94 150 Z" fill="#4b6fa0"/><path d="M20 66 L4 52 L12 74 Z" fill="#4b6fa0"/>'; } }) },
+    { id: "ovi", name: "Oviraptor", k: 0.8, sound: function () { chirp(); },
+      fact: "Oviraptor sat on its nest to keep its eggs warm, like a bird!",
+      svg: biped({ c: "#d2a03c", d: "#ad7f2a", b: "#f1dfae", neck: 16, snout: -10, headR: 0.8,
+        x: function (hx, hy) { return '<path d="M' + (hx - 6) + ' ' + (hy - 10) + ' Q' + (hx + 4) + ' ' + (hy - 44) + ' ' + (hx + 20) + ' ' + (hy - 12) + ' Z" fill="#3b7ea8"/>' +
+          '<path d="M' + (hx + 22) + ' ' + (hy - 6) + ' L' + (hx + 36) + ' ' + (hy + 4) + ' L' + (hx + 22) + ' ' + (hy + 12) + ' Z" fill="#e4572a"/>'; } }) },
+    { id: "corytho", name: "Corythosaurus", k: 1, sound: trumpet,
+      fact: "Corythosaurus has a round crest shaped like a helmet!",
+      svg: quad({ c: "#4f8aa0", d: "#3d6e80", b: "#cfe2ea", neckUp: 22,
+        pre: function (hx, hy) { return '<path d="M' + (hx - 16) + ' ' + (hy - 6) + ' Q' + (hx - 12) + ' ' + (hy - 44) + ' ' + (hx + 16) + ' ' + (hy - 28) + ' Q' + (hx + 16) + ' ' + (hy - 10) + ' ' + hx + ' ' + (hy - 2) + ' Z" fill="#e4572a"/>'; },
+        x: function () { return '<path d="M70 72 l6 -10 M90 66 l6 -10 M110 64 l6 -10" stroke="#3d6e80" stroke-width="6" stroke-linecap="round"/>'; } }) },
+    { id: "kentro", name: "Kentrosaurus", k: 0.95, sound: grunt,
+      fact: "Kentrosaurus has lots of sharp spikes on its back and tail!",
+      svg: quad({ c: "#a8a24a", d: "#86813a", b: "#e0dca6", neckUp: -12, headR: 0.8,
+        pre: function () {
+          var o = '';
+          for (var x = 52; x <= 96; x += 11) { var y = backTop(x + 4, 34) + 6; o += '<path d="M' + x + ' ' + y + ' L' + (x + 4) + ' ' + (y - 30) + ' L' + (x + 9) + ' ' + y + ' Z" fill="#f4e8cc"/>'; }
+          for (var x2 = 100; x2 <= 140; x2 += 13) { var y2 = backTop(x2 + 6, 34) + 6; o += '<path d="M' + x2 + ' ' + y2 + ' L' + (x2 + 6) + ' ' + (y2 - 18) + ' L' + (x2 + 12) + ' ' + y2 + ' Z" fill="#e0763a"/>'; }
+          return o;
+        },
+        x: function () { return '<path d="M10 80 L0 62 L18 78 Z M20 86 L10 66 L28 84 Z M34 92 L28 72 L42 90 Z" fill="#f4e8cc"/>'; } }) },
+    { id: "cerato", name: "Ceratosaurus", k: 1.05, sound: roarBig(0.9),
+      fact: "Ceratosaurus has a horn on its nose!",
+      svg: biped({ c: "#d07a3a", d: "#a85e28", b: "#f0c99a", snout: 8,
+        x: function (hx, hy) { return '<path d="M' + (hx + 26) + ' ' + (hy - 10) + ' L' + (hx + 31) + ' ' + (hy - 32) + ' L' + (hx + 37) + ' ' + (hy - 10) + ' Z" fill="#f4e8cc"/>' +
+          '<path d="M' + hx + ' ' + (hy - 14) + ' L' + (hx + 4) + ' ' + (hy - 24) + ' L' + (hx + 10) + ' ' + (hy - 14) + ' Z" fill="#a85e28"/>' +
+          '<path d="M60 82 l5 -8 M76 74 l5 -8 M92 70 l5 -8 M108 70 l5 -8" stroke="#7a4018" stroke-width="5" stroke-linecap="round"/>'; } }) },
+    { id: "sino", name: "Sinosauropteryx", k: 0.55, sound: function () { chirp(); },
+      fact: "Sinosauropteryx had a stripy ginger tail, like a cat!",
+      svg: biped({ c: "#d9873e", d: "#b56a2c", b: "#f6e6cc", headR: 0.7, neck: 8, snout: 4,
+        x: function () { return '<path d="M62 98 l-6 16 M46 92 l-8 16 M30 82 l-8 14 M16 72 l-8 10" stroke="#f6e6cc" stroke-width="6" stroke-linecap="round"/>'; } }) },
+    { id: "argentino", name: "Argentinosaurus", k: 1.3, sound: function () { tone(70, 0, 1.8, "sine", 0.35, 50); rumble(); },
+      fact: "Argentinosaurus is one of the biggest dinosaurs ever! Stomp stomp!",
+      svg: quad({ c: "#8c7a68", d: "#6f604f", b: "#cfc2b2", neckUp: 56, neckX: 18, headR: 0.7, tailY: 134 }) }
+  ];
+  var SPECIES_DIET = { styraco: ["leaves"], micro: ["meat", "fish"], ovi: ["leaves", "meat"], corytho: ["leaves"], kentro: ["leaves"], cerato: ["meat"], sino: ["meat"], argentino: ["leaves"] };
+  SPECIES.forEach(function (sp) { if (state.found["sp-" + sp.id]) DINOS.push(sp); });
+  var CAGE_COUNT = Math.max(20, DINOS.length);
 
   function cageBack(type) {
     var water = type === "water";
@@ -1515,25 +1731,28 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
       '<path d="M-38 -32 V32 M38 -32 V32" stroke="#3b2413" stroke-width="7" stroke-linecap="round"/></g>';
   }
   function buildWorld() {
+    CAGE_COUNT = Math.max(20, DINOS.length);
+    var H = 60 + Math.ceil(CAGE_COUNT / 5) * 300 + 10;
+    world.style.height = H + "px";
     var pts = [];
     for (var i = 0; i < CAGE_COUNT; i++) { var c = cagePos(i); pts.push((c.x + 125) + "," + (c.y + 205)); }
     var trees = "";
     var tseed = 3;
     function r() { tseed = (tseed * 16807) % 2147483647; return tseed / 2147483647; }
-    for (var t = 0; t < 46; t++) {
-      var tx = r() * 1700 + 20, ty = r() * 1200 + 20;
+    for (var t = 0; t < 46 + (H - 1270) / 30; t++) {
+      var tx = r() * 1700 + 20, ty = r() * (H - 70) + 20;
       var near = false;
       for (var q = 0; q < CAGE_COUNT; q++) { var cp = cagePos(q); if (tx > cp.x - 30 && tx < cp.x + 270 && ty > cp.y - 40 && ty < cp.y + 250) near = true; }
       if (near) continue;
       trees += '<use href="#tree" x="' + tx.toFixed(0) + '" y="' + ty.toFixed(0) + '"/>';
     }
-    var html = '<svg class="ground" viewBox="0 0 1740 1270" aria-hidden="true">' +
+    var html = '<svg class="ground" viewBox="0 0 1740 ' + H + '" aria-hidden="true">' +
       '<defs>' +
         '<pattern id="hazard" width="16" height="16" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="8" height="16" fill="#f2a93b"/><rect x="8" width="8" height="16" fill="#1d1d1b"/></pattern>' +
         '<g id="tree"><ellipse cx="0" cy="34" rx="22" ry="6" fill="#204a2a"/><path d="M0 34 Q2 10 0 -6" stroke="#6e4524" stroke-width="6" fill="none"/>' +
         '<path d="M0 -6 q-18 -4 -30 8 M0 -6 q18 -6 30 6 M0 -6 q-8 -16 -24 -18 M0 -6 q8 -16 24 -16 M0 -6 q0 -16 2 -24" stroke="#3f7a4c" stroke-width="7" fill="none" stroke-linecap="round"/></g>' +
       '</defs>' +
-      '<rect width="1740" height="1270" fill="#2c5a35"/>' +
+      '<rect width="1740" height="' + H + '" fill="#2c5a35"/>' +
       '<ellipse cx="300" cy="420" rx="260" ry="120" fill="#326640"/><ellipse cx="1300" cy="900" rx="320" ry="140" fill="#326640"/><ellipse cx="900" cy="200" rx="300" ry="90" fill="#326640"/>' +
       '<path d="M0 604 C 300 590, 520 624, 860 606 S 1440 590, 1740 608 L1740 642 C 1440 626, 1180 660, 860 640 S 300 626, 0 642 Z" fill="#3b7ea8"/>' +
       '<path d="M400 622 q30 -6 60 0 M900 622 q30 -6 60 0 M1300 616 q30 -6 60 0" stroke="#cfe6ef" stroke-width="3" fill="none" opacity=".6" stroke-linecap="round"/>' +
@@ -1628,6 +1847,7 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
     pachy: ["leaves"], diplo: ["leaves"], iguano: ["leaves"], theri: ["leaves"],
     galli: ["leaves", "meat"]
   };
+  Object.keys(SPECIES_DIET).forEach(function (k) { DIET[k] = SPECIES_DIET[k]; });
   var FOOD_WORD = { meat: "meat", leaves: "leaves", fish: "fish" };
   state.care = state.care || {};
   function today() { var t = new Date(); return t.getFullYear() + "-" + (t.getMonth() + 1) + "-" + t.getDate(); }
@@ -1822,6 +2042,143 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
   stage.addEventListener("pointermove", function (e) { if (e.buttons || e.pointerType === "touch") scrubAt(e.clientX, e.clientY); });
   visitDino.addEventListener("click", function (e) { if (washing) e.stopImmediatePropagation(); }, true);
   updateNeeds();
+
+  // ---------- Ranger Missions: go into the jungle and find new species (Roy's idea) ----------
+  var viewMission = $("view-mission"), jeep = $("jeep"), foundBox = $("found"), foundDino = $("found-dino");
+  var spots = Array.prototype.slice.call(viewMission.querySelectorAll(".bush-spot"));
+  var CRITTERS = {
+    butterfly: '<path d="M40 30 Q20 4 10 18 Q6 34 40 30 Z M40 30 Q60 4 70 18 Q74 34 40 30 Z" fill="#f2a93b"/><path d="M40 30 Q24 54 14 44 Q14 34 40 30 Z M40 30 Q56 54 66 44 Q66 34 40 30 Z" fill="#e4572a"/><rect x="38" y="14" width="4" height="32" rx="2" fill="#3b2413"/>',
+    frog: '<ellipse cx="40" cy="40" rx="26" ry="16" fill="#5fb37c"/><circle cx="28" cy="24" r="9" fill="#5fb37c"/><circle cx="52" cy="24" r="9" fill="#5fb37c"/><circle cx="28" cy="23" r="5" fill="#fff"/><circle cx="52" cy="23" r="5" fill="#fff"/><circle cx="29" cy="24" r="2.6" fill="#1d1d1b"/><circle cx="53" cy="24" r="2.6" fill="#1d1d1b"/><path d="M30 44 Q40 52 50 44" stroke="#1d1d1b" stroke-width="2.5" fill="none"/>',
+    bird: '<ellipse cx="38" cy="36" rx="20" ry="14" fill="#e4572a"/><circle cx="56" cy="24" r="10" fill="#e4572a"/><path d="M64 22 L78 26 L64 30 Z" fill="#f2a93b"/><circle cx="58" cy="22" r="2.5" fill="#1d1d1b"/><path d="M20 32 L4 42 L22 42 Z" fill="#3b7ea8"/><path d="M28 32 Q40 18 48 34 Z" fill="#f2a93b"/>',
+    tracks: [[16, 48], [40, 32], [64, 16]].map(function (p) { return '<g transform="translate(' + p[0] + ' ' + p[1] + ')"><ellipse cx="0" cy="6" rx="6" ry="7" fill="#3b2413"/><path d="M-2 0 L-10 -12 M0 0 L0 -14 M2 0 L10 -12" stroke="#3b2413" stroke-width="4" stroke-linecap="round"/></g>'; }).join("")
+  };
+  var CRITTER_LINES = {
+    butterfly: "Just a butterfly! Keep looking!",
+    frog: "Ribbit! Only a frog! Keep looking!",
+    bird: "Tweet tweet! A bird! Keep looking!"
+  };
+  var hidden = [], dinoSpot = -1, missionSpecies = null;
+  var FINDER_BADGE =
+    '<circle cx="55" cy="55" r="50" fill="#3f6b3a" stroke="#3b2413" stroke-width="5"/><circle cx="55" cy="55" r="38" fill="#f4e8cc"/>' +
+    '<circle cx="50" cy="50" r="18" fill="none" stroke="#3b2413" stroke-width="6"/><path d="M63 63 L80 80" stroke="#3b2413" stroke-width="8" stroke-linecap="round"/>' +
+    '<g transform="translate(44 44)"><ellipse cx="0" cy="6" rx="4" ry="5" fill="#e4572a"/><path d="M-1 1 L-6 -7 M0 0 L0 -9 M1 1 L6 -7" stroke="#e4572a" stroke-width="3" stroke-linecap="round"/></g>';
+  var MASTER_BADGE =
+    '<circle cx="55" cy="55" r="50" fill="#f2a93b" stroke="#3b2413" stroke-width="5"/><circle cx="55" cy="55" r="38" fill="#3f6b3a"/>' +
+    '<path d="M55 24 l8 18 20 2 -15 13 5 20 -18 -11 -18 11 5 -20 -15 -13 20 -2 z" fill="#f4e8cc"/>';
+
+  function nextSpecies() {
+    for (var i = 0; i < SPECIES.length; i++) if (!state.found["sp-" + SPECIES[i].id]) return SPECIES[i];
+    return null;
+  }
+  function openMission() {
+    viewPark.hidden = true; viewMission.hidden = false; homeBtn.hidden = false;
+    startMission();
+  }
+  function startMission() {
+    foundBox.hidden = true;
+    missionSpecies = nextSpecies();
+    var bag = ["butterfly", "frog", "bird", "butterfly", "frog", "bird"];
+    for (var i = bag.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), t = bag[i]; bag[i] = bag[j]; bag[j] = t; }
+    dinoSpot = -1;
+    if (missionSpecies) {
+      dinoSpot = Math.floor(Math.random() * spots.length);
+      bag[dinoSpot] = "dino";
+      var trackSpot = (dinoSpot + 1 + Math.floor(Math.random() * (spots.length - 1))) % spots.length;
+      bag[trackSpot] = "tracks";
+    }
+    hidden = bag;
+    spots.forEach(function (sp) {
+      sp.classList.remove("shake", "hint", "parted", "opened");
+      var c = sp.querySelector(".critter"); c.classList.remove("show", "stay"); c.innerHTML = "";
+    });
+    jeep.classList.remove("drive", "leave"); void jeep.offsetWidth; jeep.classList.add("drive");
+    chug();
+    say(missionSpecies
+      ? "Rangers, let's go! A new kind of dinosaur is hiding in the jungle. Tap the bushes to search!"
+      : "You found every new species on the island! Roy, tell Claude about a brand new dinosaur to discover!");
+  }
+  viewMission.addEventListener("click", function (e) {
+    var sp = e.target.closest(".bush-spot");
+    if (!sp) return;
+    var n = Number(sp.dataset.spot), what = hidden[n], c = sp.querySelector(".critter");
+    rustle();
+    sp.classList.remove("shake", "hint"); void sp.offsetWidth; sp.classList.add("shake");
+    if (what === "dino") {
+      if (sp.classList.contains("opened")) return;
+      sp.classList.add("opened", "parted");
+      say("Shh! Something big is moving in this bush...");
+      setTimeout(function () { showFound(missionSpecies); }, 900);
+      return;
+    }
+    c.innerHTML = CRITTERS[what];
+    if (what === "tracks") {
+      c.classList.remove("show"); void c.offsetWidth; c.classList.add("stay");
+      if (!sp.classList.contains("opened")) {
+        boing();
+        if (dinoSpot >= 0 && !spots[dinoSpot].classList.contains("opened")) spots[dinoSpot].classList.add("hint");
+      }
+      sp.classList.add("opened");
+      say("Dinosaur footprints! The new dinosaur is close by! Look for the wiggly bush!");
+      return;
+    }
+    sp.classList.add("opened");
+    c.classList.remove("show"); void c.offsetWidth; c.classList.add("show");
+    if (what === "frog") boing(); else if (what === "bird") chirp(); else chime();
+    say(CRITTER_LINES[what]);
+  });
+
+  function showFound(sp) {
+    foundDino.innerHTML = sp.svg;
+    foundDino.classList.remove("boxed", "hop");
+    $("found-name").textContent = sp.name;
+    $("found-fact").textContent = sp.fact;
+    $("take-btn").hidden = false; $("see-btn").hidden = true; $("again-btn").hidden = true;
+    foundBox.hidden = false;
+    sp.sound(); fanfare();
+    say("Wow! A new species! It's called " + sp.name + "! " + sp.fact);
+  }
+  foundDino.addEventListener("click", function () {
+    if (!missionSpecies || foundDino.classList.contains("boxed")) return;
+    missionSpecies.sound();
+    foundDino.classList.remove("hop"); void foundDino.offsetWidth; foundDino.classList.add("hop");
+    say(missionSpecies.fact);
+  });
+  $("take-btn").addEventListener("click", function () {
+    var sp = missionSpecies;
+    if (!sp || state.found["sp-" + sp.id]) return;
+    state.found["sp-" + sp.id] = true;
+    DINOS.push(sp);
+    save();
+    buildWorld(); updateNeeds();
+    foundDino.classList.add("boxed");
+    clunk();
+    jeep.classList.remove("drive"); void jeep.offsetWidth; jeep.classList.add("leave");
+    setTimeout(chug, 300);
+    addStar($("take-btn"));
+    var cageNo = DINOS.length;
+    say("The rangers are taking " + sp.name + " to the park! It lives in cage " + cageNo + " now!");
+    $("take-btn").hidden = true; $("see-btn").hidden = false; $("again-btn").hidden = false;
+    if (!state.found.finder) {
+      state.found.finder = true; save(); updateBook();
+      setTimeout(function () { showBadge("Species Finder", "You found a new dinosaur!", FINDER_BADGE); }, 1300);
+    } else if (!nextSpecies() && !state.found.master) {
+      state.found.master = true; save();
+      setTimeout(function () {
+        showBadge("Expedition Master", "You found every new species!", MASTER_BADGE);
+        say("You found all " + SPECIES.length + " new species! You are an Expedition Master, Roy!");
+      }, 1300);
+    }
+  });
+  $("see-btn").addEventListener("click", function () {
+    var sp = missionSpecies;
+    foundBox.hidden = true;
+    viewMission.hidden = true;
+    openMap();
+    var idx = DINOS.indexOf(sp), pos = cagePos(idx);
+    setTimeout(function () { mapScroll.scrollTo({ left: Math.max(0, pos.x - 120), top: Math.max(0, pos.y - 80), behavior: "smooth" }); }, 200);
+    say(sp.name + " is in cage " + (idx + 1) + "! Tap the cage to say hello. It is hungry and muddy!");
+  });
+  $("again-btn").addEventListener("click", function () { startMission(); });
 
   var KEEPER_BADGE =
     '<circle cx="55" cy="55" r="50" fill="#e4572a" stroke="#3b2413" stroke-width="5"/>' +
