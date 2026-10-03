@@ -379,7 +379,7 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
 .world > .ground { position: absolute; inset: 0; width: 100%; height: 100%; }
 .cage { position: absolute; width: 250px; height: 220px; background: none; border: 0; padding: 0; }
 .cage .layer { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
-.cage .dino { position: absolute; left: 50%; bottom: 25%; width: calc(150px * var(--k, 1)); transform: translateX(-50%); }
+.cage .dino { position: absolute; left: 50%; bottom: calc(25% + var(--lift, 0%)); width: calc(150px * var(--k, 1)); transform: translateX(-50%); }
 .cage .dino svg { width: 100%; height: auto; display: block; overflow: visible; }
 .cage .dino .blue-body, .cage .dino .eye { animation: none; }
 .cage:active { transform: scale(.97); }
@@ -1255,12 +1255,151 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
       fact: "Dilophosaurus has two crests on its head, like a crown!",
       sound: function () { tone(330, 0, 0.25, "triangle", 0.25, 520); tone(330, 0.3, 0.25, "triangle", 0.25, 520); tone(440, 0.6, 0.4, "triangle", 0.25, 260); } }
   ];
+  // ---------- 13 more dinosaurs, picked for Roy ----------
+  function eye(x, y, r) {
+    return '<circle cx="' + x + '" cy="' + y + '" r="' + r + '" fill="#fff"/><circle cx="' + (x + 1.5) + '" cy="' + (y + 0.5) + '" r="' + (r * 0.58) + '" fill="#1d1d1b"/><circle cx="' + (x + 2.5) + '" cy="' + (y - 1.5) + '" r="' + (r * 0.22) + '" fill="#fff"/>';
+  }
+  // a dinosaur that walks on two legs, facing right
+  function biped(o) {
+    var sn = o.snout || 0, hr = o.headR || 1, hx = 160, hy = 58 - (o.neck || 0), arm = o.arm || 12;
+    var H = function (f) { return f(hx, hy); };
+    return '<svg viewBox="0 0 230 180">' + (o.pre ? o.pre(hx, hy) : '') +
+      '<path d="M72 98 Q30 90 4 58 Q22 104 78 124 Z" fill="' + o.c + '"/>' +
+      '<ellipse cx="88" cy="120" rx="22" ry="28" fill="' + o.d + '"/>' +
+      '<path d="M80 140 L76 166 L100 166 L96 140 Z" fill="' + o.d + '"/>' +
+      '<ellipse cx="102" cy="100" rx="46" ry="30" fill="' + o.c + '"/>' +
+      '<path d="M122 80 Q' + (hx - 22) + ' ' + (hy + 8) + ' ' + (hx - 8) + ' ' + (hy + 4) + ' L' + (hx + 4) + ' ' + (hy + 22) + ' Q' + (hx - 18) + ' ' + (hy + 34) + ' 136 108 Z" fill="' + o.c + '"/>' +
+      '<ellipse cx="' + hx + '" cy="' + hy + '" rx="' + (26 * hr) + '" ry="' + (18 * hr) + '" fill="' + o.c + '"/>' +
+      '<path d="M' + (hx + 6) + ' ' + (hy - 12 * hr) + ' Q' + (hx + 36 + sn) + ' ' + (hy - 10 * hr) + ' ' + (hx + 40 + sn) + ' ' + (hy + 2) + ' Q' + (hx + 38 + sn) + ' ' + (hy + 12 * hr) + ' ' + (hx + 6) + ' ' + (hy + 14 * hr) + ' Z" fill="' + o.c + '"/>' +
+      '<ellipse cx="112" cy="112" rx="30" ry="14" fill="' + o.b + '"/>' +
+      '<path d="M106 124 Q104 150 112 162 L130 164 L124 150 Q126 136 122 122 Z" fill="' + o.c + '"/>' +
+      '<path d="M134 104 q14 4 ' + (arm * 0.8) + ' ' + arm + ' l-4 -2 l0 4 l-4 -3 Z" fill="' + o.d + '"/>' +
+      (o.x ? o.x(hx, hy) : '') +
+      eye(hx + 4, hy - 4, 7 * Math.max(hr, 0.8)) +
+      '<path d="M' + (hx + 14) + ' ' + (hy + 8 * hr) + ' Q' + (hx + 26 + sn / 2) + ' ' + (hy + 12 * hr) + ' ' + (hx + 36 + sn) + ' ' + (hy + 4) + '" stroke="#1d1d1b" stroke-width="2.5" fill="none" stroke-linecap="round"/>' +
+      '<circle cx="' + (hx + 34 + sn) + '" cy="' + (hy - 4) + '" r="2" fill="#1d1d1b"/>' +
+      '</svg>';
+  }
+  // a dinosaur that walks on four legs, facing right
+  function quad(o) {
+    var hr = o.headR || 1, hx = 182 + (o.neckX || 0), hy = 80 - (o.neckUp || 0), ry = o.bodyRy || 34;
+    return '<svg viewBox="0 0 230 170">' + (o.pre ? o.pre(hx, hy) : '') +
+      '<path d="M60 96 Q30 92 4 ' + (o.tailY || 84) + ' Q20 118 64 118 Z" fill="' + o.c + '"/>' +
+      '<rect x="54" y="108" width="22" height="48" rx="9" fill="' + o.d + '"/><rect x="128" y="108" width="22" height="48" rx="9" fill="' + o.d + '"/>' +
+      '<ellipse cx="100" cy="96" rx="58" ry="' + ry + '" fill="' + o.c + '"/>' +
+      '<path d="M146 ' + (96 - ry * 0.6) + ' Q' + (hx - 16) + ' ' + (hy - 8) + ' ' + (hx - 6) + ' ' + (hy - 10 * hr) + ' L' + hx + ' ' + (hy + 12 * hr) + ' Q' + (hx - 20) + ' ' + (hy + 14) + ' 150 112 Z" fill="' + o.c + '"/>' +
+      '<rect x="70" y="112" width="22" height="48" rx="9" fill="' + o.c + '"/><rect x="144" y="112" width="22" height="48" rx="9" fill="' + o.c + '"/>' +
+      '<ellipse cx="104" cy="' + (96 + ry * 0.6) + '" rx="40" ry="11" fill="' + o.b + '"/>' +
+      '<ellipse cx="' + (hx + 4) + '" cy="' + hy + '" rx="' + (20 * hr) + '" ry="' + (14 * hr) + '" fill="' + o.c + '"/>' +
+      '<ellipse cx="' + (hx + 4 + 16 * hr) + '" cy="' + (hy + 4 * hr) + '" rx="' + (12 * hr) + '" ry="' + (9 * hr) + '" fill="' + o.c + '"/>' +
+      (o.x ? o.x(hx, hy) : '') +
+      eye(hx + 6, hy - 4 * hr, 6 * Math.max(hr, 0.8)) +
+      '<path d="M' + (hx + 10 * hr) + ' ' + (hy + 8 * hr) + ' Q' + (hx + 20 * hr) + ' ' + (hy + 12 * hr) + ' ' + (hx + 28 * hr) + ' ' + (hy + 6 * hr) + '" stroke="#1d1d1b" stroke-width="2.5" fill="none" stroke-linecap="round"/>' +
+      '</svg>';
+  }
+  function backTop(x, ry) { var t = (x - 100) / 58; return 96 - ry * Math.sqrt(Math.max(0, 1 - t * t)); }
+  function plates() {
+    var out = '';
+    for (var x = 48; x <= 140; x += 15) {
+      var y = backTop(x + 8, 34) + 6, h = 18 + (x > 70 && x < 130 ? 10 : 0);
+      out += '<path d="M' + x + ' ' + y + ' L' + (x + 8) + ' ' + (y - h) + ' L' + (x + 16) + ' ' + y + ' Z" fill="#e0763a" stroke="#a84a24" stroke-width="2"/>';
+    }
+    return out;
+  }
+  var roarBig = function (p) { return function () { roar(p, 1.8); }; };
+  var trumpet = function () { tone(196, 0, 0.9, "sawtooth", 0.12, 233); tone(294, 0, 0.9, "triangle", 0.12, 349); };
+  var grunt = function () { tone(90, 0, 0.3, "sawtooth", 0.15, 60); tone(80, 0.4, 0.3, "sawtooth", 0.15, 55); };
+  var bonk = function () { tone(180, 0, 0.15, "square", 0.2, 90); setTimeout(function () { boing(); }, 180); };
+  DINOS.push(
+    { id: "stego", name: "Stegosaurus", k: 1, sound: grunt,
+      fact: "Stegosaurus has big plates on its back and spikes on its tail!",
+      svg: quad({ c: "#8a9a4a", d: "#6b7a36", b: "#d4d0a0", neckUp: -12, headR: 0.85,
+        pre: plates,
+        x: function () { return '<path d="M10 80 L0 64 L18 78 Z M18 84 L12 66 L26 82 Z" fill="#f4e8cc"/>'; } }) },
+    { id: "ankylo", name: "Ankylosaurus", k: 1, sound: bonk,
+      fact: "Ankylosaurus wears armor, with a club on its tail. Bonk!",
+      svg: quad({ c: "#9a7a52", d: "#7a5c3a", b: "#d6c29a", neckUp: -16, headR: 0.9, bodyRy: 26,
+        x: function () {
+          var o = '<ellipse cx="10" cy="86" rx="14" ry="11" fill="#7a5c3a"/>';
+          for (var i = 0; i < 6; i++) o += '<circle cx="' + (60 + i * 16) + '" cy="' + (backTop(60 + i * 16, 26) + 8) + '" r="6" fill="#c9a36a"/>';
+          for (var j = 0; j < 5; j++) o += '<circle cx="' + (68 + j * 16) + '" cy="' + (backTop(68 + j * 16, 26) + 22) + '" r="5" fill="#c9a36a"/>';
+          return o + '<path d="M44 96 l-10 4 l10 4 Z M156 96 l10 4 l-10 4 Z" fill="#f4e8cc"/>';
+        } }) },
+    { id: "ptera", name: "Pteranodon", k: 1.05, lift: "18%", sound: function () { screech(); },
+      fact: "Pteranodon is a flying reptile that soars over the sea!",
+      svg: '<svg viewBox="0 0 220 140">' +
+        '<path d="M100 70 L10 30 Q40 70 96 84 Z" fill="#8a4f2e"/>' +
+        '<path d="M120 70 L210 30 Q180 70 124 84 Z" fill="#b8693e"/>' +
+        '<ellipse cx="110" cy="78" rx="26" ry="13" fill="#a3603a"/>' +
+        '<ellipse cx="112" cy="84" rx="16" ry="6" fill="#e2b48a"/>' +
+        '<path d="M126 70 L104 40 L132 62 Z" fill="#e4572a"/>' +
+        '<ellipse cx="134" cy="66" rx="12" ry="9" fill="#a3603a"/>' +
+        '<path d="M140 62 L182 70 L140 74 Z" fill="#f2a93b"/>' + eye(134, 64, 5) +
+        '<path d="M100 90 l-6 12 M116 90 l2 12" stroke="#8a4f2e" stroke-width="4" stroke-linecap="round"/>' +
+        '</svg>' },
+    { id: "para", name: "Parasaurolophus", k: 1, sound: trumpet,
+      fact: "Parasaurolophus has a long crest. It might have tooted like a trumpet!",
+      svg: quad({ c: "#6aa86a", d: "#4f8a50", b: "#d8e6b0", neckUp: 22, headR: 0.95,
+        pre: function (hx, hy) { return '<path d="M' + (hx + 2) + ' ' + (hy - 8) + ' Q' + (hx - 30) + ' ' + (hy - 40) + ' ' + (hx - 52) + ' ' + (hy - 40) + ' Q' + (hx - 40) + ' ' + (hy - 24) + ' ' + (hx - 6) + ' ' + (hy + 4) + ' Z" fill="#e4572a"/>'; },
+        x: function () { return '<path d="M70 72 l6 -10 M90 66 l6 -10 M110 64 l6 -10 M130 66 l6 -10" stroke="#4f8a50" stroke-width="6" stroke-linecap="round"/>'; } }) },
+    { id: "pachy", name: "Pachycephalosaurus", k: 0.9, sound: bonk,
+      fact: "Pachycephalosaurus has a super thick, bumpy head!",
+      svg: biped({ c: "#a87a5a", d: "#84593c", b: "#e2c9a6", headR: 0.95,
+        x: function (hx, hy) {
+          var o = '<ellipse cx="' + (hx - 2) + '" cy="' + (hy - 12) + '" rx="22" ry="17" fill="#c49870"/>';
+          for (var i = 0; i < 5; i++) o += '<circle cx="' + (hx - 24 + i * 6) + '" cy="' + (hy - 2 - Math.abs(i - 2) * 3) + '" r="3" fill="#84593c"/>';
+          return o;
+        } }) },
+    { id: "galli", name: "Gallimimus", k: 0.9, sound: function () { chirp(); },
+      fact: "Gallimimus is a speedy runner, like an ostrich!",
+      svg: biped({ c: "#d8b77a", d: "#b8955a", b: "#f1e3c0", neck: 24, snout: 6, headR: 0.7,
+        x: function () { return '<path d="M70 82 l8 -8 M86 76 l8 -8 M102 74 l8 -8" stroke="#b8955a" stroke-width="5" stroke-linecap="round"/>'; } }) },
+    { id: "carno", name: "Carnotaurus", k: 1, sound: roarBig(0.85),
+      fact: "Carnotaurus has two horns on its head, like a bull!",
+      svg: biped({ c: "#b8483a", d: "#8e3328", b: "#e2a08a", snout: 2, arm: 6,
+        x: function (hx, hy) { return '<path d="M' + (hx - 4) + ' ' + (hy - 12) + ' L' + (hx - 18) + ' ' + (hy - 32) + ' L' + (hx + 6) + ' ' + (hy - 16) + ' Z" fill="#f4e8cc"/>' +
+          '<path d="M64 84 l4 -6 M80 76 l4 -7 M96 72 l4 -7 M112 72 l4 -7" stroke="#8e3328" stroke-width="5" stroke-linecap="round"/>'; } }) },
+    { id: "diplo", name: "Diplodocus", k: 1.15, sound: function () { tone(100, 0, 1.6, "sine", 0.3, 70); },
+      fact: "Diplodocus is super long, with a tail like a whip!",
+      svg: quad({ c: "#9aa86a", d: "#7d8a52", b: "#d6deb0", neckUp: 50, neckX: 16, headR: 0.7, tailY: 132 }) },
+    { id: "allo", name: "Allosaurus", k: 1.05, sound: roarBig(0.95),
+      fact: "Allosaurus was a big hunter, long before T-Rex!",
+      svg: biped({ c: "#c9853f", d: "#a3672b", b: "#efd1a0", snout: 8,
+        x: function (hx, hy) { return '<path d="M' + (hx + 8) + ' ' + (hy - 14) + ' L' + (hx + 14) + ' ' + (hy - 28) + ' L' + (hx + 22) + ' ' + (hy - 12) + ' Z" fill="#e4572a"/>' +
+          '<path d="M60 84 l6 -8 M78 76 l6 -9 M96 72 l6 -9 M114 72 l6 -9" stroke="#8a5420" stroke-width="5" stroke-linecap="round"/>'; } }) },
+    { id: "iguano", name: "Iguanodon", k: 1, sound: grunt,
+      fact: "Iguanodon has a pointy spike on its thumb!",
+      svg: quad({ c: "#5f9a7a", d: "#4a7d62", b: "#c9e2cf", neckUp: 10,
+        x: function () { return '<path d="M156 150 L148 136 L162 144 Z" fill="#f4e8cc" stroke="#3b2413" stroke-width="1.5"/>'; } }) },
+    { id: "bary", name: "Baryonyx", k: 1, sound: roarBig(1.05),
+      fact: "Baryonyx has a giant claw and loves to catch fish!",
+      svg: biped({ c: "#6f8a5a", d: "#566e45", b: "#d2dcb0", snout: 20, headR: 0.85, arm: 22,
+        x: function () { return '<path d="M152 126 q10 2 10 14 q-4 -6 -12 -8 Z" fill="#f4e8cc"/>'; } }) },
+    { id: "theri", name: "Therizinosaurus", k: 1.05, sound: function () { chirp(); grunt(); },
+      fact: "Therizinosaurus has giant claws, but it only ate plants!",
+      svg: biped({ c: "#b08a5a", d: "#8a6a40", b: "#e8d4b0", neck: 18, snout: 2, headR: 0.75, arm: 26,
+        x: function () { var o = ''; for (var i = 0; i < 7; i++) o += '<path d="M' + (60 + i * 12) + ' ' + (76 - (i > 3 ? (i - 3) * 4 : 0)) + ' q4 -10 10 -2" stroke="#8a6a40" stroke-width="4" fill="none" stroke-linecap="round"/>';
+          return o + '<path d="M150 130 l24 18 M146 132 l18 24 M142 132 l10 28" stroke="#f4e8cc" stroke-width="4" stroke-linecap="round"/>'; } }) },
+    { id: "mosa", name: "Mosasaurus", k: 1.15, cage: "water", lift: "-6%", sound: function () { chug(); roar(0.8, 1.2); },
+      fact: "Mosasaurus is a giant sea reptile that lives in the water!",
+      svg: '<svg viewBox="0 0 240 120">' +
+        '<path d="M40 64 L4 36 L14 64 L4 92 Z" fill="#46708a"/>' +
+        '<ellipse cx="110" cy="64" rx="80" ry="26" fill="#5a86a2"/>' +
+        '<ellipse cx="116" cy="76" rx="56" ry="10" fill="#c7dbe6"/>' +
+        '<path d="M90 82 L70 108 L104 88 Z M150 82 L140 108 L164 86 Z" fill="#46708a"/>' +
+        '<path d="M170 50 Q200 42 236 56 Q234 70 200 76 L170 78 Z" fill="#5a86a2"/>' +
+        '<polyline points="184,70 188,76 192,70 196,76 200,70 204,75 208,69 212,74 216,68 220,72" fill="#fff" stroke="#fff" stroke-width="1"/>' +
+        eye(190, 56, 6) + '<circle cx="230" cy="56" r="2" fill="#1d1d1b"/>' +
+        '<path d="M80 44 l6 -8 M100 40 l6 -8 M120 40 l6 -8" stroke="#46708a" stroke-width="5" stroke-linecap="round"/>' +
+        '</svg>' }
+  );
   var CAGE_COUNT = 20;
 
-  function cageBack() {
+  function cageBack(type) {
+    var water = type === "water";
     return '<svg class="layer back" viewBox="0 0 250 220" aria-hidden="true">' +
-      '<ellipse cx="125" cy="150" rx="122" ry="62" fill="#3d7a46"/>' +
-      '<ellipse cx="110" cy="140" rx="70" ry="30" fill="#4a8a52"/>' +
+      '<ellipse cx="125" cy="150" rx="122" ry="62" fill="' + (water ? "#c9a76a" : "#3d7a46") + '"/>' +
+      '<ellipse cx="125" cy="146" rx="' + (water ? 108 : 70) + '" ry="' + (water ? 50 : 30) + '" fill="' + (water ? "#3b7ea8" : "#4a8a52") + '"/>' +
       '<path d="M14 120 Q125 60 236 120" stroke="#3b2413" stroke-width="5" fill="none"/>' +
       '<path d="M14 104 Q125 44 236 104" stroke="#3b2413" stroke-width="5" fill="none"/>' +
       '<path d="M14 90 V150 M54 74 V130 M94 64 V122 M156 64 V122 M196 74 V130 M236 90 V150" stroke="#6e4524" stroke-width="8" stroke-linecap="round"/>' +
@@ -1273,8 +1412,8 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
       '<path d="M8 150 V186 M48 168 V204 M202 168 V204 M242 150 V186" stroke="#8a5a31" stroke-width="10" stroke-linecap="round"/>' +
       '<rect x="88" y="176" width="74" height="36" rx="4" fill="#1d1d1b"/>' +
       '<rect x="91" y="179" width="68" height="30" rx="3" fill="url(#hazard)"/>' +
-      '<rect x="70" y="190" width="110" height="28" rx="6" fill="#f4e8cc" stroke="#3b2413" stroke-width="3"/>' +
-      '<text x="125" y="210" text-anchor="middle" font-family="Baloo 2, Trebuchet MS, sans-serif" font-weight="800" font-size="' + (label.length > 10 ? 13 : 17) + '" fill="#3b2413">' + label + '</text>' +
+      '<rect x="58" y="190" width="134" height="28" rx="6" fill="#f4e8cc" stroke="#3b2413" stroke-width="3"/>' +
+      '<text x="125" y="210" text-anchor="middle" font-family="Baloo 2, Trebuchet MS, sans-serif" font-weight="800" font-size="' + (label.length > 14 ? 11.5 : label.length > 10 ? 14 : 17) + '" fill="#3b2413">' + label + '</text>' +
       '<circle cx="20" cy="30" r="16" fill="#f2a93b" stroke="#3b2413" stroke-width="3"/>' +
       '<text x="20" y="36" text-anchor="middle" font-family="Baloo 2, Trebuchet MS, sans-serif" font-weight="800" font-size="16" fill="#3b2413">' + n + '</text>' +
       '<g class="got"><path d="M230 12l5 11 12 1-9 8 3 12-11-6-11 6 3-12-9-8 12-1z" fill="#f2a93b" stroke="#3b2413" stroke-width="2" stroke-linejoin="round"/></g>' +
@@ -1323,8 +1462,8 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
       '</svg>';
     for (var k = 0; k < CAGE_COUNT; k++) {
       var pos = cagePos(k), d = DINOS[k];
-      var inner = cageBack() +
-        (d ? '<div class="dino" style="--k:' + d.k + '">' + d.svg + '</div>' : '') +
+      var inner = cageBack(d && d.cage) +
+        (d ? '<div class="dino" style="--k:' + d.k + (d.lift ? ';--lift:' + d.lift : '') + '">' + d.svg + '</div>' : '') +
         cageFront(d ? d.name.replace(" the Raptor", "") : "?", k + 1);
       html += '<button class="cage' + (d ? "" : " empty") + (d && state.found["saw-" + d.id] ? " visited" : "") +
         '" data-cage="' + k + '" style="left:' + pos.x + 'px;top:' + pos.y + 'px" aria-label="' + (d ? d.name : "Empty cage") + '">' + inner + '</button>';
