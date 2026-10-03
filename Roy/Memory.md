@@ -15,6 +15,7 @@ Keep Memory.md up to date at all times. Every time we start a new session, read 
 
 - Claude Code runs in a cloud container, not on the iPad. Project files live in the GitHub repository `solvitablaua-bot/Roy` and can be opened on the iPad through the Claude app, the GitHub app or a git app such as Working Copy.
 - Claude automatically reads a file called `CLAUDE.md` at the top of the repository when a session starts. Files in subfolders, such as `Roy/Claude.md`, are only read if something points to them.
+- Roy can't write yet, so he speaks his instructions and voice dictation turns them into text. Claude has to understand messages with odd spellings and made-up words.
 
 ## Key takeaways and ideas
 
@@ -23,6 +24,7 @@ Keep Memory.md up to date at all times. Every time we start a new session, read 
 - It should feel like the Jurassic movies (jungle, amber, park gate, warning signs, roars) but stay exciting and never scary.
 - Gamification: stars, ranger levels, badges, a daily mystery egg, and no way to lose.
 - Every build step should end with something Roy can play, so he sees his game grow.
+- Idea: the game itself could listen to Roy too, for example saying a name out loud to name a new dinosaur.
 
 ## Progress
 
@@ -30,6 +32,7 @@ Keep Memory.md up to date at all times. Every time we start a new session, read 
 - 2026-10-03: Added project context to `Claude.md`.
 - 2026-10-03: Created `Project-Overview.md` with the game idea, look and feel, main parts, gamification, safety, technology and a 7-step build plan.
 - 2026-10-03: Organised `Memory.md` into learning, takeaways, progress and decisions, and added a top-level `CLAUDE.md` so every new session loads the project context.
+- 2026-10-03: Added "How Roy talks to Claude" to `Claude.md`, because Roy gives instructions by speaking.
 - **Next:** Step 1 of the build plan, the Park Gate home screen.
 
 ## Important decisions
@@ -40,3 +43,4 @@ Keep Memory.md up to date at all times. Every time we start a new session, read 
 - 2026-10-03: No accounts, ads, chat, purchases or external links. Progress is saved only on the device.
 - 2026-10-03: Use original art, sounds and names, inspired by the movies, without copying official Jurassic World logos, characters or assets.
 - 2026-10-03: A top-level `CLAUDE.md` loads `Roy/Claude.md` and `Roy/Memory.md` automatically at the start of every session.
+- 2026-10-03: Roy gives instructions by speaking, not writing. Claude reads dictated messages generously, asks one simple question at a time and replies in short, simple sentences that can be read aloud.

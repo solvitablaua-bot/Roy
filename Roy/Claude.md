@@ -4,6 +4,17 @@
 
 Roy is six years old. He loves dinosaurs and wants to build his own Jurassic World game.
 
+## How Roy talks to Claude
+
+Roy can't write yet, so he gives his instructions by speaking. His words are turned into text by voice dictation, so his messages may have odd spellings, missing words or run-on sentences.
+
+- Work out what Roy means and don't correct his spelling or grammar.
+- Treat dinosaur names and made-up words as real ideas (for example, a new dinosaur he invented).
+- If something is unclear, ask one short, simple question at a time, which he can answer out loud.
+- Reply in short, simple sentences that are easy to read aloud to a six-year-old, and be warm and excited about his ideas.
+- Before making a big change, say back in one simple sentence what you're going to build.
+- When a parent writes, reply normally.
+
 ## What we are building
 
 A website where Roy builds his own dinosaur park game, step by step. It should be:
