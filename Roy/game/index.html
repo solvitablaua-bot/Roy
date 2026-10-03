@@ -233,6 +233,70 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
 .badge strong { font-family: var(--font-sign); font-size: 1.6rem; font-weight: 400; }
 .badge span { font-size: 1.2rem; font-weight: 700; }
 
+/* ---------- views ---------- */
+[hidden] { display: none !important; }
+.view { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 8px; }
+.top-right { display: flex; gap: 10px; }
+
+/* ---------- Egg Lab ---------- */
+.lab { flex: 1; min-height: 0; display: grid; place-items: end center; container-type: size; }
+.hatchery {
+  position: relative;
+  width: min(100cqw, 88cqh, 560px);
+  aspect-ratio: 1 / 1.1;
+  pointer-events: auto;
+}
+.lamp { position: absolute; left: 50%; top: 0; width: 34%; transform: translateX(-50%); }
+.glow {
+  position: absolute; left: 10%; right: 10%; top: 12%; bottom: 4%;
+  background: radial-gradient(ellipse at 50% 72%, rgba(249, 210, 122, .55), rgba(242, 169, 59, .18) 45%, transparent 70%);
+  clip-path: polygon(40% 0, 60% 0, 100% 100%, 0 100%);
+  animation: warm 2.4s ease-in-out infinite alternate;
+}
+.hatchery > svg, .hatchery > button { position: absolute; display: block; }
+.egg-btn { left: 21%; width: 58%; bottom: 7%; background: none; border: 0; padding: 0; }
+.egg-btn svg { width: 100%; height: auto; display: block; overflow: visible; }
+.egg-btn.wobble svg { animation: wobble .5s ease; transform-origin: 50% 95%; }
+.egg-btn .crack { opacity: 0; transition: opacity .15s; }
+.egg-btn[data-cracks="1"] .c1, .egg-btn[data-cracks="2"] .c1, .egg-btn[data-cracks="2"] .c2 { opacity: 1; }
+.shell-edge { opacity: 0; }
+.shell-top { transform-box: fill-box; transform-origin: 50% 100%; }
+.hatched .shell-top { animation: lid 1s cubic-bezier(.3, .6, .4, 1) forwards; }
+.hatched .shell-edge, .done .shell-edge { opacity: 1; }
+.done .shell-top { display: none; }
+.hatched .crack, .done .crack { display: none; }
+.hatched .egg-btn, .done .egg-btn { pointer-events: none; }
+.blue-btn {
+  left: 12%; width: 74%; bottom: 31%;
+  background: none; border: 0; padding: 0;
+  opacity: 0; pointer-events: none;
+}
+.blue-btn svg { width: 100%; height: auto; display: block; overflow: visible; }
+.hatched .blue-btn { animation: hatch .9s .25s cubic-bezier(.3, 1.5, .5, 1) forwards; pointer-events: auto; }
+.done .blue-btn { opacity: 1; pointer-events: auto; }
+.blue-btn .blue-body { transform-box: fill-box; transform-origin: 50% 100%; animation: breathe 1.8s ease-in-out infinite alternate; }
+.blue-btn.hop .blue-body { animation: hop .55s cubic-bezier(.3, 1.4, .5, 1); }
+.blue-btn .eye { transform-box: fill-box; transform-origin: center; animation: blink 3.5s infinite; }
+.nest { left: 4%; width: 92%; bottom: 0; }
+.bit { position: fixed; z-index: 9; width: 26px; height: 22px; pointer-events: none; animation: bit 1s ease-out forwards; }
+.lab-bar { display: flex; justify-content: center; min-height: 64px; }
+.pill {
+  pointer-events: auto;
+  display: flex; align-items: center; gap: 10px;
+  background: var(--canopy); border: 4px solid var(--amber); border-radius: 999px;
+  padding: 6px 22px 6px 10px;
+  font-size: 1.3rem; font-weight: 800;
+}
+.pill svg { width: 40px; height: 40px; }
+.pill:active { transform: scale(.94); }
+
+@keyframes warm { to { opacity: .7; } }
+@keyframes wobble { 20% { transform: rotate(-9deg); } 45% { transform: rotate(8deg); } 70% { transform: rotate(-4deg); } }
+@keyframes lid { to { transform: translate(-70%, -260%) rotate(-80deg); opacity: 0; } }
+@keyframes hatch { 0% { opacity: 1; transform: translateY(45%) scale(.55); } 100% { opacity: 1; transform: none; } }
+@keyframes breathe { to { transform: scaleY(1.03) translateY(-1px); } }
+@keyframes hop { 40% { transform: translateY(-22%) rotate(-6deg); } 70% { transform: translateY(0) scaleY(.9); } }
+@keyframes bit { to { transform: translate(var(--dx), var(--dy)) rotate(var(--r)); opacity: 0; } }
 @keyframes pop { 50% { transform: scale(1.3); } }
 @keyframes bob { to { transform: translateY(-6px) rotate(-3deg); } }
 @keyframes shake { 15%, 45%, 75% { transform: translateX(-7px); } 30%, 60%, 90% { transform: translateX(7px); } }
@@ -284,9 +348,14 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
       <svg viewBox="0 0 40 40"><path d="M20 3l5 11 12 1-9 8 3 12-11-6-11 6 3-12-9-8 12-1z" fill="#f2a93b" stroke="#3b2413" stroke-width="2" stroke-linejoin="round"/></svg>
       <span id="star-count">0</span>
     </div>
-    <button class="icon-btn" id="sound" aria-label="Sound on">
-      <svg viewBox="0 0 32 32" id="sound-icon"></svg>
-    </button>
+    <div class="top-right">
+      <button class="icon-btn" id="home" hidden aria-label="Back to the park gate">
+        <svg viewBox="0 0 32 32"><path d="M4 30V12h6v18M22 30V12h6v18" fill="#a8844f"/><path d="M2 12 L6 4 H26 L30 12 Z" fill="#6e4524"/><path d="M10 16h12v14H10z" fill="#f9d27a"/></svg>
+      </button>
+      <button class="icon-btn" id="sound" aria-label="Sound on">
+        <svg viewBox="0 0 32 32" id="sound-icon"></svg>
+      </button>
+    </div>
   </header>
 
   <div class="guide">
@@ -316,6 +385,7 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
     </p>
   </div>
 
+  <section class="view" id="view-park">
   <main class="stage">
     <button class="secret volcano" id="volcano" aria-label="Volcano">
   <svg viewBox="0 0 260 170">
@@ -384,11 +454,10 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
   </main>
 
   <nav class="menu" id="menu" hidden aria-label="Park map">
-    <button class="place next" data-place="egg">
+    <button class="place next" data-place="egg" id="place-egg">
       <svg viewBox="0 0 64 64"><ellipse cx="32" cy="36" rx="20" ry="25" fill="#f4e8cc"/><circle cx="24" cy="28" r="4" fill="#6cc48a"/><circle cx="40" cy="40" r="5" fill="#6cc48a"/><circle cx="28" cy="48" r="3" fill="#6cc48a"/><path d="M16 30 l6 4 l5 -5 l6 6 l5 -5 l6 4" stroke="#3b2413" stroke-width="2.5" fill="none" stroke-linejoin="round"/></svg>
       Egg Lab
-      <span class="soon" aria-label="Coming soon"><svg viewBox="0 0 18 18"><rect x="3" y="8" width="12" height="9" rx="2" fill="#3b2413"/><path d="M5.5 8V6a3.5 3.5 0 0 1 7 0v2" stroke="#3b2413" stroke-width="2.4" fill="none"/></svg></span>
-    </button>
+</button>
     <button class="place" data-place="book">
       <svg viewBox="0 0 64 64"><rect x="10" y="10" width="44" height="46" rx="4" fill="#a3603a"/><rect x="16" y="10" width="38" height="46" rx="3" fill="#c9793f"/><path d="M30 42 q-4 -8 2 -10 q6 2 2 10 Z M26 30 a3 3 0 1 0 0.1 0 M33 26 a3 3 0 1 0 0.1 0 M40 30 a3 3 0 1 0 0.1 0" fill="#3b2413"/></svg>
       Dino Book
@@ -410,6 +479,82 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
       <span class="soon" aria-label="Coming soon"><svg viewBox="0 0 18 18"><rect x="3" y="8" width="12" height="9" rx="2" fill="#3b2413"/><path d="M5.5 8V6a3.5 3.5 0 0 1 7 0v2" stroke="#3b2413" stroke-width="2.4" fill="none"/></svg></span>
     </button>
   </nav>
+  </section>
+
+  <section class="view" id="view-lab" hidden>
+    <div class="lab">
+      <div class="hatchery" id="hatchery">
+        <div class="glow"></div>
+        <svg class="lamp" viewBox="0 0 120 70" aria-hidden="true">
+          <rect x="56" y="0" width="8" height="22" fill="#2e312d"/>
+          <path d="M20 60 Q24 22 60 20 Q96 22 100 60 Z" fill="#5d625c" stroke="#2e312d" stroke-width="4"/>
+          <ellipse cx="60" cy="60" rx="34" ry="8" fill="#f9d27a"/>
+        </svg>
+        <button class="blue-btn" id="blue" aria-label="Blue the baby raptor">
+          <svg viewBox="0 0 200 180">
+          <g class="blue-body">
+            <path d="M80 110 Q40 104 6 70 Q22 106 42 118 Q62 130 86 130 Z" fill="#4a86c8"/>
+            <path d="M70 118 Q66 150 80 160 L86 172 L104 172 L96 160 Q100 140 96 120 Z" fill="#3c70ac"/>
+            <ellipse cx="96" cy="118" rx="38" ry="28" fill="#4a86c8"/>
+            <path d="M108 104 Q118 82 126 70 L152 84 Q140 102 130 120 Z" fill="#4a86c8"/>
+            <ellipse cx="142" cy="62" rx="32" ry="27" fill="#4a86c8"/>
+            <path d="M150 50 Q186 50 192 66 Q190 82 168 86 Q150 88 140 82 Z" fill="#4a86c8"/>
+            <ellipse cx="106" cy="128" rx="26" ry="15" fill="#9cc6ec"/>
+            <path d="M14 76 Q46 104 80 94 Q106 86 120 62 Q130 42 160 40" stroke="#24456f" stroke-width="7" fill="none" stroke-linecap="round"/>
+            <path d="M102 130 Q100 154 110 164 L114 174 L130 174 L122 162 Q126 146 122 128 Z" fill="#4a86c8"/>
+            <path d="M112 172 q-6 -10 4 -14" stroke="#f4e8cc" stroke-width="3" fill="none" stroke-linecap="round"/>
+            <path d="M118 174 l-2 5 M126 174 l2 5 M88 172 l-3 5 M100 172 l2 5" stroke="#1d2b3a" stroke-width="3" stroke-linecap="round"/>
+            <path d="M130 108 q14 4 16 16 l-4 -1 l1 5 l-5 -3 l-1 4 q-6 -10 -10 -14 Z" fill="#3c70ac"/>
+            <path d="M120 42 q4 -14 12 -4 q4 -12 12 -2 q6 -10 12 2" fill="#3c70ac"/>
+            <ellipse cx="164" cy="74" rx="7" ry="4" fill="#f08aa0" opacity=".7"/>
+            <path d="M162 80 Q176 84 188 74" stroke="#1d2b3a" stroke-width="3" fill="none" stroke-linecap="round"/>
+            <circle cx="184" cy="60" r="2.2" fill="#1d2b3a"/>
+            <g class="eye">
+              <circle cx="146" cy="56" r="12" fill="#fff"/>
+              <circle cx="148" cy="56" r="8.5" fill="#f2a93b"/>
+              <ellipse cx="149" cy="56" rx="2.6" ry="7" fill="#1d1d1b"/>
+              <circle cx="151.5" cy="51.5" r="2.6" fill="#fff"/>
+            </g>
+          </g>
+        </svg>
+        </button>
+        <button class="egg-btn" id="egg" data-cracks="0" aria-label="Dinosaur egg">
+          <svg viewBox="0 0 200 240">
+            <defs>
+              <clipPath id="clip-top"><polygon points="0,0 200,0 200,120 180,108 160,130 140,108 120,130 100,108 80,130 60,108 40,130 20,108 0,120"/></clipPath>
+              <clipPath id="clip-bottom"><polygon points="0,240 0,120 20,108 40,130 60,108 80,130 100,108 120,130 140,108 160,130 180,108 200,120 200,240"/></clipPath>
+              <g id="egg-shape">
+                <ellipse cx="100" cy="134" rx="80" ry="102" fill="#f4e8cc"/>
+                <ellipse cx="72" cy="96" rx="12" ry="9" fill="#7fb0dc"/>
+                <ellipse cx="128" cy="70" rx="9" ry="7" fill="#7fb0dc"/>
+                <ellipse cx="136" cy="150" rx="14" ry="10" fill="#7fb0dc"/>
+                <ellipse cx="80" cy="190" rx="10" ry="8" fill="#7fb0dc"/>
+                <ellipse cx="66" cy="70" rx="14" ry="26" fill="#fff" opacity=".45" transform="rotate(25 66 70)"/>
+              </g>
+            </defs>
+            <g clip-path="url(#clip-bottom)">
+              <use href="#egg-shape"/>
+              <ellipse class="shell-edge" cx="100" cy="122" rx="74" ry="12" fill="#c9b78e"/>
+              <polyline class="shell-edge" points="20,108 40,130 60,108 80,130 100,108 120,130 140,108 160,130 180,108" fill="none" stroke="#a8844f" stroke-width="4" stroke-linejoin="round"/>
+            </g>
+            <g class="shell-top" clip-path="url(#clip-top)"><use href="#egg-shape"/></g>
+            <path class="crack c1" d="M58 80 l14 12 l-8 10 l16 10 l-4 10" stroke="#3b2413" stroke-width="4" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+            <path class="crack c2" d="M138 52 l-8 18 l14 8 l-10 18 l12 12 l-6 12" stroke="#3b2413" stroke-width="4" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+          </svg>
+        </button>
+        <svg class="nest" viewBox="0 0 300 60" aria-hidden="true">
+          <path d="M6 18 Q150 70 294 18 Q290 52 150 58 Q10 52 6 18 Z" fill="#8a5a31"/>
+          <path d="M20 26 q40 16 80 10 M60 40 q50 14 110 2 M140 30 q60 12 130 -6 M30 36 q30 14 60 12 M190 44 q40 -2 80 -16" stroke="#c29c62" stroke-width="4" fill="none" stroke-linecap="round"/>
+        </svg>
+      </div>
+    </div>
+    <div class="lab-bar">
+      <button class="pill" id="again" hidden>
+        <svg viewBox="0 0 40 40"><ellipse cx="20" cy="22" rx="12" ry="15" fill="#f4e8cc"/><circle cx="15" cy="18" r="2.5" fill="#7fb0dc"/><circle cx="24" cy="27" r="3" fill="#7fb0dc"/></svg>
+        Hatch again
+      </button>
+    </div>
+  </section>
 </div>
 
 <div class="badge" id="badge" aria-live="polite">
@@ -514,6 +659,21 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
   function chime() { tone(784, 0, 0.25, "triangle", 0.3); tone(1175, 0.12, 0.4, "triangle", 0.3); }
   function fanfare() { [523, 659, 784, 1047].forEach(function (f, i) { tone(f, i * 0.13, 0.35, "square", 0.12); }); }
   function screech() { tone(1400, 0, 0.25, "sawtooth", 0.08, 2600); tone(1800, 0.3, 0.3, "sawtooth", 0.08, 900); }
+  function crack() {
+    var ctx = ac(); if (!ctx) return;
+    var t = ctx.currentTime;
+    var src = ctx.createBufferSource(); src.buffer = noiseBuffer(ctx, 0.12);
+    var hp = ctx.createBiquadFilter(); hp.type = "highpass"; hp.frequency.value = 1800;
+    var g = ctx.createGain();
+    g.gain.setValueAtTime(0.9, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.12);
+    src.connect(hp).connect(g).connect(ctx.destination);
+    src.start(t);
+  }
+  function chirp() {
+    tone(1200, 0, 0.12, "sine", 0.3, 2400);
+    tone(1500, 0.16, 0.14, "sine", 0.3, 2800);
+    tone(1800, 0.34, 0.18, "triangle", 0.25, 1300);
+  }
   function boing() { tone(220, 0, 0.35, "sine", 0.4, 660); }
   function clunk() { tone(140, 0, 0.12, "square", 0.15, 90); tone(110, 0.1, 0.15, "square", 0.12, 70); }
 
@@ -622,7 +782,7 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
         state.found.gate = true; save();
         addStar(gate);
         showBadge("Park Opener", "You opened your park!", GATE_BADGE);
-        say("Roar! Welcome to your park, Roy! You got a star! Next we will build the Egg Lab.");
+        say("Roar! Welcome to your park, Roy! You got a star! Tap the Egg Lab to hatch a dinosaur!");
       } else {
         say("Welcome back, boss! Pick a place to explore.");
       }
@@ -631,7 +791,6 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
 
   // ---------- places on the park map ----------
   var placeLines = {
-    egg: "The Egg Lab is next! Soon you will hatch your very own dinosaur!",
     book: "The Dino Book is coming soon. It will keep all your dinosaurs!",
     care: "Dino Care is coming soon. You will feed and wash your dinosaurs!",
     build: "Build Park is coming soon. You will build fences, trees and ponds!",
@@ -640,9 +799,116 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
   menu.addEventListener("click", function (e) {
     var btn = e.target.closest(".place");
     if (!btn) return;
+    if (btn.dataset.place === "egg") { openLab(); return; }
+    if (btn.dataset.place === "book" && state.found.hatch) {
+      clunk();
+      btn.classList.remove("wiggle"); void btn.offsetWidth; btn.classList.add("wiggle");
+      say("The Dino Book is next! Blue will be the first dinosaur in it!");
+      return;
+    }
     clunk();
     btn.classList.remove("wiggle"); void btn.offsetWidth; btn.classList.add("wiggle");
     say(placeLines[btn.dataset.place]);
+  });
+
+  // ---------- Egg Lab ----------
+  var viewPark = $("view-park"), viewLab = $("view-lab"), homeBtn = $("home");
+  var hatchery = $("hatchery"), egg = $("egg"), blue = $("blue"), again = $("again");
+  var cracks = 0, hatching = false;
+  var FIRST_HATCH_BADGE =
+    '<circle cx="55" cy="55" r="50" fill="#7fb0dc" stroke="#3b2413" stroke-width="5"/>' +
+    '<circle cx="55" cy="55" r="38" fill="#f4e8cc"/>' +
+    '<path d="M33 62 Q33 30 55 26 Q77 30 77 62 Z" fill="#fff" stroke="#a8844f" stroke-width="3"/>' +
+    '<path d="M31 62 l8 -8 l8 8 l8 -8 l8 8 l8 -8 l8 8 Q77 86 55 86 Q33 86 31 62 Z" fill="#f4e8cc" stroke="#a8844f" stroke-width="3" stroke-linejoin="round"/>' +
+    '<circle cx="55" cy="44" r="7" fill="#4a86c8"/><circle cx="57" cy="42" r="2.5" fill="#1d1d1b"/>';
+
+  function updateBook() {
+    var book = menu.querySelector('[data-place="book"]');
+    book.classList.toggle("next", !!state.found.hatch);
+    $("place-egg").classList.toggle("next", !state.found.hatch);
+  }
+  updateBook();
+
+  function resetEgg(alreadyHatched) {
+    cracks = 0; hatching = false;
+    egg.dataset.cracks = "0";
+    hatchery.classList.remove("hatched", "done");
+    if (alreadyHatched) hatchery.classList.add("done");
+    egg.disabled = !!alreadyHatched;
+    again.hidden = !alreadyHatched;
+  }
+  function openLab() {
+    viewPark.hidden = true; viewLab.hidden = false; homeBtn.hidden = false;
+    boing();
+    resetEgg(!!state.found.hatch);
+    if (state.found.hatch) say("Blue is so happy to see you, Roy! Tap Blue to say hi!");
+    else say("This is the Egg Lab! Something is inside this egg. Tap it to help it hatch!");
+  }
+  homeBtn.addEventListener("click", function () {
+    viewLab.hidden = true; viewPark.hidden = false; homeBtn.hidden = true;
+    say("Welcome back to the park gate! Where shall we go?");
+  });
+
+  function shellBits() {
+    var r = egg.getBoundingClientRect();
+    for (var i = 0; i < 10; i++) {
+      var b = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      b.setAttribute("viewBox", "0 0 26 22"); b.setAttribute("class", "bit");
+      b.innerHTML = '<polygon points="2,20 8,2 14,12 24,6 20,20" fill="#f4e8cc" stroke="#a8844f" stroke-width="2"/>';
+      b.style.left = (r.left + r.width / 2 - 13) + "px";
+      b.style.top = (r.top + r.height * 0.42) + "px";
+      var a = Math.PI + (i / 9) * Math.PI;
+      b.style.setProperty("--dx", Math.cos(a) * (90 + Math.random() * 90) + "px");
+      b.style.setProperty("--dy", Math.sin(a) * (80 + Math.random() * 80) + "px");
+      b.style.setProperty("--r", (Math.random() * 540 - 270) + "deg");
+      document.body.appendChild(b);
+      setTimeout(b.remove.bind(b), 1100);
+    }
+  }
+  egg.addEventListener("click", function () {
+    if (hatching) return;
+    egg.classList.remove("wobble"); void egg.offsetWidth; egg.classList.add("wobble");
+    crack();
+    cracks += 1;
+    if (cracks === 1) { egg.dataset.cracks = "1"; say("Crack! Something is moving inside! Tap again!"); return; }
+    if (cracks === 2) { egg.dataset.cracks = "2"; say("Crack crack! Almost there! One more tap!"); return; }
+    hatching = true;
+    egg.disabled = true;
+    crack(); shellBits();
+    hatchery.classList.add("hatched");
+    setTimeout(chirp, 350);
+    setTimeout(function () {
+      again.hidden = false;
+      if (!state.found.hatch) {
+        state.found.hatch = true; save();
+        updateBook();
+        addStar(blue);
+        showBadge("First Hatch", "Blue the raptor is born!", FIRST_HATCH_BADGE);
+        say("Wow! It's a baby raptor! Her name is Blue! Blue loves you, Roy!");
+      } else {
+        say("Peekaboo! Blue popped out again!");
+      }
+    }, 1100);
+  });
+  var blueLines = [
+    "Squeak squeak! That's how baby raptors say hello!",
+    "Raptors are super fast runners!",
+    "Blue wants to be your best friend!",
+    "Blue has a big claw on each foot. Snip snap!",
+    "Blue is a little bit sleepy. Yawn!",
+    "Blue thinks you are the best park boss!"
+  ];
+  var blueLine = 0;
+  blue.addEventListener("click", function () {
+    chirp();
+    blue.classList.remove("hop"); void blue.offsetWidth; blue.classList.add("hop");
+    say(blueLines[blueLine]);
+    blueLine = (blueLine + 1) % blueLines.length;
+  });
+  again.addEventListener("click", function () {
+    boing();
+    resetEgg(false);
+    say("Here comes the egg again! Tap it to hatch!");
   });
 
   // ---------- jungle secrets ----------

@@ -26,6 +26,8 @@ Keep Memory.md up to date at all times. Every time we start a new session, read 
 - Gamification: stars, ranger levels, badges, a daily mystery egg, and no way to lose.
 - Every build step should end with something Roy can play, so he sees his game grow.
 - Hidden secrets make exploring fun: tapping the volcano, the moon and the bush each gives a star, and finding all three gives the Jungle Explorer badge. More secrets can be added in each new area.
+- Roy's first big idea (spoken): "When I tap on that egg, it should hatch and a baby raptor Blue would come out." This became the Egg Lab.
+- Tapping the egg 3 times (crack, crack, hatch) is more exciting for Roy than hatching on the first tap.
 - Idea: the game itself could listen to Roy too, for example saying a name out loud to name a new dinosaur.
 
 ## Progress
@@ -37,7 +39,8 @@ Keep Memory.md up to date at all times. Every time we start a new session, read 
 - 2026-10-03: Added "How Roy talks to Claude" to `Claude.md`, because Roy gives instructions by speaking.
 - 2026-10-03: **Step 1 done: Park Gate home screen** (`Roy/game/index.html`). Night jungle with a giant wooden gate, torches and a "ROY'S DINO PARK" sign. Tapping the gate roars, shakes and swings it open, then the park map appears with Egg Lab, Dino Book, Dino Care, Build Park and Missions (all locked for now, Egg Lab glowing as next). Tops, a baby triceratops ranger, talks in a speech bubble and out loud. Stars counter, Park Opener badge, 3 hidden secrets and the Jungle Explorer badge. Sound on/off button. Progress saves on the device. Tested at iPad and phone sizes.
 - 2026-10-03: Published a playable preview at https://claude.ai/artifact/1j9X2trZp4YDxJJUj44Ec3 (private to Roy's parent's account).
-- **Next:** Step 2, the Egg Lab: hatch and name the first dinosaur.
+- 2026-10-03: **Step 2 done: Egg Lab, from Roy's own idea.** Tap the Egg Lab on the park map to go inside: a warm lamp shines on a spotted egg in a nest. Tap it: crack, crack, then it hatches, eggshell bits fly, and a baby blue raptor called Blue pops out with a squeak. Roy gets a star and the First Hatch badge. Tap Blue to make her hop, squeak and say fun things. "Hatch again" replays it (no extra stars). A home button goes back to the gate. Blue is saved, so she is there next time. Tested at iPad (both ways round) and phone sizes. Preview updated at the same link.
+- **Next:** Step 3, the Dino Book: Blue becomes the first dinosaur in Roy's collection. Dino Book now glows on the park map as next.
 
 ## Important decisions
 
@@ -50,3 +53,4 @@ Keep Memory.md up to date at all times. Every time we start a new session, read 
 - 2026-10-03: Roy gives instructions by speaking, not writing. Claude reads dictated messages generously, asks one simple question at a time and replies in short, simple sentences that can be read aloud.
 - 2026-10-03: The guide character is Tops, a friendly baby triceratops in a ranger hat. Original design.
 - 2026-10-03: The game lives in `Roy/game/`, with `index.html` as the start page. Progress (stars, badges, secrets found, sound setting) is saved in the browser on the iPad.
+- 2026-10-03: The first dinosaur is Blue, a baby blue raptor, because Roy asked for it. She is our own drawing (blue body, dark stripe, big orange eyes, fluffy head), not a copy of the movie character.
