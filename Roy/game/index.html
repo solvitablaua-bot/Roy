@@ -990,6 +990,10 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
 .cam-btn { position: absolute; left: 12px; bottom: 12px; z-index: 3;
   background: var(--amber); color: var(--wood-dark); border: 4px solid var(--wood-dark); border-radius: 999px;
   font-size: 1.3rem; font-weight: 800; padding: 10px 22px; box-shadow: 0 5px 0 var(--wood-dark); }
+.cam-flip { position: absolute; left: 12px; top: 12px; z-index: 3; width: 74px; height: 74px; border-radius: 50%;
+  background: var(--amber); border: 4px solid var(--wood-dark); box-shadow: 0 5px 0 var(--wood-dark); padding: 10px; }
+.cam-flip svg { width: 100%; height: 100%; }
+.cam-room.selfie video { transform: scaleX(-1); }
 .cam-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 var(--wood-dark); }
 @media (max-width: 560px) { .cam-btn { font-size: 1.05rem; padding: 8px 14px; } }
 .esc-back:active { transform: translateY(3px); box-shadow: 0 2px 0 var(--wood-dark); }
@@ -1495,6 +1499,7 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
       <div class="cam-room" id="cam-room" hidden>
         <video id="cam-video" playsinline muted autoplay></video>
         <div class="cam-dino" id="cam-dino" role="button" tabindex="0" aria-label="Dinosaur"><div class="box" id="cam-dino-box"></div></div>
+        <button class="cam-flip" id="cam-flip" aria-label="Turn the camera around"><svg viewBox="0 0 40 40"><rect x="4" y="12" width="32" height="22" rx="4" fill="#3b2413"/><rect x="14" y="7" width="12" height="7" rx="2" fill="#3b2413"/><circle cx="20" cy="23" r="7" fill="#f4e8cc"/><path d="M15 21 a5 5 0 0 1 9 -2 M25 25 a5 5 0 0 1 -9 2" stroke="#3b2413" stroke-width="2" fill="none"/></svg></button>
         <button class="esc-back" id="cam-back">Back into the game!</button>
       </div>
     </div>
@@ -2201,7 +2206,7 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
       later(function () { escBusy = false; }, 1000);
   }
   // ---------- the real house: the dinosaur in the room, seen through the iPad camera (Roy's idea) ----------
-  var camRoom = $("cam-room"), camVideo = $("cam-video"), camStream = null;
+  var camRoom = $("cam-room"), camVideo = $("cam-video"), camStream = null, camFacing = "environment";
   function camOk() { return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia); }
   function stopCamera() {
     if (camStream) camStream.getTracks().forEach(function (t) { t.stop(); });
@@ -2212,13 +2217,14 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
     function finish(ok) { if (finished) return; finished = true; done(ok); }
     setTimeout(function () { if (!camStream) finish(false); }, 15000);
     try {
-      navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }, audio: false }).then(function (stream) {
+      navigator.mediaDevices.getUserMedia({ video: { facingMode: camFacing }, audio: false }).then(function (stream) {
         if (viewHouse.hidden) { stream.getTracks().forEach(function (t) { t.stop(); }); return; }
         camStream = stream;
         camVideo.srcObject = stream;
         var pl = camVideo.play(); if (pl && pl.catch) pl.catch(function () {});
         house.hidden = true;
         camRoom.hidden = false;
+        camRoom.classList.toggle("selfie", camFacing === "user");
         $("cam-dino-box").innerHTML = escDino.svg;
         var cd = $("cam-dino"); cd.style.animation = "none"; void cd.offsetWidth; cd.style.animation = "";
         stomp(); later(stomp, 600);
@@ -2243,6 +2249,19 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
       if (ok) { say(shortName(escDino) + " is in YOUR house now! Tap " + shortName(escDino) + "!"); return; }
       $("cam-btn").hidden = true;
       say("The camera can't open here. Ask a grown-up to help! " + shortName(escDino) + " can play in this house for now.");
+    });
+  });
+  $("cam-flip").addEventListener("click", function () {
+    if (escBusy) return;
+    escBusy = true;
+    var old = camFacing;
+    camFacing = camFacing === "user" ? "environment" : "user";
+    if (camStream) camStream.getTracks().forEach(function (t) { t.stop(); });
+    camStream = null;
+    startCamera(function (ok) {
+      escBusy = false;
+      if (!ok) { camFacing = old; startCamera(function () {}); return; }
+      say(camFacing === "user" ? "Look! It's YOU! " + shortName(escDino) + " came out of the game to play with you!" : shortName(escDino) + " is in your room! Tap " + shortName(escDino) + "!");
     });
   });
   $("cam-back").addEventListener("click", function () {
