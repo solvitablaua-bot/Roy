@@ -408,6 +408,11 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
 .visit.mystery .care-bar, .visit.mystery .food-tray { display: none !important; }
 .visit-dino.shadow svg { filter: brightness(0) opacity(.85); }
 .visit-dino.reveal svg { animation: revealflash .9s ease; }
+/* the golden dinosaur in the last Mystery Cage (Roy's idea) */
+.visit-dino.golden svg { filter: drop-shadow(0 0 14px rgba(249, 210, 122, .9)); }
+.gold-sparkle { position: absolute; width: 9%; pointer-events: none; animation: twinkle 1.4s ease-in-out infinite; }
+.cage.golden-cage { filter: drop-shadow(0 0 20px rgba(242, 201, 74, .95)); }
+@keyframes twinkle { 0%, 100% { transform: scale(.3) rotate(0deg); opacity: .2; } 50% { transform: scale(1) rotate(45deg); opacity: 1; } }
 .clue-dots { display: flex; gap: 10px; justify-content: center; }
 .clue-dots span { width: 22px; height: 22px; border-radius: 50%; background: rgba(244, 232, 204, .25); border: 3px solid var(--bone); }
 .clue-dots span.on { background: #f2d24b; }
@@ -2213,7 +2218,28 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
   function dayNumber() { var t = new Date(); return Math.floor(new Date(t.getFullYear(), t.getMonth(), t.getDate()).getTime() / 86400000); }
   // 12 Mystery Cages, each with a different secret dinosaur every day (Roy's idea)
   var MYSTERY_SLOTS = 12;
-  var CLOTHS = ["#6b4a9b", "#2f7a7a", "#a83a5a", "#3a5aa8", "#a86a2a", "#4a8a3a", "#8a3aa8", "#2a6aa8", "#a84a2a", "#5a5aa8", "#2f8a6a", "#9b4a7a"];
+  var CLOTHS = ["#6b4a9b", "#2f7a7a", "#a83a5a", "#3a5aa8", "#a86a2a", "#4a8a3a", "#8a3aa8", "#2a6aa8", "#a84a2a", "#5a5aa8", "#2f8a6a", "#c9961e"];
+  var GOLD_SLOT = 11;
+  // turn a dinosaur's skin into shiny gold: every colour becomes a gold shade, eyes stay the same
+  function goldify(svg) {
+    return svg.replace(/#([0-9a-fA-F]{6}|[0-9a-fA-F]{3})\b/g, function (hex, h) {
+      if (h.length === 3) h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2];
+      var r = parseInt(h.slice(0, 2), 16), g = parseInt(h.slice(2, 4), 16), b = parseInt(h.slice(4, 6), 16);
+      var L = (0.3 * r + 0.59 * g + 0.11 * b) / 255;
+      if (L > 0.97 || L < 0.14) return hex;
+      return L < 0.35 ? "#9c6a12" : L < 0.55 ? "#d19a1e" : L < 0.75 ? "#f0c040" : "#fbe7a0";
+    });
+  }
+  var goldCache = {};
+  function goldenOf(m) {
+    if (!goldCache[m.id]) goldCache[m.id] = {
+      id: m.id, name: "Golden " + m.name, clue: m.clue,
+      fact: "WOW! This " + m.name + " has skin made of shiny gold! " + m.fact,
+      svg: goldify(m.svg),
+      sound: function () { m.sound(); setTimeout(chime, 300); }
+    };
+    return goldCache[m.id];
+  }
   function todaysMystery(slot) { return MYSTERY[(dayNumber() * MYSTERY_SLOTS + (slot || 0)) % MYSTERY.length]; }
   function mysteryKey(slot) { return slot ? "mystery" + (slot + 1) + "-" + today() : "mystery-" + today(); }
   var TARP = '<svg viewBox="0 0 160 140" preserveAspectRatio="none" aria-hidden="true">' +
@@ -2303,8 +2329,8 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
     }
     for (var slot = 0; slot < MYSTERY_SLOTS; slot++) {
       var mp = cagePos(mysteryIdx + slot);
-      html += '<button class="cage mystery-cage" data-mystery="' + (slot + 1) + '" data-cage="' + (mysteryIdx + slot) + '" style="left:' + mp.x + 'px;top:' + mp.y + 'px" aria-label="Mystery cage ' + (slot + 1) + '">' +
-        cageBack("mystery") + '<div class="tarp">' + TARP.split("#6b4a9b").join(CLOTHS[slot]).split("#4a3270").join("rgba(0,0,0,.3)") + '</div>' + cageFront("MYSTERY " + (slot + 1), "?") + '</button>';
+      html += '<button class="cage mystery-cage' + (slot === GOLD_SLOT ? " golden-cage" : "") + '" data-mystery="' + (slot + 1) + '" data-cage="' + (mysteryIdx + slot) + '" style="left:' + mp.x + 'px;top:' + mp.y + 'px" aria-label="Mystery cage ' + (slot + 1) + '">' +
+        cageBack("mystery") + '<div class="tarp">' + TARP.split("#6b4a9b").join(CLOTHS[slot]).split("#4a3270").join("rgba(0,0,0,.3)").split("#f2d24b").join(slot === GOLD_SLOT ? "#fff" : "#f2d24b") + '</div>' + cageFront("MYSTERY " + (slot + 1), "?") + '</button>';
     }
     world.innerHTML = html;
   }
@@ -2376,7 +2402,8 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
   });
   function closeVisit() {
     visit.hidden = true; current = null; mysteryOn = null;
-    visit.classList.remove("mystery"); visitDino.classList.remove("shadow", "reveal"); $("clue-dots").hidden = true;
+    visit.classList.remove("mystery"); visitDino.classList.remove("shadow", "reveal", "golden"); $("clue-dots").hidden = true;
+    stage.querySelectorAll(".gold-sparkle").forEach(function (x) { x.remove(); });
     resetCare(); updateNeeds();
   }
   var mysteryOn = null, clueStep = 0;
@@ -2389,6 +2416,7 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
   function openMystery(slot) {
     mysterySlot = slot || 0;
     var m = todaysMystery(mysterySlot);
+    if (mysterySlot === GOLD_SLOT) m = goldenOf(m);
     mysteryOn = m; current = null; clueStep = 0;
     var solved = state.found[mysteryKey(mysterySlot)];
     visit.classList.add("mystery");
@@ -2400,6 +2428,7 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
     if (solved) {
       clueStep = 3; setClueDots();
       visitDino.classList.remove("shadow");
+      if (mysterySlot === GOLD_SLOT) goldShine();
       $("visit-name").textContent = m.name;
       $("visit-fact").textContent = m.fact;
       m.sound();
@@ -2411,7 +2440,23 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
     $("visit-name").textContent = "Mystery Dinosaur";
     $("visit-fact").textContent = "Tap the shadow to get a clue!";
     tone(300, 0, 0.6, "sine", 0.2, 600);
-    say("The Mystery Cage! A secret dinosaur is hiding in here. Tap the shadow to get clues. Can you guess who it is?");
+    say(mysterySlot === GOLD_SLOT
+      ? "This is the golden Mystery Cage! Something very shiny is hiding in here. Tap the shadow to get clues!"
+      : "The Mystery Cage! A secret dinosaur is hiding in here. Tap the shadow to get clues. Can you guess who it is?");
+  }
+  var GOLD_STAR = '<svg class="gold-sparkle" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 0 L12 8 L20 10 L12 12 L10 20 L8 12 L0 10 L8 8 Z" fill="#fff6c0"/></svg>';
+  var GOLD_BADGE =
+    '<circle cx="55" cy="55" r="50" fill="#f2c84a" stroke="#9c6a12" stroke-width="5"/><circle cx="55" cy="55" r="38" fill="#fbe7a0"/>' +
+    '<path d="M30 70 Q30 40 52 36 Q60 26 74 32 Q86 40 80 52 L70 56 L72 74 Z" fill="#d19a1e"/><circle cx="70" cy="42" r="3" fill="#3b2413"/>' +
+    '<path d="M22 30 l2 6 6 2 -6 2 -2 6 -2 -6 -6 -2 6 -2 Z M86 70 l2 6 6 2 -6 2 -2 6 -2 -6 -6 -2 6 -2 Z" fill="#fff"/>';
+  function goldShine() {
+    visitDino.classList.add("golden");
+    stage.querySelectorAll(".gold-sparkle").forEach(function (x) { x.remove(); });
+    [[12, 18], [80, 10], [30, 70], [88, 60], [55, 4], [6, 50], [70, 82]].forEach(function (p, i) {
+      stage.insertAdjacentHTML("beforeend", GOLD_STAR);
+      var sp = stage.lastElementChild;
+      sp.style.left = p[0] + "%"; sp.style.top = p[1] + "%"; sp.style.animationDelay = (i * 0.2) + "s";
+    });
   }
   visitDino.addEventListener("click", function (e) {
     if (!mysteryOn) return;
@@ -2426,7 +2471,17 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
     fanfare(); hearts(); m.sound();
     $("visit-name").textContent = m.name;
     $("visit-fact").textContent = m.fact;
-    say("Ta-da! It's " + m.name + "! " + m.fact + " Did you guess it?");
+    if (mysterySlot === GOLD_SLOT) {
+      goldShine();
+      [0, 0.15, 0.3, 0.45].forEach(function (t, i) { tone(1047 + i * 262, t + 0.5, 0.3, "triangle", 0.2); });
+      say("Ta-da! It's a golden " + m.name.replace("Golden ", "") + "! Its skin is made of shiny gold! Did you guess it?");
+      if (!state.found.goldenDino) {
+        state.found.goldenDino = true; save();
+        setTimeout(function () { showBadge("Golden Dinosaur", "You found the golden dinosaur!", GOLD_BADGE); }, 2200);
+      }
+    } else {
+      say("Ta-da! It's " + m.name + "! " + m.fact + " Did you guess it?");
+    }
     state.found[mysteryKey(mysterySlot)] = true; save();
     addStar(visitDino);
     if (!state.found.mysterySolver) {
