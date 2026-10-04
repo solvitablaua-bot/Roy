@@ -977,6 +977,21 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
 .esc-back { position: absolute; right: 12px; bottom: 12px; z-index: 3;
   background: var(--leaf); color: var(--bone); border: 4px solid var(--wood-dark); border-radius: 999px;
   font-size: 1.3rem; font-weight: 800; padding: 10px 24px; box-shadow: 0 5px 0 var(--wood-dark); }
+.cam-room { position: absolute; inset: 0; background: #1d1d1b; overflow: hidden; }
+.cam-room video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.cam-dino { position: absolute; left: 50%; bottom: 4%; width: 62%; height: 0; padding-bottom: 48%; margin-left: -31%;
+  cursor: pointer; animation: cam-in 1.6s cubic-bezier(.2, 1, .3, 1); }
+.cam-dino .box { position: absolute; inset: 0; animation: cam-walk 1.1s ease-in-out infinite alternate; transform-origin: 50% 100%; }
+.cam-dino .box svg { position: absolute; inset: 0; width: 100%; height: 100%; filter: drop-shadow(0 12px 10px rgba(0, 0, 0, .45)); }
+.cam-dino::after { content: ""; position: absolute; left: 15%; right: 15%; bottom: -3%; height: 10%; border-radius: 50%; background: rgba(0, 0, 0, .35); z-index: -1; }
+.cam-dino.hop .box { animation: hd-bounce .45s ease-in-out 2; }
+@keyframes cam-in { 0% { transform: scale(.15) translateY(-120%); opacity: 0; } 30% { opacity: 1; } 100% { transform: none; } }
+@keyframes cam-walk { from { transform: translateX(-6%) rotate(-2deg); } to { transform: translateX(6%) rotate(2deg); } }
+.cam-btn { position: absolute; left: 12px; bottom: 12px; z-index: 3;
+  background: var(--amber); color: var(--wood-dark); border: 4px solid var(--wood-dark); border-radius: 999px;
+  font-size: 1.3rem; font-weight: 800; padding: 10px 22px; box-shadow: 0 5px 0 var(--wood-dark); }
+.cam-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 var(--wood-dark); }
+@media (max-width: 560px) { .cam-btn { font-size: 1.05rem; padding: 8px 14px; } }
 .esc-back:active { transform: translateY(3px); box-shadow: 0 2px 0 var(--wood-dark); }
 @media (max-width: 560px) { .esc-back { font-size: 1.05rem; padding: 8px 16px; } }
 @keyframes shake { 15%, 45%, 75% { transform: translateX(-7px); } 30%, 60%, 90% { transform: translateX(7px); } }
@@ -1474,7 +1489,13 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
           </g>
           <g id="house-dino" style="transform: translate(330px, 300px)"><g class="hop" id="house-dino-art"></g></g>
         </svg>
+        <button class="cam-btn" id="cam-btn" hidden>&#128247; My real house!</button>
         <button class="esc-back" id="esc-back">Back into the game!</button>
+      </div>
+      <div class="cam-room" id="cam-room" hidden>
+        <video id="cam-video" playsinline muted autoplay></video>
+        <div class="cam-dino" id="cam-dino" role="button" tabindex="0" aria-label="Dinosaur"><div class="box" id="cam-dino-box"></div></div>
+        <button class="esc-back" id="cam-back">Back into the game!</button>
       </div>
     </div>
   </section>
@@ -2146,7 +2167,28 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
     escBusy = true;
     later(function () {
       tinkle(); splash(); shards(); roar(0.8, 1.6); rumble();
-      escGlass.hidden = true; house.hidden = false;
+      escGlass.hidden = true;
+      if (camOk()) {
+        startCamera(function (ok) {
+          if (!ok) { cartoonHouse(); return; }
+          say("CRASH! " + shortName(escDino) + " broke out of the game and came into YOUR house! Tap " + shortName(escDino) + "!");
+          escBusy = false;
+          escFirstStar();
+        });
+        return;
+      }
+      cartoonHouse();
+    }, 350);
+  });
+  function escFirstStar() {
+    if (state.found.escape) return;
+    state.found.escape = true; save();
+    addStar(viewHouse);
+    later(function () { showBadge("Dino Escape", "A dinosaur came out of the game!", ESCAPE_BADGE); }, 900);
+  }
+  function cartoonHouse() {
+      house.hidden = false;
+      $("cam-btn").hidden = !camOk();
       houseDinoArt.innerHTML = escDino.svg.replace("<svg ", '<svg x="0" y="0" width="260" height="200" ');
       houseDino.style.transition = "none";
       placeHouseDino(370, 120, 0.2);
@@ -2155,13 +2197,59 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
       later(function () { placeHouseDino(270, 300, 1); houseDino.classList.remove("stomp"); void houseDino.getBoundingClientRect(); houseDino.classList.add("stomp"); }, 60);
       ["lamp", "fridge-door", "sofa-seat"].forEach(function (id) { $(id).classList.remove("fallen", "open", "squash"); });
       say("CRASH! " + shortName(escDino) + " broke out of the game! Now " + shortName(escDino) + " is in the house! Tap things in the house and see what happens!");
-      if (!state.found.escape) {
-        state.found.escape = true; save();
-        addStar(house);
-        later(function () { showBadge("Dino Escape", "A dinosaur came out of the game!", ESCAPE_BADGE); }, 900);
-      }
+      escFirstStar();
       later(function () { escBusy = false; }, 1000);
-    }, 350);
+  }
+  // ---------- the real house: the dinosaur in the room, seen through the iPad camera (Roy's idea) ----------
+  var camRoom = $("cam-room"), camVideo = $("cam-video"), camStream = null;
+  function camOk() { return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia); }
+  function stopCamera() {
+    if (camStream) camStream.getTracks().forEach(function (t) { t.stop(); });
+    camStream = null; camVideo.srcObject = null; camRoom.hidden = true;
+  }
+  function startCamera(done) {
+    var finished = false;
+    function finish(ok) { if (finished) return; finished = true; done(ok); }
+    setTimeout(function () { if (!camStream) finish(false); }, 15000);
+    try {
+      navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }, audio: false }).then(function (stream) {
+        if (viewHouse.hidden) { stream.getTracks().forEach(function (t) { t.stop(); }); return; }
+        camStream = stream;
+        camVideo.srcObject = stream;
+        var pl = camVideo.play(); if (pl && pl.catch) pl.catch(function () {});
+        house.hidden = true;
+        camRoom.hidden = false;
+        $("cam-dino-box").innerHTML = escDino.svg;
+        var cd = $("cam-dino"); cd.style.animation = "none"; void cd.offsetWidth; cd.style.animation = "";
+        stomp(); later(stomp, 600);
+        finish(true);
+      }, function () { finish(false); });
+    } catch (err) { finish(false); }
+  }
+  $("cam-dino").addEventListener("click", function () {
+    if (!escDino) return;
+    if (escDino.sound) escDino.sound();
+    var cd = $("cam-dino");
+    cd.classList.remove("hop"); void cd.offsetWidth; cd.classList.add("hop");
+    var lines = [" is in your house!", " says ROAR!", " likes your room!", " wants a snack!", " is stomping around!"];
+    say(shortName(escDino) + lines[Math.floor(Math.random() * lines.length)]);
+  });
+  $("cam-btn").addEventListener("click", function () {
+    if (escBusy) return;
+    escBusy = true;
+    say("Let's see if " + shortName(escDino) + " can come into your real house!");
+    startCamera(function (ok) {
+      escBusy = false;
+      if (ok) { say(shortName(escDino) + " is in YOUR house now! Tap " + shortName(escDino) + "!"); return; }
+      $("cam-btn").hidden = true;
+      say("The camera can't open here. Ask a grown-up to help! " + shortName(escDino) + " can play in this house for now.");
+    });
+  });
+  $("cam-back").addEventListener("click", function () {
+    stopCamera();
+    tone(300, 0, 0.6, "sine", 0.3, 1200); chime();
+    openEscape();
+    say("Whoosh! " + shortName(escDino) + " is back in the game! Who should come out next?");
   });
   function foodWord(d) {
     var diet = DIET[d.id] || ["leaves"];
@@ -2291,7 +2379,7 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
   }
   homeBtn.addEventListener("click", function () {
     clearMission(true); activeMission = null; gm.hidden = true;
-    viewLab.hidden = true; viewMap.hidden = true; viewMission.hidden = true; viewBook.hidden = true; foundBox.hidden = true; viewShop.hidden = true; shopOpen = false; viewMemory.hidden = true; memoryLock = true; viewHouse.hidden = true; escTimers.forEach(clearTimeout); viewPark.hidden = false; homeBtn.hidden = true;
+    viewLab.hidden = true; viewMap.hidden = true; viewMission.hidden = true; viewBook.hidden = true; foundBox.hidden = true; viewShop.hidden = true; shopOpen = false; viewMemory.hidden = true; memoryLock = true; viewHouse.hidden = true; escTimers.forEach(clearTimeout); stopCamera(); viewPark.hidden = false; homeBtn.hidden = true;
     say("Welcome back to the park gate! Where shall we go?");
   });
 

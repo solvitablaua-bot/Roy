@@ -31,6 +31,7 @@ A website where Roy builds his own dinosaur park game, step by step. It should b
 - Design for a six-year-old: big buttons, pictures and sounds over text, very short words, no failure states that feel like losing. Exceptions, because Roy asked for them: in the Raptor Run the raptors can catch you if you are too slow, and on the boat trip the Mosasaurus can sink the boat if you are too slow. Keep any such moment cartoon-like and silly (a dust cloud and "CHOMP!", or bubbles and "GLUG GLUG!", nothing gory or scary) with an instant "Try again!".
 - It must work on an iPad in Safari with touch. No mouse-only or hover-only interactions.
 - No accounts, ads, chat, payments or external links. Save progress on the device only.
+- The camera is only used for Dino Escape (Roy's idea: the dinosaur comes into the real house). The picture is shown live on the screen only. It is never recorded, saved or sent anywhere, and the camera turns off when you leave.
 - Use original art, sounds and names. The design should look and feel like the movies without copying official logos, characters or assets.
 - Keep it simple to run: plain HTML, CSS and JavaScript, no build step.
 - See `Project-Overview.md` for the plan.
