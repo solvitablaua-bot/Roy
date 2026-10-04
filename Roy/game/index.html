@@ -2150,12 +2150,72 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
       fact: "Pachyrhinosaurus had a big bumpy pad on its nose instead of a horn!",
       svg: quad({ c: "#a87a5a", d: "#86593c", b: "#e8cdb0", neckUp: 4,
         pre: function (hx, hy) { return fan(hx - 6, hy - 6, 24, 40, 200, 280, 4, "#f4e8cc") + '<ellipse cx="' + (hx - 6) + '" cy="' + (hy - 8) + '" rx="26" ry="24" fill="#d9a35a"/>'; },
-        x: function (hx, hy) { return '<ellipse cx="' + (hx + 22) + '" cy="' + (hy - 8) + '" rx="12" ry="8" fill="#c9a36a" stroke="#86593c" stroke-width="2"/>'; } }) }
+        x: function (hx, hy) { return '<ellipse cx="' + (hx + 22) + '" cy="' + (hy - 8) + '" rx="12" ry="8" fill="#c9a36a" stroke="#86593c" stroke-width="2"/>'; } }) },
+    { id: "giga", name: "Giganotosaurus", sound: function () { roar(0.65, 2.2); },
+      clue: "Here is a clue: I'm a giant meat-eater, as long as a bus!",
+      fact: "Giganotosaurus was one of the biggest meat-eating dinosaurs ever, as long as a bus!",
+      svg: biped({ c: "#b0604a", d: "#8a4634", b: "#e8b8a0", snout: 14, arm: 8,
+        x: function (hx, hy) { return '<path d="M' + (hx - 10) + ' ' + (hy - 14) + ' l6 -8 l6 8 M' + (hx + 6) + ' ' + (hy - 16) + ' l6 -8 l6 8" fill="#8a4634"/>' +
+          '<path d="M60 82 l6 -9 M78 74 l6 -9 M96 70 l6 -9 M114 70 l6 -9" stroke="#6e3424" stroke-width="5" stroke-linecap="round"/>' +
+          '<polyline points="' + (hx + 14) + ',' + (hy + 8) + ' ' + (hx + 18) + ',' + (hy + 14) + ' ' + (hx + 22) + ',' + (hy + 8) + ' ' + (hx + 26) + ',' + (hy + 14) + ' ' + (hx + 30) + ',' + (hy + 8) + ' ' + (hx + 34) + ',' + (hy + 13) + '" fill="#fff" stroke="#fff" stroke-width="1"/>'; } }) },
+    { id: "mamen", name: "Mamenchisaurus", sound: function () { tone(90, 0, 1.8, "sine", 0.3, 65); },
+      clue: "Here is a clue: my neck is super, super, super long!",
+      fact: "Mamenchisaurus had one of the longest necks of any animal ever, longer than a bus!",
+      svg: quad({ c: "#9a9a6a", d: "#7a7a50", b: "#dedcb6", neckUp: 54, neckX: 26, headR: 0.65, tailY: 128 }) },
+    { id: "chasmo", name: "Chasmosaurus", sound: grunt,
+      clue: "Here is a clue: I have a giant frill like a big shield!",
+      fact: "Chasmosaurus had a huge frill with big holes in it, like windows, to make it light!",
+      svg: quad({ c: "#6a8a5a", d: "#4f6e44", b: "#cfe0b8", neckUp: 4,
+        pre: function (hx, hy) { return '<path d="M' + (hx - 30) + ' ' + (hy + 14) + ' L' + (hx - 26) + ' ' + (hy - 46) + ' L' + (hx + 18) + ' ' + (hy - 34) + ' L' + (hx + 6) + ' ' + (hy + 2) + ' Z" fill="#e4572a"/>' +
+          '<ellipse cx="' + (hx - 18) + '" cy="' + (hy - 24) + '" rx="6" ry="9" fill="#2a5634"/><ellipse cx="' + (hx - 2) + '" cy="' + (hy - 22) + '" rx="6" ry="9" fill="#2a5634"/>'; },
+        x: function (hx, hy) { return '<path d="M' + (hx + 2) + ' ' + (hy - 8) + ' L' + (hx + 4) + ' ' + (hy - 20) + ' L' + (hx + 10) + ' ' + (hy - 8) + ' Z M' + (hx + 22) + ' ' + (hy - 4) + ' L' + (hx + 26) + ' ' + (hy - 14) + ' L' + (hx + 30) + ' ' + (hy - 4) + ' Z" fill="#f4e8cc"/>'; } }) },
+    { id: "euo", name: "Euoplocephalus", sound: bonk,
+      clue: "Here is a clue: I have armor everywhere, even on my eyelids!",
+      fact: "Euoplocephalus was covered in armor, even on its eyelids, and had a club on its tail!",
+      svg: quad({ c: "#7a6a5a", d: "#5c4e40", b: "#cfc2b2", neckUp: -16, headR: 0.95, bodyRy: 28,
+        x: function (hx, hy) {
+          var o = '<ellipse cx="8" cy="84" rx="15" ry="12" fill="#5c4e40"/><circle cx="2" cy="80" r="4" fill="#cfc2b2"/><circle cx="14" cy="80" r="4" fill="#cfc2b2"/>';
+          for (var i = 0; i < 6; i++) o += '<path d="M' + (56 + i * 16) + ' ' + (backTop(60 + i * 16, 28) + 8) + ' l4 -10 l4 10 Z" fill="#cfc2b2"/>';
+          return o + '<path d="M' + (hx + 2) + ' ' + (hy - 12) + ' q6 -6 12 0" stroke="#cfc2b2" stroke-width="4" fill="none"/>';
+        } }) },
+    { id: "troodon", name: "Troodon", sound: function () { chirp(); },
+      clue: "Here is a clue: I have big eyes to see in the dark!",
+      fact: "Troodon had big eyes for seeing at night and a big brain for its size!",
+      svg: biped({ c: "#8a9a6a", d: "#6a7a4e", b: "#e0e6c6", neck: 10, snout: 4, headR: 0.8,
+        x: function (hx, hy) { return '<circle cx="' + (hx + 4) + '" cy="' + (hy - 4) + '" r="11" fill="#fff"/><circle cx="' + (hx + 6) + '" cy="' + (hy - 3) + '" r="7" fill="#f2a93b"/>'; } }) },
+    { id: "utah", name: "Utahraptor", sound: function () { roar(1.2, 1.2); chirp(); },
+      clue: "Here is a clue: I'm a giant raptor with a huge claw on my foot!",
+      fact: "Utahraptor was a giant raptor with a toe claw bigger than a banana!",
+      svg: biped({ c: "#5a7a9a", d: "#425e7a", b: "#c6d6e6", snout: 10, headR: 0.85, arm: 14,
+        x: function () { return '<path d="M118 160 q-12 -16 4 -24" stroke="#f4e8cc" stroke-width="6" fill="none" stroke-linecap="round"/><path d="M132 100 L172 122 L160 128 L134 116 Z" fill="#425e7a"/><path d="M40 70 l4 -8 M56 74 l4 -8 M72 76 l4 -8" stroke="#2e4660" stroke-width="5" stroke-linecap="round"/>'; } }) },
+    { id: "tsintao", name: "Tsintaosaurus", sound: trumpet,
+      clue: "Here is a clue: I have a crest on my head like a unicorn horn!",
+      fact: "Tsintaosaurus had a crest on its head that pointed up, a bit like a unicorn horn!",
+      svg: quad({ c: "#c98a5a", d: "#a86e40", b: "#f0d6b8", neckUp: 20,
+        x: function (hx, hy) { return '<path d="M' + (hx - 2) + ' ' + (hy - 10) + ' L' + (hx + 14) + ' ' + (hy - 48) + ' L' + (hx + 10) + ' ' + (hy - 8) + ' Z" fill="#9b6fc4"/>' + '<ellipse cx="' + (hx + 34) + '" cy="' + (hy + 6) + '" rx="12" ry="6" fill="#e0b47a"/>'; } }) },
+    { id: "ourano", name: "Ouranosaurus", sound: trumpet,
+      clue: "Here is a clue: I have a sail on my back, but I only eat plants!",
+      fact: "Ouranosaurus had a sail on its back, and it only ate plants!",
+      svg: quad({ c: "#7a9a8a", d: "#5e7c6c", b: "#d0e2d8", neckUp: 14,
+        pre: function () { return '<path d="M50 80 Q100 10 150 80 Z" fill="#e0a060"/><path d="M70 80 L74 46 M90 80 L94 32 M110 80 L112 32 M130 80 L130 46" stroke="#a86e40" stroke-width="4"/>'; },
+        x: function (hx, hy) { return '<ellipse cx="' + (hx + 34) + '" cy="' + (hy + 6) + '" rx="12" ry="6" fill="#c9b07a"/>'; } }) },
+    { id: "salta", name: "Saltasaurus", sound: function () { tone(120, 0, 1.2, "sine", 0.3, 90); },
+      clue: "Here is a clue: I have a long neck and bumpy armor on my back!",
+      fact: "Saltasaurus was a long-necked dinosaur with bumpy armor on its back!",
+      svg: quad({ c: "#a0886a", d: "#806a50", b: "#e2d4bc", neckUp: 34, neckX: 10, headR: 0.7, tailY: 124,
+        x: function () { var o = ''; for (var i = 0; i < 8; i++) o += '<circle cx="' + (56 + i * 12) + '" cy="' + (backTop(56 + i * 12, 34) + 10 + (i % 2) * 8) + '" r="5" fill="#c9b08a"/>'; return o; } }) },
+    { id: "archaeo", name: "Archaeopteryx", sound: function () { tone(1600, 0, 0.12, "sine", 0.2, 2400); tone(1900, 0.15, 0.12, "sine", 0.2, 2600); },
+      clue: "Here is a clue: I have feathers and wings, like a bird!",
+      fact: "Archaeopteryx had feathers and wings. It was part dinosaur, part bird!",
+      svg: biped({ c: "#3a4a6a", d: "#2a364e", b: "#9aa8c6", neck: 10, snout: 2, headR: 0.75, arm: 12,
+        x: function () { return '<path d="M128 96 L196 70 L186 92 L198 104 L170 112 L178 124 L140 120 Z" fill="#c0452c"/><path d="M30 74 L0 66 L10 80 L0 92 L32 86 Z" fill="#c0452c"/>'; } }) }
   ];
   function dayNumber() { var t = new Date(); return Math.floor(new Date(t.getFullYear(), t.getMonth(), t.getDate()).getTime() / 86400000); }
-  // two Mystery Cages, each with a different secret dinosaur every day
-  function todaysMystery(slot) { return MYSTERY[(dayNumber() * 2 + (slot || 0)) % MYSTERY.length]; }
-  function mysteryKey(slot) { return slot ? "mystery2-" + today() : "mystery-" + today(); }
+  // 12 Mystery Cages, each with a different secret dinosaur every day (Roy's idea)
+  var MYSTERY_SLOTS = 12;
+  var CLOTHS = ["#6b4a9b", "#2f7a7a", "#a83a5a", "#3a5aa8", "#a86a2a", "#4a8a3a", "#8a3aa8", "#2a6aa8", "#a84a2a", "#5a5aa8", "#2f8a6a", "#9b4a7a"];
+  function todaysMystery(slot) { return MYSTERY[(dayNumber() * MYSTERY_SLOTS + (slot || 0)) % MYSTERY.length]; }
+  function mysteryKey(slot) { return slot ? "mystery" + (slot + 1) + "-" + today() : "mystery-" + today(); }
   var TARP = '<svg viewBox="0 0 160 140" preserveAspectRatio="none" aria-hidden="true">' +
     '<path d="M10 140 Q14 40 60 26 Q80 6 100 26 Q146 40 150 140 Z" fill="#6b4a9b"/>' +
     '<path d="M30 140 Q40 70 70 40 M120 140 Q116 80 96 44" stroke="#4a3270" stroke-width="5" fill="none"/>' +
@@ -2204,17 +2264,17 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
   function buildWorld() {
     CAGE_COUNT = Math.max(20, DINOS.length);
     mysteryIdx = CAGE_COUNT;
-    var H = 60 + Math.ceil((CAGE_COUNT + 2) / 5) * 300 + 10;
+    var H = 60 + Math.ceil((CAGE_COUNT + MYSTERY_SLOTS) / 5) * 300 + 10;
     world.style.height = H + "px";
     var pts = [];
-    for (var i = 0; i <= CAGE_COUNT + 1; i++) { var c = cagePos(i); pts.push((c.x + 125) + "," + (c.y + 205)); }
+    for (var i = 0; i < CAGE_COUNT + MYSTERY_SLOTS; i++) { var c = cagePos(i); pts.push((c.x + 125) + "," + (c.y + 205)); }
     var trees = "";
     var tseed = 3;
     function r() { tseed = (tseed * 16807) % 2147483647; return tseed / 2147483647; }
     for (var t = 0; t < 46 + (H - 1270) / 30; t++) {
       var tx = r() * 1700 + 20, ty = r() * (H - 70) + 20;
       var near = false;
-      for (var q = 0; q <= CAGE_COUNT + 1; q++) { var cp = cagePos(q); if (tx > cp.x - 30 && tx < cp.x + 270 && ty > cp.y - 40 && ty < cp.y + 250) near = true; }
+      for (var q = 0; q < CAGE_COUNT + MYSTERY_SLOTS; q++) { var cp = cagePos(q); if (tx > cp.x - 30 && tx < cp.x + 270 && ty > cp.y - 40 && ty < cp.y + 250) near = true; }
       if (near) continue;
       trees += '<use href="#tree" x="' + tx.toFixed(0) + '" y="' + ty.toFixed(0) + '"/>';
     }
@@ -2241,11 +2301,11 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
       html += '<button class="cage' + (d ? "" : " empty") + (d && state.found["saw-" + d.id] ? " visited" : "") +
         '" data-cage="' + k + '" style="left:' + pos.x + 'px;top:' + pos.y + 'px" aria-label="' + (d ? d.name : "Empty cage") + '">' + inner + '<div class="needs"></div></button>';
     }
-    [0, 1].forEach(function (slot) {
+    for (var slot = 0; slot < MYSTERY_SLOTS; slot++) {
       var mp = cagePos(mysteryIdx + slot);
       html += '<button class="cage mystery-cage" data-mystery="' + (slot + 1) + '" data-cage="' + (mysteryIdx + slot) + '" style="left:' + mp.x + 'px;top:' + mp.y + 'px" aria-label="Mystery cage ' + (slot + 1) + '">' +
-        cageBack("mystery") + '<div class="tarp">' + (slot ? TARP.split("#6b4a9b").join("#2f7a7a").split("#4a3270").join("#1f5555") : TARP) + '</div>' + cageFront("MYSTERY " + (slot + 1), "?") + '</button>';
-    });
+        cageBack("mystery") + '<div class="tarp">' + TARP.split("#6b4a9b").join(CLOTHS[slot]).split("#4a3270").join("rgba(0,0,0,.3)") + '</div>' + cageFront("MYSTERY " + (slot + 1), "?") + '</button>';
+    }
     world.innerHTML = html;
   }
   buildWorld();
@@ -2325,6 +2385,7 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
     '<text x="55" y="74" text-anchor="middle" font-family="Alfa Slab One, Georgia, serif" font-size="52" fill="#f2d24b">?</text>';
   function setClueDots() { $("clue-dots").querySelectorAll("span").forEach(function (sp, i) { sp.classList.toggle("on", i < clueStep); }); }
   var mysterySlot = 0;
+  function mysteriesLeft() { var n = 0; for (var i = 0; i < MYSTERY_SLOTS; i++) if (!state.found[mysteryKey(i)]) n++; return n; }
   function openMystery(slot) {
     mysterySlot = slot || 0;
     var m = todaysMystery(mysterySlot);
@@ -2342,7 +2403,7 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
       $("visit-name").textContent = m.name;
       $("visit-fact").textContent = m.fact;
       m.sound();
-      say("You already found this mystery dinosaur today. It's " + m.name + "! " + (state.found[mysteryKey(1 - mysterySlot)] ? "Come back tomorrow for new ones!" : "Have you tried the other Mystery Cage?"));
+      say("You already found this mystery dinosaur today. It's " + m.name + "! " + (mysteriesLeft() ? "There are " + mysteriesLeft() + " more Mystery Cages to solve today!" : "You solved every Mystery Cage today! Come back tomorrow for new ones!"));
       return;
     }
     visitDino.classList.add("shadow");
@@ -2371,13 +2432,19 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
     if (!state.found.mysterySolver) {
       state.found.mysterySolver = true; save();
       setTimeout(function () { showBadge("Mystery Solver", "You found the mystery dinosaur!", MYSTERY_BADGE); }, 1500);
+    } else if (!mysteriesLeft() && !state.found.mysteryMaster) {
+      state.found.mysteryMaster = true; save();
+      setTimeout(function () {
+        showBadge("Mystery Master", "You solved all 12 Mystery Cages in one day!", MYSTERY_BADGE.replace("#9b6fc4", "#f2a93b"));
+        say("You solved all 12 Mystery Cages today! You are a Mystery Master, Roy!");
+      }, 2600);
     }
   }, true);
   $("find-mystery").addEventListener("click", function () {
     var pos = cagePos(mysteryIdx);
     mapScroll.scrollTo({ left: Math.max(0, pos.x - 120), top: Math.max(0, pos.y - 60), behavior: "smooth" });
     tone(300, 0, 0.5, "sine", 0.2, 700);
-    say("Here are the two Mystery Cages! Each one has a different secret dinosaur. Tap one!");
+    say("Here are the 12 Mystery Cages! Each one has a different secret dinosaur. Tap one!");
   });
   $("visit-close").addEventListener("click", closeVisit);
   visit.addEventListener("click", function (e) { if (e.target === visit) closeVisit(); });
