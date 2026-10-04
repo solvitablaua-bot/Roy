@@ -796,6 +796,21 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
 
 /* ---------- Memory Game: find two of the same dinosaur (Roy's idea) ---------- */
 .memory { flex: 1; min-height: 0; position: relative; pointer-events: auto; display: flex; flex-direction: column; }
+/* sleepy dart blasters you win in the memory game (Roy's idea) */
+.blaster-shelf { flex: 0 0 auto; display: flex; gap: 8px; justify-content: center; align-items: stretch; padding: 8px; overflow-x: auto;
+  background: rgba(29, 29, 27, .45); border-radius: 18px; margin: 0 8px 8px; }
+.blaster-shelf[hidden] { display: none; }
+.blaster-shelf .shelf-title { align-self: center; color: var(--bone); font-weight: 800; font-size: 1rem; padding: 0 6px; flex: 0 0 auto; }
+.blaster { flex: 0 0 auto; position: relative; width: 84px; height: 116px; border-radius: 14px; border: 3px solid rgba(244, 232, 204, .5);
+  background: rgba(244, 232, 204, .1); cursor: pointer; }
+.blaster.on { border-color: var(--amber); background: rgba(242, 169, 59, .35); box-shadow: 0 0 14px rgba(242, 169, 59, .7); }
+.blaster .gunbox { position: absolute; left: 14%; right: 14%; top: 4%; bottom: 26%; }
+.blaster .gunbox svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.blaster.locked .gunbox svg { filter: brightness(0) opacity(.45); }
+.blaster span { position: absolute; left: 0; right: 0; bottom: 4px; text-align: center; color: var(--bone); font-size: .72rem; font-weight: 800; line-height: 1.05; }
+.blaster.locked span { opacity: .7; }
+.mem-levels { overflow-y: auto; }
+@media (max-width: 560px) { .mem-levels { align-content: flex-start; } .blaster { width: 66px; height: 96px; } .blaster-shelf .shelf-title { display: none; } .blaster-shelf { justify-content: flex-start; } }
 .mem-levels { flex: 1; min-height: 0; display: flex; gap: 16px; justify-content: center; align-items: center; flex-wrap: wrap; padding: 8px; }
 .mem-level {
   width: 30%; min-width: 150px; max-width: 260px;
@@ -1029,9 +1044,6 @@ body.quake .app { animation: shake .4s ease; }
 @keyframes zzz { from { transform: translate(0, 0) scale(.6); opacity: 0; } 20% { opacity: 1; } to { transform: translate(40px, -120px) scale(1.4); opacity: 0; } }
 .bk-aimdot { position: fixed; width: 60px; height: 60px; margin: -30px 0 0 -30px; z-index: 304; pointer-events: none; border-radius: 50%;
   border: 4px solid #f2a93b; box-shadow: 0 0 0 3px #1d1d1b; animation: puff .45s ease-out forwards; }
-.bk-say { position: absolute; left: 50%; bottom: 6%; transform: translateX(-50%); z-index: 2; max-width: 90%;
-  background: var(--bone); color: var(--wood-dark); border: 4px solid var(--wood-dark); border-radius: 20px; padding: 8px 18px;
-  font-weight: 800; font-size: clamp(1rem, 3vmin, 1.4rem); text-align: center; pointer-events: none; }
 @keyframes shake { 15%, 45%, 75% { transform: translateX(-7px); } 30%, 60%, 90% { transform: translateX(7px); } }
 @keyframes tap { 0%, 100% { transform: translateX(-50%) scale(1); opacity: .9; } 50% { transform: translateX(-50%) scale(.82); opacity: .6; } }
 @keyframes flicker { to { transform: scaleY(1.15) scaleX(.9); } }
@@ -1461,6 +1473,7 @@ body.quake .app { animation: shake .4s ease; }
         <div class="mem-level" role="button" tabindex="0" data-level="hard"><svg viewBox="0 0 200 130" aria-hidden="true"><rect x="10.0" y="10.0" width="37.5" height="20.0" rx="5" fill="#f2a93b" stroke="#3b2413" stroke-width="2.5"/><rect x="57.5" y="10.0" width="37.5" height="20.0" rx="5" fill="#f2a93b" stroke="#3b2413" stroke-width="2.5"/><rect x="105.0" y="10.0" width="37.5" height="20.0" rx="5" fill="#f2a93b" stroke="#3b2413" stroke-width="2.5"/><rect x="152.5" y="10.0" width="37.5" height="20.0" rx="5" fill="#f2a93b" stroke="#3b2413" stroke-width="2.5"/><rect x="10.0" y="40.0" width="37.5" height="20.0" rx="5" fill="#f2a93b" stroke="#3b2413" stroke-width="2.5"/><rect x="57.5" y="40.0" width="37.5" height="20.0" rx="5" fill="#f2a93b" stroke="#3b2413" stroke-width="2.5"/><rect x="105.0" y="40.0" width="37.5" height="20.0" rx="5" fill="#f2a93b" stroke="#3b2413" stroke-width="2.5"/><rect x="152.5" y="40.0" width="37.5" height="20.0" rx="5" fill="#f2a93b" stroke="#3b2413" stroke-width="2.5"/><rect x="10.0" y="70.0" width="37.5" height="20.0" rx="5" fill="#f2a93b" stroke="#3b2413" stroke-width="2.5"/><rect x="57.5" y="70.0" width="37.5" height="20.0" rx="5" fill="#f2a93b" stroke="#3b2413" stroke-width="2.5"/><rect x="105.0" y="70.0" width="37.5" height="20.0" rx="5" fill="#f2a93b" stroke="#3b2413" stroke-width="2.5"/><rect x="152.5" y="70.0" width="37.5" height="20.0" rx="5" fill="#f2a93b" stroke="#3b2413" stroke-width="2.5"/><rect x="10.0" y="100.0" width="37.5" height="20.0" rx="5" fill="#f2a93b" stroke="#3b2413" stroke-width="2.5"/><rect x="57.5" y="100.0" width="37.5" height="20.0" rx="5" fill="#f2a93b" stroke="#3b2413" stroke-width="2.5"/><rect x="105.0" y="100.0" width="37.5" height="20.0" rx="5" fill="#f2a93b" stroke="#3b2413" stroke-width="2.5"/><rect x="152.5" y="100.0" width="37.5" height="20.0" rx="5" fill="#f2a93b" stroke="#3b2413" stroke-width="2.5"/></svg>Big<b>&#9733;&#9733;&#9733;</b></div>
       </div>
       <div class="mem-board" id="mem-board" hidden></div>
+      <div class="blaster-shelf" id="blaster-shelf"></div>
     </div>
   </section>
 
@@ -1761,7 +1774,6 @@ body.quake .app { animation: shake .4s ease; }
     <rect x="30" y="114" width="60" height="80" rx="16" fill="#2e5b3a" stroke="#1d1d1b" stroke-width="4"/>
     <path d="M40 132 h40 M40 146 h40 M40 160 h40" stroke="#3f7a4c" stroke-width="5" stroke-linecap="round"/>
   </svg></div>
-  <div class="bk-say" id="bk-say" hidden></div>
 </div>
 <div class="launcher" id="launcher" hidden>
   <video id="ln-video" playsinline muted autoplay></video>
@@ -2083,7 +2095,6 @@ body.quake .app { animation: shake .4s ease; }
   // ---------- Dino Escape: a dinosaur breaks out of the REAL screen, anywhere in the game (Roy's idea) ----------
   var viewHouse = $("view-house"), escPick = $("esc-pick");
   var bk = $("breakout"), bkCracks = $("bk-cracks"), bkHole = $("bk-hole"), bkDino = $("bk-dino"), bkArt = $("bk-art");
-  var bkSay = $("bk-say");
   var ESC_IDS = ["trex", "blue", "trike", "stego", "spino", "ankylo"];
   var escDino = null, escTimers = [], bkActive = false, bkLoose = false, bkTaps = 0, bkWalk = null, bkFromMenu = false, bkCx = 0, bkCy = 0;
   var camStream = null, camFacing = "environment";
@@ -2097,7 +2108,7 @@ body.quake .app { animation: shake .4s ease; }
   function stomp() { tone(70, 0, 0.18, "sine", 0.5, 40); tone(70, 0.3, 0.18, "sine", 0.5, 40); }
   function tinkle() { for (var i = 0; i < 9; i++) tone(1800 + Math.random() * 1800, i * 0.05, 0.25, "triangle", 0.12, 1200); }
   function quake() { document.body.classList.remove("quake"); void document.body.offsetWidth; document.body.classList.add("quake"); }
-  function bkTalk(text) { bkSay.textContent = text; bkSay.hidden = false; say(text); }
+  function bkTalk(text) { say(text); }
   function openEscape() {
     viewPark.hidden = true; viewHouse.hidden = false; homeBtn.hidden = false;
     escPick.innerHTML = ESC_IDS.map(function (id) {
@@ -2161,7 +2172,7 @@ body.quake .app { animation: shake .4s ease; }
     bk.className = "breakout"; bk.hidden = false;
     bkHole.style.left = bkCx + "px"; bkHole.style.top = bkCy + "px"; bkHole.style.width = "0"; bkHole.style.height = "0";
     bkDino.className = "bk-dino"; bkDino.style.left = bkCx + "px"; bkDino.style.top = bkCy + "px";
-    bkArt.innerHTML = d.svg; bkSay.hidden = true; $("bk-gun").hidden = true;
+    bkArt.innerHTML = d.svg; $("bk-gun").hidden = true;
     bkDino.querySelectorAll(".stuck").forEach(function (x) { x.remove(); });
     $("bk-danger").hidden = false;
     rumble();
@@ -2182,8 +2193,10 @@ body.quake .app { animation: shake .4s ease; }
     later(function () {
       bkDino.classList.remove("out"); bkDino.classList.add("loose");
       bkLoose = true;
+      var gunB = myBlaster(); bkNeed = gunB.mega ? 2 : 3;
+      $("bk-gun").innerHTML = blasterSvg(gunB);
       $("bk-gun").hidden = false; $("bk-gun").style.transform = "";
-      bkTalk(shortName(d) + " is out! Shoot " + shortName(d) + " with 3 sleepy darts! Tap " + shortName(d) + " to shoot!");
+      bkTalk(shortName(d) + " is out! Shoot " + shortName(d) + " with " + bkNeed + " sleepy darts from your " + gunB.name + "! Tap " + shortName(d) + " to shoot!");
       walkAbout();
       bkWalk = setInterval(walkAbout, 1700);
     }, 3600);
@@ -2205,7 +2218,7 @@ body.quake .app { animation: shake .4s ease; }
     src.connect(hp).connect(g).connect(ctx.destination); src.start(t);
   }
   function snore() { tone(110, 0, 0.9, "sawtooth", 0.08, 70); tone(160, 1.1, 0.7, "sine", 0.1, 260); }
-  var bkDartsFlying = 0;
+  var bkDartsFlying = 0, bkNeed = 3;
   bk.addEventListener("pointerdown", function (e) {
     if (!bkLoose) return;
     var gun = $("bk-gun").getBoundingClientRect();
@@ -2221,7 +2234,7 @@ body.quake .app { animation: shake .4s ease; }
     var hitEl = document.elementFromPoint(x, y);
     var hit = !!(hitEl && hitEl.closest && hitEl.closest("#bk-dino"));
     var dart = document.createElement("span");
-    dart.className = "bk-dart"; dart.innerHTML = DART_SVG;
+    dart.className = "bk-dart"; dart.innerHTML = dartSvg(myBlaster());
     var deg = ang * 180 / Math.PI;
     var bx = gx + Math.cos(ang) * gun.height * 0.75, by = gy + Math.sin(ang) * gun.height * 0.75;
     dart.style.left = bx + "px"; dart.style.top = by + "px"; dart.style.transform = "rotate(" + deg + "deg)";
@@ -2243,7 +2256,7 @@ body.quake .app { animation: shake .4s ease; }
       // stick the dart into the dinosaur
       dart.remove();
       var r = bkDino.getBoundingClientRect();
-      var st = document.createElement("span"); st.className = "stuck"; st.innerHTML = DART_SVG;
+      var st = document.createElement("span"); st.className = "stuck"; st.innerHTML = dartSvg(myBlaster());
       st.style.left = ((x - r.left) / r.width * 100 - 13) + "%"; st.style.top = ((y - r.top) / r.height * 100 - 2.5) + "%";
       st.style.transform = "rotate(" + deg + "deg)";
       bkDino.appendChild(st);
@@ -2251,8 +2264,8 @@ body.quake .app { animation: shake .4s ease; }
       tone(900, 0, 0.08, "square", 0.1, 500);
       if (escDino.sound) escDino.sound();
       bkDino.classList.remove("wobble"); void bkDino.offsetWidth; bkDino.classList.add("wobble");
-      if (bkTaps === 1) { bkTalk("Got it! " + shortName(escDino) + " is getting sleepy... Shoot again!"); return; }
-      if (bkTaps === 2) { bkTalk("Yawn! One more sleepy dart!"); return; }
+      if (bkTaps < bkNeed - 1) { bkTalk("Got it! " + shortName(escDino) + " is getting sleepy... Shoot again!"); return; }
+      if (bkTaps === bkNeed - 1) { bkTalk("Yawn! One more sleepy dart!"); return; }
       fallAsleep();
     }
     requestAnimationFrame(fly);
@@ -4222,6 +4235,7 @@ body.quake .app { animation: shake .4s ease; }
     say("Memory game! Tap two cards. If the same dinosaur pops out of both, you found a match! Pick a small, middle or big game!");
   }
   function showMemLevels() {
+    renderShelf(); $("blaster-shelf").hidden = false;
     memoryLock = true;
     memBoard.hidden = true; memLevels.hidden = false;
   }
@@ -4230,6 +4244,7 @@ body.quake .app { animation: shake .4s ease; }
     if (b) startMemory(b.dataset.level);
   });
   function startMemory(level) {
+    $("blaster-shelf").hidden = true;
     var L = MEM_LEVELS[level];
     memLevel = level; memFirst = null; memMatched = 0; memoryLock = false;
     var picks = shuffle(DINOS.slice()).slice(0, L.pairs);
@@ -4295,12 +4310,75 @@ body.quake .app { animation: shake .4s ease; }
     state.found.memoryWins = (state.found.memoryWins || 0) + 1; save(); updateBook();
     say("You found all the pairs! What a great memory, Roy!");
     if (state.found.memoryWins === 1) setTimeout(function () { showBadge("Dino Memory", "You won the memory game!", MEMORY_BADGE); }, 1600);
+    var prize = state.found.memoryWins < BLASTERS.length ? BLASTERS[state.found.memoryWins] : null;
+    if (prize) {
+      state.blaster = prize.id; save();
+      setTimeout(function () {
+        showBadge("New Blaster!", "You won the " + prize.name + "!", blasterBadge(prize));
+        pfft();
+        say("You found all the pairs! Your prize is a new sleepy dart blaster: the " + prize.name + "!" + (prize.mega ? " It makes dinosaurs sleepy with just 2 darts!" : ""));
+      }, state.found.memoryWins === 1 ? 4200 : 1800);
+    }
     setTimeout(function () {
       if (viewMemory.hidden) return;
       showMemLevels();
-      say("Do you want to play again? Pick a small, middle or big game!");
-    }, 4200);
+      say(prize ? "Here are your blasters! Tap one to use it. Or play again to win another one!" : "Do you want to play again? Pick a small, middle or big game!");
+    }, prize ? (state.found.memoryWins === 1 ? 8200 : 6000) : 4200);
   }
+
+  // ---------- sleepy dart blasters: win the memory game to get a new one (Roy's idea) ----------
+  var BLASTERS = [
+    { id: "ranger", name: "Ranger Blaster", barrel: "#5d625c", mid: "#e4572a", grip: "#2e5b3a", line: "#3f7a4c", pom: "#e98bd0" },
+    { id: "jungle", name: "Jungle Blaster", barrel: "#3f7a4c", mid: "#6b8a3a", grip: "#2e5b3a", line: "#a8c45a", pom: "#f9d27a" },
+    { id: "lava", name: "Lava Blaster", barrel: "#3b2413", mid: "#e4372a", grip: "#f2a93b", line: "#e4572a", pom: "#ff7a3a" },
+    { id: "ice", name: "Ice Blaster", barrel: "#cfe6ef", mid: "#7fb0dc", grip: "#4a86c8", line: "#cfe6ef", pom: "#ffffff" },
+    { id: "sea", name: "Sea Blaster", barrel: "#5a86a2", mid: "#2a8f88", grip: "#0d2a3d", line: "#7fe0d0", pom: "#7fe0d0" },
+    { id: "golden", name: "Golden Blaster", barrel: "#b07d16", mid: "#f2c84a", grip: "#f2c84a", line: "#fff3b0", pom: "#f2a93b" },
+    { id: "rainbow", name: "Mega Rainbow Blaster", barrel: "#7a4ab0", mid: "rainbow", grip: "#4a86c8", line: "#fff", pom: "#e98bd0", mega: true }
+  ];
+  function blastersOwned() { return Math.min(BLASTERS.length, 1 + (state.found.memoryWins || 0)); }
+  function myBlaster() {
+    var owned = blastersOwned();
+    for (var i = 0; i < owned; i++) if (BLASTERS[i].id === state.blaster) return BLASTERS[i];
+    return BLASTERS[owned - 1];
+  }
+  var rainbowN = 0;
+  function blasterInner(b) {
+    var gid = "rainbow-mid-" + (rainbowN++);
+    var mid = b.mid === "rainbow" ? "url(#" + gid + ")" : b.mid;
+    return (b.mid === "rainbow" ? '<defs><linearGradient id="' + gid + '" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e4572a"/><stop offset=".3" stop-color="#f9d27a"/><stop offset=".55" stop-color="#5fb37c"/><stop offset=".8" stop-color="#4a86c8"/><stop offset="1" stop-color="#9a6ad8"/></linearGradient></defs>' : "") +
+      '<rect x="44" y="0" width="32" height="96" rx="8" fill="' + b.barrel + '" stroke="#1d1d1b" stroke-width="4"/>' +
+      '<rect x="50" y="8" width="20" height="10" rx="3" fill="#1d1d1b"/>' +
+      (b.mega ? '<rect x="22" y="20" width="22" height="60" rx="8" fill="' + b.barrel + '" stroke="#1d1d1b" stroke-width="4"/><rect x="76" y="20" width="22" height="60" rx="8" fill="' + b.barrel + '" stroke="#1d1d1b" stroke-width="4"/>' : "") +
+      '<rect x="36" y="60" width="48" height="60" rx="12" fill="' + mid + '" stroke="#1d1d1b" stroke-width="4"/>' +
+      '<circle cx="60" cy="84" r="12" fill="#f9d27a" stroke="#1d1d1b" stroke-width="3"/><path d="M54 84 q6 -10 12 0 q-6 -3 -12 0 Z" fill="#3b2413"/>' +
+      '<rect x="30" y="114" width="60" height="76" rx="16" fill="' + b.grip + '" stroke="#1d1d1b" stroke-width="4"/>' +
+      '<path d="M40 132 h40 M40 146 h40 M40 160 h40" stroke="' + b.line + '" stroke-width="5" stroke-linecap="round"/>';
+  }
+  function blasterSvg(b) { return '<svg viewBox="0 0 120 190" aria-hidden="true">' + blasterInner(b) + '</svg>'; }
+  function blasterBadge(b) {
+    return '<circle cx="55" cy="55" r="50" fill="#173326" stroke="#f2a93b" stroke-width="5"/>' +
+      '<g transform="translate(29 10) scale(.44)">' + blasterInner(b) + '</g>' +
+      '<path d="M18 30 l2 6 6 2 -6 2 -2 6 -2 -6 -6 -2 6 -2 Z M88 70 l2 6 6 2 -6 2 -2 6 -2 -6 -6 -2 6 -2 Z" fill="#f9d27a"/>';
+  }
+  function dartSvg(b) { return DART_SVG.replace("#e98bd0", b.pom); }
+  function renderShelf() {
+    var owned = blastersOwned(), on = myBlaster().id;
+    $("blaster-shelf").innerHTML = '<span class="shelf-title">My blasters:</span>' + BLASTERS.map(function (b, i) {
+      var locked = i >= owned;
+      return '<div class="blaster' + (locked ? " locked" : "") + (b.id === on ? " on" : "") + '" role="button" tabindex="0" data-id="' + b.id + '">' +
+        '<div class="gunbox">' + blasterSvg(b) + '</div><span>' + (locked ? "Win to get!" : b.name.replace(" Blaster", "")) + '</span></div>';
+    }).join("");
+  }
+  $("blaster-shelf").addEventListener("click", function (e) {
+    var el = e.target.closest(".blaster");
+    if (!el) return;
+    if (el.classList.contains("locked")) { clunk(); say("Win the memory game to get this blaster!"); return; }
+    var b = BLASTERS.filter(function (x) { return x.id === el.dataset.id; })[0];
+    state.blaster = b.id; save(); renderShelf();
+    pfft();
+    say("You picked the " + b.name + "!" + (b.mega ? " It makes dinosaurs sleepy with just 2 darts!" : " Use it when a dinosaur breaks out of the screen!"));
+  });
 
   // ---------- Pet Shop: people come in and buy baby pet dinosaurs (Roy's idea) ----------
   var viewShop = $("view-shop"), tanksEl = $("tanks"), wishEl = $("wish"), customerEl = $("customer");
