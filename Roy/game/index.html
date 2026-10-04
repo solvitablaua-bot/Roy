@@ -118,6 +118,15 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
   background: radial-gradient(ellipse at 50% 100%, #f9d27a 0%, #c9772b 30%, #2a4a2f 70%, #13281d 100%);
   overflow: hidden;
 }
+.gate-trex {
+  position: absolute; left: -8%; right: -8%; bottom: 0; height: 78%;
+  transform: translateY(105%); transition: transform .55s cubic-bezier(.3, 1.4, .5, 1);
+  pointer-events: none;
+}
+.gate-trex svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.gate-trex.up { transform: translateY(0); }
+.gate-trex.up.roaring svg { animation: trexroar .25s ease-in-out 6 alternate; }
+@keyframes trexroar { to { transform: translateY(-3%) rotate(-3deg) scale(1.04); } }
 .doorway .path {
   position: absolute; left: 30%; right: 30%; bottom: 0; height: 60%;
   background: linear-gradient(#e0b56a00, #e0b56a99);
@@ -1093,6 +1102,7 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
     <button class="gate" id="gate" aria-label="Park gate">
       <div class="doorway">
         <div class="path"></div>
+        <div class="gate-trex" id="gate-trex"></div>
         <div class="door left"><div class="warn"></div><div class="ring"></div></div>
         <div class="door right"><div class="warn"></div><div class="ring"></div></div>
       </div>
@@ -1666,11 +1676,32 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
 
   // ---------- the park gate ----------
   var opening = false;
+  // a big T-Rex roars in the gateway every time the gate opens (Roy's idea)
+  var gateTrex = $("gate-trex");
+  function trexRoar() {
+    roar(0.55, 2.6);
+    setTimeout(function () { roar(0.7, 1.8); }, 250);
+    tone(50, 0, 2.4, "sawtooth", 0.18, 35);
+    rumble();
+  }
+  function trexInGate() {
+    if (!gateTrex.firstChild) gateTrex.innerHTML = dinoById("trex").svg.replace("<svg ", '<svg preserveAspectRatio="xMidYMax meet" ');
+    gateTrex.classList.add("up");
+    tone(60, 0, 0.3, "square", 0.2, 40);
+    setTimeout(function () {
+      gateTrex.classList.add("roaring");
+      trexRoar();
+      gate.classList.remove("shake"); void gate.offsetWidth; gate.classList.add("shake");
+    }, 450);
+    setTimeout(function () { gateTrex.classList.remove("roaring"); }, 2200);
+    setTimeout(function () { gateTrex.classList.remove("up"); }, 3600);
+  }
   gate.addEventListener("click", function () {
     if (opening) return;
-    roar(1, 1.7);
     gate.classList.remove("shake"); void gate.offsetWidth; gate.classList.add("shake");
     if (gate.classList.contains("open")) {
+      roar(1, 1.2);
+      gateTrex.classList.remove("up", "roaring");
       opening = true;
       gate.classList.remove("open");
       menu.hidden = true;
@@ -1679,7 +1710,12 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
       return;
     }
     opening = true;
+    clunk();
     gate.classList.add("open");
+    setTimeout(trexInGate, 700);
+    setTimeout(function () {
+      say("ROOOAAAR! It's T-Rex! He's saying welcome to the park!");
+    }, 1300);
     setTimeout(function () {
       menu.hidden = false;
       opening = false;
@@ -1687,11 +1723,11 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
         state.found.gate = true; save();
         addStar(gate);
         showBadge("Park Opener", "You opened your park!", GATE_BADGE);
-        say("Roar! Welcome to your park, Roy! You got a star! Tap the Egg Lab to hatch a dinosaur!");
+        say("Welcome to your park, Roy! You got a star! Tap the Egg Lab to hatch a dinosaur!");
       } else {
         say("Welcome back, boss! Pick a place to explore.");
       }
-    }, 1200);
+    }, 4300);
   });
 
   // ---------- places on the park map ----------
