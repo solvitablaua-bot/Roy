@@ -408,6 +408,9 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
 .visit.mystery .care-bar, .visit.mystery .food-tray { display: none !important; }
 .visit-dino.shadow svg { filter: brightness(0) opacity(.85); }
 .visit-dino.reveal svg { animation: revealflash .9s ease; }
+/* new species are fossil bones (Roy's idea) */
+.visit.bones .care-bar, .visit.bones .food-tray { display: none !important; }
+.mud.sand { background: radial-gradient(circle at 35% 35%, #e8cf96, #b08a4a 70%); width: 20%; }
 /* the golden dinosaur in the last Mystery Cage (Roy's idea) */
 .visit-dino.golden svg { filter: drop-shadow(0 0 14px rgba(249, 210, 122, .9)); }
 /* the Golden Monster made of gold (Roy's idea) */
@@ -1488,7 +1491,7 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
 
 <div class="visit" id="found" hidden>
   <div class="visit-card">
-    <div class="dino-stage">
+    <div class="dino-stage" id="found-stage">
       <button class="visit-dino" id="found-dino" aria-label="New dinosaur"></button>
     </div>
     <h2 class="visit-name" id="found-name"></h2>
@@ -2150,29 +2153,83 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
     }
     return o;
   }
+  // ---------- fossil skeletons: the new species found on missions are bones (Roy's idea) ----------
+  var BONE = "#efe3c4", BONE_DARK = "#6e5a3a";
+  function boneLine(d, w) {
+    return '<path d="' + d + '" stroke="' + BONE_DARK + '" stroke-width="' + (w + 4) + '" fill="none" stroke-linecap="round" stroke-linejoin="round"/>' +
+      '<path d="' + d + '" stroke="' + BONE + '" stroke-width="' + w + '" fill="none" stroke-linecap="round" stroke-linejoin="round"/>';
+  }
+  function knob(x, y, r) { return '<circle cx="' + x + '" cy="' + y + '" r="' + (r + 2) + '" fill="' + BONE_DARK + '"/><circle cx="' + x + '" cy="' + y + '" r="' + r + '" fill="' + BONE + '"/>'; }
+  function boneFx(str) {
+    if (!str) return "";
+    return str.replace(/stroke="#[0-9a-fA-F]{3,6}"/g, 'stroke="' + BONE + '"').replace(/fill="#[0-9a-fA-F]{3,6}"/g, 'fill="' + BONE + '" stroke="' + BONE_DARK + '" stroke-width="2"');
+  }
+  function qpt(p0, p1, p2, t) { var u = 1 - t; return [u * u * p0[0] + 2 * u * t * p1[0] + t * t * p2[0], u * u * p0[1] + 2 * u * t * p1[1] + t * t * p2[1]]; }
+  function spine(p0, p1, p2, n, r0, r1) {
+    var o = "";
+    for (var i = 0; i <= n; i++) { var q = qpt(p0, p1, p2, i / n); o += knob(q[0].toFixed(1), q[1].toFixed(1), (r0 + (r1 - r0) * i / n).toFixed(1)); }
+    return o;
+  }
+  function skeleton(kind, o) {
+    var out = "", hr = o.headR || 1, hx, hy;
+    if (kind === "biped") {
+      var sn = o.snout || 0, arm = o.arm || 12;
+      hx = 160; hy = 58 - (o.neck || 0);
+      out += (o.pre ? boneFx(o.pre(hx, hy)) : "");
+      out += boneLine("M92 98 L84 140 L90 164", 7) + boneLine("M90 164 l-12 2 M90 164 l2 5 M90 164 l12 1", 3) + knob(84, 140, 4);
+      for (var i = 0; i < 5; i++) { var x = 82 + i * 10, y = 84 - i * 1.5; out += boneLine("M" + x + " " + y + " Q" + (x - 8) + " " + (y + 18) + " " + (x - 2) + " " + (y + 32), 4); }
+      out += spine([8, 62], [70, 106], [124, 82], 12, 2.5, 6);
+      out += spine([124, 82], [hx - 26, hy + 20], [hx - 16, hy + 6], 4, 5, 4);
+      out += boneLine("M116 104 L114 142 L122 164", 6) + boneLine("M122 164 l-10 1 M122 164 l2 5 M122 164 l11 0", 3) + knob(92, 98, 7) + knob(116, 104, 5);
+      out += boneLine("M132 100 L" + (132 + arm * 0.6) + " " + (100 + arm * 0.8) + " L" + (134 + arm) + " " + (104 + arm), 4);
+      out += '<path d="M' + (hx - 22 * hr) + ' ' + hy + ' Q' + (hx - 20 * hr) + ' ' + (hy - 18 * hr) + ' ' + (hx + 4) + ' ' + (hy - 16 * hr) + ' L' + (hx + 36 + sn) + ' ' + (hy - 8) + ' Q' + (hx + 44 + sn) + ' ' + hy + ' ' + (hx + 36 + sn) + ' ' + (hy + 8) +
+        ' L' + (hx - 4) + ' ' + (hy + 14 * hr) + ' Q' + (hx - 22 * hr) + ' ' + (hy + 14 * hr) + ' ' + (hx - 22 * hr) + ' ' + hy + ' Z" fill="' + BONE + '" stroke="' + BONE_DARK + '" stroke-width="3"/>';
+      out += '<ellipse cx="' + (hx + 2) + '" cy="' + (hy - 4) + '" rx="' + (7 * hr) + '" ry="' + (8 * hr) + '" fill="' + BONE_DARK + '"/><circle cx="' + (hx + 30 + sn) + '" cy="' + (hy - 3) + '" r="2.5" fill="' + BONE_DARK + '"/>';
+      out += '<path d="M' + (hx - 4) + ' ' + (hy + 7) + ' L' + (hx + 36 + sn) + ' ' + (hy + 5) + '" stroke="' + BONE_DARK + '" stroke-width="2"/>';
+      var teeth = ""; for (var tx = hx + 8; tx < hx + 34 + sn; tx += 5) teeth += "M" + tx + " " + (hy + 6) + " l2 4 l2 -4 ";
+      out += '<path d="' + teeth + '" stroke="' + BONE_DARK + '" stroke-width="1.5" fill="none"/>';
+      out += (o.x ? boneFx(o.x(hx, hy)) : "");
+      return '<svg viewBox="0 0 230 180"><ellipse cx="110" cy="170" rx="90" ry="7" fill="rgba(0,0,0,.18)"/>' + out + '</svg>';
+    }
+    var ry = o.bodyRy || 34, tailY = o.tailY || 84;
+    hx = 182 + (o.neckX || 0); hy = 80 - (o.neckUp || 0);
+    out += (o.pre ? boneFx(o.pre(hx, hy)) : "");
+    out += boneLine("M66 98 L62 130 L66 156", 7) + boneLine("M140 98 L136 130 L140 156", 7);
+    for (var r = 0; r < 6; r++) { var rx = 72 + r * 12, top = 96 - ry * 0.85; out += boneLine("M" + rx + " " + top + " Q" + (rx + 8) + " " + (96 + ry * 0.1) + " " + (rx + 2) + " " + (96 + ry * 0.6), 4); }
+    out += spine([6, tailY], [44, 96 - ry * 0.4], [100, 96 - ry * 0.95], 12, 2.5, 6);
+    out += spine([100, 96 - ry * 0.95], [138, 96 - ry * 0.95], [148, 96 - ry * 0.6], 3, 6, 6);
+    out += spine([148, 96 - ry * 0.6], [hx - 16, hy + 6], [hx - 6, hy + 2], Math.max(3, Math.round((o.neckUp || 0) / 10) + 3), 5, 4);
+    out += boneLine("M82 100 L80 132 L84 158", 7) + boneLine("M156 100 L152 132 L156 158", 7) + knob(80, 132, 4) + knob(152, 132, 4) + knob(78, 96, 8) + knob(150, 98, 7);
+    out += '<ellipse cx="' + (hx + 4) + '" cy="' + hy + '" rx="' + (20 * hr) + '" ry="' + (14 * hr) + '" fill="' + BONE + '" stroke="' + BONE_DARK + '" stroke-width="3"/>' +
+      '<ellipse cx="' + (hx + 4 + 16 * hr) + '" cy="' + (hy + 4 * hr) + '" rx="' + (12 * hr) + '" ry="' + (9 * hr) + '" fill="' + BONE + '" stroke="' + BONE_DARK + '" stroke-width="3"/>' +
+      '<ellipse cx="' + (hx + 6) + '" cy="' + (hy - 4 * hr) + '" rx="' + (5 * hr) + '" ry="' + (6 * hr) + '" fill="' + BONE_DARK + '"/><circle cx="' + (hx + 4 + 24 * hr) + '" cy="' + (hy + 2 * hr) + '" r="2.2" fill="' + BONE_DARK + '"/>';
+    out += (o.x ? boneFx(o.x(hx, hy)) : "");
+    return '<svg viewBox="0 0 230 170"><ellipse cx="104" cy="162" rx="90" ry="7" fill="rgba(0,0,0,.18)"/>' + out + '</svg>';
+  }
+  function rattle() { for (var i = 0; i < 7; i++) tone(700 + Math.random() * 700, i * 0.07, 0.05, "square", 0.1, 450); }
   var SPECIES = [
     { id: "styraco", name: "Styracosaurus", k: 0.95, sound: grunt,
       fact: "Styracosaurus has a crown of long spikes on its frill!",
-      svg: quad({ c: "#b5894a", d: "#8f6a34", b: "#e6cf9e", neckUp: 4,
+      svg: skeleton("quad", { c: "#b5894a", d: "#8f6a34", b: "#e6cf9e", neckUp: 4,
         pre: function (hx, hy) { return fan(hx - 4, hy - 4, 22, 48, 190, 290, 6, "#f4e8cc") + '<ellipse cx="' + (hx - 6) + '" cy="' + (hy - 8) + '" rx="24" ry="22" fill="#d9a35a"/>'; },
         x: function (hx, hy) { return '<path d="M' + (hx + 18) + ' ' + (hy - 6) + ' L' + (hx + 26) + ' ' + (hy - 34) + ' L' + (hx + 30) + ' ' + (hy - 4) + ' Z" fill="#f4e8cc"/>'; } }) },
     { id: "micro", name: "Microraptor", k: 0.6, sound: function () { chirp(); },
       fact: "Microraptor had feathers on its arms and legs, like four wings!",
-      svg: biped({ c: "#2e3a4f", d: "#1f2838", b: "#5b6f8f", snout: 4, headR: 0.75, neck: 6,
+      svg: skeleton("biped", { c: "#2e3a4f", d: "#1f2838", b: "#5b6f8f", snout: 4, headR: 0.75, neck: 6,
         x: function () { return '<path d="M132 100 L192 126 L176 134 L186 146 L166 146 L170 158 L134 120 Z" fill="#4b6fa0"/><path d="M84 138 L54 164 L70 164 L60 176 L94 150 Z" fill="#4b6fa0"/><path d="M20 66 L4 52 L12 74 Z" fill="#4b6fa0"/>'; } }) },
     { id: "ovi", name: "Oviraptor", k: 0.8, sound: function () { chirp(); },
       fact: "Oviraptor sat on its nest to keep its eggs warm, like a bird!",
-      svg: biped({ c: "#d2a03c", d: "#ad7f2a", b: "#f1dfae", neck: 16, snout: -10, headR: 0.8,
+      svg: skeleton("biped", { c: "#d2a03c", d: "#ad7f2a", b: "#f1dfae", neck: 16, snout: -10, headR: 0.8,
         x: function (hx, hy) { return '<path d="M' + (hx - 6) + ' ' + (hy - 10) + ' Q' + (hx + 4) + ' ' + (hy - 44) + ' ' + (hx + 20) + ' ' + (hy - 12) + ' Z" fill="#3b7ea8"/>' +
           '<path d="M' + (hx + 22) + ' ' + (hy - 6) + ' L' + (hx + 36) + ' ' + (hy + 4) + ' L' + (hx + 22) + ' ' + (hy + 12) + ' Z" fill="#e4572a"/>'; } }) },
     { id: "corytho", name: "Corythosaurus", k: 1, sound: trumpet,
       fact: "Corythosaurus has a round crest shaped like a helmet!",
-      svg: quad({ c: "#4f8aa0", d: "#3d6e80", b: "#cfe2ea", neckUp: 22,
+      svg: skeleton("quad", { c: "#4f8aa0", d: "#3d6e80", b: "#cfe2ea", neckUp: 22,
         pre: function (hx, hy) { return '<path d="M' + (hx - 16) + ' ' + (hy - 6) + ' Q' + (hx - 12) + ' ' + (hy - 44) + ' ' + (hx + 16) + ' ' + (hy - 28) + ' Q' + (hx + 16) + ' ' + (hy - 10) + ' ' + hx + ' ' + (hy - 2) + ' Z" fill="#e4572a"/>'; },
         x: function () { return '<path d="M70 72 l6 -10 M90 66 l6 -10 M110 64 l6 -10" stroke="#3d6e80" stroke-width="6" stroke-linecap="round"/>'; } }) },
     { id: "kentro", name: "Kentrosaurus", k: 0.95, sound: grunt,
       fact: "Kentrosaurus has lots of sharp spikes on its back and tail!",
-      svg: quad({ c: "#a8a24a", d: "#86813a", b: "#e0dca6", neckUp: -12, headR: 0.8,
+      svg: skeleton("quad", { c: "#a8a24a", d: "#86813a", b: "#e0dca6", neckUp: -12, headR: 0.8,
         pre: function () {
           var o = '';
           for (var x = 52; x <= 96; x += 11) { var y = backTop(x + 4, 34) + 6; o += '<path d="M' + x + ' ' + y + ' L' + (x + 4) + ' ' + (y - 30) + ' L' + (x + 9) + ' ' + y + ' Z" fill="#f4e8cc"/>'; }
@@ -2182,20 +2239,24 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
         x: function () { return '<path d="M10 80 L0 62 L18 78 Z M20 86 L10 66 L28 84 Z M34 92 L28 72 L42 90 Z" fill="#f4e8cc"/>'; } }) },
     { id: "cerato", name: "Ceratosaurus", k: 1.05, sound: roarBig(0.9),
       fact: "Ceratosaurus has a horn on its nose!",
-      svg: biped({ c: "#d07a3a", d: "#a85e28", b: "#f0c99a", snout: 8,
+      svg: skeleton("biped", { c: "#d07a3a", d: "#a85e28", b: "#f0c99a", snout: 8,
         x: function (hx, hy) { return '<path d="M' + (hx + 26) + ' ' + (hy - 10) + ' L' + (hx + 31) + ' ' + (hy - 32) + ' L' + (hx + 37) + ' ' + (hy - 10) + ' Z" fill="#f4e8cc"/>' +
           '<path d="M' + hx + ' ' + (hy - 14) + ' L' + (hx + 4) + ' ' + (hy - 24) + ' L' + (hx + 10) + ' ' + (hy - 14) + ' Z" fill="#a85e28"/>' +
           '<path d="M60 82 l5 -8 M76 74 l5 -8 M92 70 l5 -8 M108 70 l5 -8" stroke="#7a4018" stroke-width="5" stroke-linecap="round"/>'; } }) },
     { id: "sino", name: "Sinosauropteryx", k: 0.55, sound: function () { chirp(); },
       fact: "Sinosauropteryx had a stripy ginger tail, like a cat!",
-      svg: biped({ c: "#d9873e", d: "#b56a2c", b: "#f6e6cc", headR: 0.7, neck: 8, snout: 4,
+      svg: skeleton("biped", { c: "#d9873e", d: "#b56a2c", b: "#f6e6cc", headR: 0.7, neck: 8, snout: 4,
         x: function () { return '<path d="M62 98 l-6 16 M46 92 l-8 16 M30 82 l-8 14 M16 72 l-8 10" stroke="#f6e6cc" stroke-width="6" stroke-linecap="round"/>'; } }) },
     { id: "argentino", name: "Argentinosaurus", k: 1.3, sound: function () { tone(70, 0, 1.8, "sine", 0.35, 50); rumble(); },
       fact: "Argentinosaurus is one of the biggest dinosaurs ever! Stomp stomp!",
-      svg: quad({ c: "#8c7a68", d: "#6f604f", b: "#cfc2b2", neckUp: 56, neckX: 18, headR: 0.7, tailY: 134 }) }
+      svg: skeleton("quad", { c: "#8c7a68", d: "#6f604f", b: "#cfc2b2", neckUp: 56, neckX: 18, headR: 0.7, tailY: 134 }) }
   ];
   var SPECIES_DIET = { styraco: ["leaves"], micro: ["meat", "fish"], ovi: ["leaves", "meat"], corytho: ["leaves"], kentro: ["leaves"], cerato: ["meat"], sino: ["meat"], argentino: ["leaves"] };
-  SPECIES.forEach(function (sp) { if (state.found["sp-" + sp.id]) DINOS.push(sp); });
+  SPECIES.forEach(function (sp) {
+    sp.bones = true; sp.cage = "fossil"; sp.sound = rattle;
+    sp.name = sp.name + " Bones";
+    if (state.found["sp-" + sp.id]) DINOS.push(sp);
+  });
   var CAGE_COUNT = Math.max(20, DINOS.length);
 
   // ---------- the Mystery Cage: a different secret dinosaur every day (Roy's idea) ----------
@@ -2340,8 +2401,8 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
   function cageBack(type) {
     var water = type === "water";
     return '<svg class="layer back" viewBox="0 0 250 220" aria-hidden="true">' +
-      '<ellipse cx="125" cy="150" rx="122" ry="62" fill="' + (water ? "#c9a76a" : type === "mystery" ? "#4a3270" : "#3d7a46") + '"/>' +
-      '<ellipse cx="125" cy="146" rx="' + (water ? 108 : 70) + '" ry="' + (water ? 50 : 30) + '" fill="' + (water ? "#3b7ea8" : "#4a8a52") + '"/>' +
+      '<ellipse cx="125" cy="150" rx="122" ry="62" fill="' + (water ? "#c9a76a" : type === "mystery" ? "#4a3270" : type === "fossil" ? "#b08a4a" : "#3d7a46") + '"/>' +
+      '<ellipse cx="125" cy="146" rx="' + (water ? 108 : 70) + '" ry="' + (water ? 50 : 30) + '" fill="' + (water ? "#3b7ea8" : type === "fossil" ? "#d9b77a" : "#4a8a52") + '"/>' +
       '<path d="M14 120 Q125 60 236 120" stroke="#3b2413" stroke-width="5" fill="none"/>' +
       '<path d="M14 104 Q125 44 236 104" stroke="#3b2413" stroke-width="5" fill="none"/>' +
       '<path d="M14 90 V150 M54 74 V130 M94 64 V122 M156 64 V122 M196 74 V130 M236 90 V150" stroke="#6e4524" stroke-width="8" stroke-linecap="round"/>' +
@@ -2467,7 +2528,9 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
     d.sound();
     var status = isHungry(d) && isDirty(d) ? " " + shortName(d) + " is hungry and muddy!" :
       isHungry(d) ? " " + shortName(d) + " is hungry!" : isDirty(d) ? " " + shortName(d) + " is muddy!" : "";
-    say("This is " + d.name + "! " + d.fact + status);
+    visit.classList.toggle("bones", !!d.bones);
+    if (d.bones) say("These are " + d.name + "! " + d.fact + " Bones don't need food or baths!");
+    else say("This is " + d.name + "! " + d.fact + status);
     if (!state.found["saw-" + d.id]) {
       state.found["saw-" + d.id] = true; save();
       cage.classList.add("visited");
@@ -2489,7 +2552,7 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
     say(current.fact);
   });
   function closeVisit() {
-    visit.hidden = true; current = null; mysteryOn = null;
+    visit.hidden = true; current = null; mysteryOn = null; visit.classList.remove("bones");
     visit.classList.remove("mystery"); visitDino.classList.remove("shadow", "reveal", "golden"); $("clue-dots").hidden = true;
     stage.querySelectorAll(".gold-sparkle").forEach(function (x) { x.remove(); });
     resetCare(); updateNeeds();
@@ -2668,8 +2731,8 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
   state.care = state.care || {};
   function today() { var t = new Date(); return t.getFullYear() + "-" + (t.getMonth() + 1) + "-" + t.getDate(); }
   function careOf(d) { return state.care[d.id] || (state.care[d.id] = {}); }
-  function isHungry(d) { return careOf(d).fed !== today(); }
-  function isDirty(d) { return careOf(d).washed !== today(); }
+  function isHungry(d) { return !d.bones && careOf(d).fed !== today(); }
+  function isDirty(d) { return !d.bones && careOf(d).washed !== today(); }
   function shortName(d) { return d.name.replace(" the Raptor", ""); }
   var ICON_BOWL = '<svg viewBox="0 0 40 40"><path d="M4 18 H36 Q34 34 20 34 Q6 34 4 18 Z" fill="#a8844f" stroke="#3b2413" stroke-width="2"/><path d="M12 13 q3 -4 0 -9 M20 13 q3 -4 0 -9 M28 13 q3 -4 0 -9" stroke="#e4572a" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>';
   var ICON_MUD = '<svg viewBox="0 0 40 40"><path d="M20 4 Q32 20 30 28 Q28 36 20 36 Q12 36 10 28 Q8 20 20 4 Z" fill="#7a5230"/><circle cx="16" cy="26" r="3.5" fill="#9a6a40"/></svg>';
@@ -2678,6 +2741,7 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
     world.querySelectorAll(".cage").forEach(function (c) {
       var d = DINOS[Number(c.dataset.cage)], box = c.querySelector(".needs");
       if (!d || !box) return;
+      if (d.bones) { box.innerHTML = ""; return; }
       var h = isHungry(d), m = isDirty(d);
       box.innerHTML = (h ? '<span class="need">' + ICON_BOWL + '</span>' : '') +
         (m ? '<span class="need">' + ICON_MUD + '</span>' : '') +
@@ -2927,34 +2991,34 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
     '<path d="M48 52 l6 6 l12 -14" stroke="#3f8a4a" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>';
   var MISSIONS = [
     { id: "styraco", type: "species", target: "styraco", place: "jungle", title: "Spiky Frill Hunt", play: "search", hint: "spikes",
-      text: "A dinosaur with a crown of spikes is hiding in the jungle. Look for spikes poking out!" },
+      text: "Old dinosaur bones with a crown of spikes are buried in the jungle. Look for spikes poking out!" },
     { id: "micro", type: "species", target: "micro", place: "forest", title: "Four-Wing Flyer", play: "search", hint: "feathers",
-      text: "Feathers are falling from one of the tall trees. Which tree is it?" },
+      text: "Old stone feathers are falling from one of the tall trees. The bones are hiding there. Which tree is it?" },
     { id: "eggs", type: "eggs", place: "jungle", title: "Egg Rescue", play: "eggs",
       text: "Oh no! Three dinosaur eggs rolled away into the jungle. Find all three!",
       reward: "Egg Rescuer badge", badge: ["Egg Rescuer", "You saved all the eggs!", EGG_BADGE] },
     { id: "ovi", type: "species", target: "ovi", place: "desert", title: "Nest Patrol", play: "search", hint: "eggshell",
-      text: "Someone is sitting on a nest in the rocky desert. Look for bits of eggshell!" },
+      text: "Old dinosaur bones are buried by a nest in the rocky desert. Look for bits of eggshell!" },
     { id: "trex", type: "escape", target: "trex", place: "jungle", title: "T-Rex Escape!", play: "trail", size: "big", alarm: true,
       text: "Alarm! T-Rex got out of his cage! Follow his big footprints and take him home.",
       reward: "Fence Fixer badge", badge: ["Fence Fixer", "T-Rex is safe at home!", FENCE_BADGE] },
     { id: "corytho", type: "species", target: "corytho", place: "swamp", title: "Swamp Song", play: "listen",
-      text: "A trumpet sound is coming from the swamp. Listen carefully! Who is singing?" },
+      text: "The wind blows through old hollow bones in the swamp and makes a trumpet sound. Listen carefully! Where is it?" },
     { id: "feed", type: "care", care: "fed", goal: 5, place: "park", title: "Feeding Time",
       text: "Your dinosaurs are hungry! Feed 5 dinosaurs today.", reward: "Every day!" },
     { id: "kentro", type: "species", target: "kentro", place: "desert", title: "Spike Valley", play: "decoys",
-      text: "Lots of spikes are poking out of the rocks. Which spikes belong to a dinosaur?" },
+      text: "Lots of spikes are poking out of the rocks. Which spikes are dinosaur bones?" },
     { id: "cerato", type: "species", target: "cerato", place: "volcano", title: "Volcano Horn", play: "lava",
-      text: "A dinosaur with a horn on its nose lives near the volcano. Hop across the hot lava. Be brave!" },
+      text: "Bones with a horn on the nose are buried near the volcano. Hop across the hot lava. Be brave!" },
     { id: "blue", type: "escape", target: "blue", place: "forest", title: "Where is Blue?", play: "peek",
       text: "Blue is playing hide and seek in the tall trees. Tap the tree when she peeks out!",
       reward: "Raptor Friend badge", badge: ["Raptor Friend", "You found Blue!", RAPTOR_BADGE] },
-    { id: "sino", type: "species", target: "sino", place: "jungle", title: "Stripy Tail Trail", play: "trail", size: "small", runner: true,
-      text: "A little dinosaur with a stripy tail ran past. Follow its tiny footprints!" },
+    { id: "sino", type: "species", target: "sino", place: "jungle", title: "Stripy Tail Trail", play: "trail", size: "small",
+      text: "Tiny footprints in old stone lead to some little bones. Follow the trail!" },
     { id: "bath", type: "care", care: "washed", goal: 3, place: "park", title: "Bath Day",
       text: "Muddy dinosaurs everywhere! Give 3 dinosaurs a bath today.", reward: "Every day!" },
     { id: "argentino", type: "species", target: "argentino", place: "swamp", title: "Giant Footprints", play: "trail", size: "giant",
-      text: "Huge footprints, bigger than a car! Follow them and find out who made them!" }
+      text: "Huge footprints in old stone, bigger than a car! Follow them to some giant bones!" }
   ];
   function careCount(m) { return DINOS.filter(function (d) { return careOf(d)[m.care] === today(); }).length; }
   function missionDone(m) {
@@ -2970,7 +3034,7 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
     return m.care === "fed" ? BOWL_BIG : TUB_BIG;
   }
   function missionReward(m) {
-    if (m.type === "species") return state.found["sp-" + m.target] ? speciesById(m.target).name + " lives in your park!" : "A mystery dinosaur for your park!";
+    if (m.type === "species") return state.found["sp-" + m.target] ? speciesById(m.target).name + " are in your park!" : "Mystery dinosaur bones for your park!";
     return m.reward;
   }
   function missionSay(m) {
@@ -3113,7 +3177,10 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
   var BEE = '<ellipse cx="40" cy="36" rx="16" ry="11" fill="#f2d24b"/><path d="M34 26 V46 M44 26 V46" stroke="#1d1d1b" stroke-width="5"/><ellipse cx="34" cy="20" rx="9" ry="7" fill="#cfe6ef" opacity=".9"/><ellipse cx="48" cy="20" rx="9" ry="7" fill="#cfe6ef" opacity=".9"/><circle cx="56" cy="34" r="2.5" fill="#1d1d1b"/>';
   var BLUE_PEEK = '<ellipse cx="38" cy="38" rx="22" ry="17" fill="#4a86c8"/><path d="M44 30 Q72 28 78 40 Q74 50 54 50 Z" fill="#4a86c8"/><path d="M18 30 Q30 18 56 22" stroke="#24456f" stroke-width="5" fill="none" stroke-linecap="round"/><circle cx="44" cy="32" r="8" fill="#fff"/><circle cx="46" cy="32" r="5.5" fill="#f2a93b"/><ellipse cx="46.5" cy="32" rx="1.8" ry="4.5" fill="#1d1d1b"/><path d="M56 46 Q66 48 74 42" stroke="#1d1d1b" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M22 24 q3 -10 9 -3 q3 -9 9 -1" fill="#3c70ac"/>';
   var STONE = '<svg viewBox="0 0 100 50"><ellipse cx="50" cy="30" rx="48" ry="18" fill="#5d5550"/><ellipse cx="46" cy="24" rx="36" ry="12" fill="#7a716b"/></svg>';
-  var GIANT_LEG = '<svg viewBox="0 0 100 260"><rect x="26" y="0" width="48" height="236" rx="18" fill="#8c7a68"/><path d="M30 0 V230" stroke="#6f604f" stroke-width="6"/><ellipse cx="50" cy="238" rx="44" ry="20" fill="#6f604f"/><path d="M14 246 l-6 10 M40 252 l-2 8 M62 252 l2 8 M86 246 l6 10" stroke="#f4e8cc" stroke-width="5" stroke-linecap="round"/></svg>';
+  var GIANT_LEG = '<svg viewBox="0 0 100 260"><ellipse cx="50" cy="246" rx="48" ry="12" fill="#b08a4a"/>' +
+    '<path d="M50 30 V220" stroke="#6e5a3a" stroke-width="38" stroke-linecap="round"/><path d="M50 30 V220" stroke="#efe3c4" stroke-width="30" stroke-linecap="round"/>' +
+    '<circle cx="32" cy="22" r="22" fill="#efe3c4" stroke="#6e5a3a" stroke-width="4"/><circle cx="68" cy="22" r="22" fill="#efe3c4" stroke="#6e5a3a" stroke-width="4"/>' +
+    '<path d="M44 80 q8 20 0 40" stroke="#d8c8a4" stroke-width="5" fill="none"/></svg>';
   var TRAILS = {
     big: { pts: [[34, 86], [44, 74], [54, 63], [63, 53], [71, 44]], end: [84, 30] },
     small: { pts: [[30, 88], [37, 80], [44, 73], [51, 66], [58, 60], [65, 54], [72, 48], [78, 42]], end: [88, 28] },
@@ -3256,7 +3323,7 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
       var leg = layer('<button class="giant-leg" aria-label="Giant leg">' + GIANT_LEG + '</button>');
       leg.style.left = t.end[0] + "%";
       rumble(); shakeGround();
-      say("The footprints stop at this giant leg! Tap it and look up, way up!");
+      say("The footprints stop at a giant bone sticking out of the ground! Tap it to dig!");
       return;
     }
     dinoSpot = 0;
@@ -3355,7 +3422,7 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
     if (e.target.closest(".giant-leg")) {
       rumble(); shakeGround();
       clearMission(false);
-      say("Look up! Way, way up! It's a giant dinosaur!");
+      say("Dig dig dig! It's the bones of a giant dinosaur!");
       setTimeout(function () { showFound(foundTarget()); }, 900);
       return;
     }
@@ -3426,22 +3493,61 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
     showHint();
   });
 
+  var foundStage = $("found-stage"), digging = false;
+  function startDig(t) {
+    digging = true;
+    foundStage.classList.add("washing");
+    foundStage.querySelectorAll(".mud").forEach(function (x) { x.remove(); });
+    for (var i = 0; i < 7; i++) {
+      var m = document.createElement("span");
+      m.className = "mud sand";
+      m.style.left = (18 + (i % 4) * 21 + Math.random() * 6) + "%";
+      m.style.top = (30 + Math.floor(i / 4) * 32 + Math.random() * 8) + "%";
+      foundStage.appendChild(m);
+    }
+    $("found-name").textContent = "Something is buried here!";
+    $("found-fact").textContent = "Brush away the sand with your finger!";
+    $("take-btn").hidden = true;
+    say("You found something buried in the ground! Brush away the sand with your finger to dig out the bones!");
+  }
+  function digAt(x, y) {
+    if (!digging) return;
+    var el = document.elementFromPoint(x, y);
+    if (!el || !el.classList.contains("sand") || el.classList.contains("gone")) return;
+    el.classList.add("gone");
+    rustle();
+    setTimeout(el.remove.bind(el), 360);
+    if (foundStage.querySelectorAll(".sand:not(.gone)").length) return;
+    digging = false;
+    foundStage.classList.remove("washing");
+    var t = foundTarget();
+    rattle(); fanfare();
+    $("found-name").textContent = t.name;
+    $("found-fact").textContent = t.fact;
+    $("take-btn").hidden = false;
+    say((state.found["sp-" + t.id] ? "You dug up the " + t.name + " again! " : "Wow! The bones of a new species! It's " + t.name.replace(" Bones", "") + "! ") + t.fact);
+  }
+  foundStage.addEventListener("pointerdown", function (e) { digAt(e.clientX, e.clientY); });
+  foundStage.addEventListener("pointermove", function (e) { if (e.buttons || e.pointerType === "touch") digAt(e.clientX, e.clientY); });
   function showFound(t) {
     var m = activeMission;
     foundDino.innerHTML = t.svg;
     foundDino.classList.remove("boxed", "hop");
     $("found-name").textContent = t.name;
     $("found-fact").textContent = t.fact;
-    $("take-label").textContent = m.type === "eggs" ? "Bring the eggs home" : m.type === "escape" ? "Take " + shortName(t) + " home" : "Take it to the park";
+    $("take-label").textContent = m.type === "eggs" ? "Bring the eggs home" : m.type === "escape" ? "Take " + shortName(t) + " home" : "Take the bones to the park";
     $("take-btn").hidden = false; $("see-btn").hidden = true; $("again-btn").hidden = true;
+    foundStage.querySelectorAll(".mud").forEach(function (x) { x.remove(); });
+    digging = false; foundStage.classList.remove("washing");
     foundBox.hidden = false;
+    if (m.type === "species") { startDig(t); return; }
     t.sound(); fanfare();
-    if (m.type === "species") say((state.found["sp-" + t.id] ? "You found " + t.name + " again! " : "Wow! A new species! It's called " + t.name + "! ") + t.fact);
+    if (m.type === "species") say("");
     else if (m.type === "escape") say("You found " + shortName(t) + "! Phew! Let's take " + shortName(t) + " back home.");
     else say("You rescued all three eggs! Hooray!");
   }
   foundDino.addEventListener("click", function () {
-    if (!activeMission || foundDino.classList.contains("boxed")) return;
+    if (!activeMission || digging || foundDino.classList.contains("boxed")) return;
     var t = foundTarget();
     t.sound();
     foundDino.classList.remove("hop"); void foundDino.offsetWidth; foundDino.classList.add("hop");
@@ -3463,7 +3569,7 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
     jeep.classList.remove("drive"); void jeep.offsetWidth; jeep.classList.add("leave");
     setTimeout(chug, 300);
     if (first) for (var k = 0; k < 3; k++) setTimeout(function () { addStar($("take-btn")); }, k * 300);
-    if (m.type === "species") say(newSpecies ? "The rangers are taking " + t.name + " to the park! It lives in cage " + DINOS.length + " now! Mission complete!" : t.name + " goes back to the park. Mission complete!");
+    if (m.type === "species") say(newSpecies ? "The rangers are taking the " + t.name + " to the park! They are in cage " + DINOS.length + " now! Mission complete!" : "The " + t.name + " go back to the park. Mission complete!");
     else if (m.id === "blue") say("Blue had so much fun playing hide and seek! She is back home now. Mission complete!");
     else if (m.type === "escape") say(shortName(t) + " is back home, and the fence is fixed! Mission complete!");
     else say("The eggs are safe and warm in the Egg Lab! Mission complete!");
@@ -3485,7 +3591,7 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
     openMap();
     var idx = DINOS.indexOf(t), pos = cagePos(idx);
     setTimeout(function () { mapScroll.scrollTo({ left: Math.max(0, pos.x - 120), top: Math.max(0, pos.y - 80), behavior: "smooth" }); }, 200);
-    say(t.name + " is in cage " + (idx + 1) + "! Tap the cage to say hello.");
+    say(t.name + (t.bones ? " are" : " is") + " in cage " + (idx + 1) + "! Tap the cage to have a look.");
   });
   $("again-btn").addEventListener("click", function () { clearMission(true); openBook(); });
 
