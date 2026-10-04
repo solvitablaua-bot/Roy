@@ -350,6 +350,25 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
 .boat.moving .wake { animation: wake 1.2s ease-out; }
 .boat .tap-hint { left: 46%; bottom: 30%; }
 .boat.started .tap-hint { display: none; }
+/* the Mosasaurus attacks the boat (Roy's idea) */
+.boat .rock-group { transform-box: fill-box; transform-origin: 50% 100%; }
+.boat.attacked .rock-group { animation: boat-rock .9s ease-in-out infinite; }
+.boat.jolt .rock-group { animation: boat-jolt .45s ease-out; }
+@keyframes boat-rock { 0%, 100% { transform: rotate(-6deg); } 50% { transform: rotate(6deg) translateY(-6px); } }
+@keyframes boat-jolt { 0% { transform: rotate(0); } 30% { transform: rotate(-14deg) translate(-10px, -10px); } 60% { transform: rotate(8deg); } 100% { transform: rotate(0); } }
+.mosa-wrap { position: absolute; left: 78%; bottom: 10%; width: 78%; height: 0; padding-bottom: 72%; overflow: hidden; pointer-events: none; }
+.mosa-wrap.up { pointer-events: auto; cursor: pointer; }
+.mosa-wrap .mosa { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible;
+  transform: translateY(105%); transition: transform .7s cubic-bezier(.2, 1.3, .4, 1); }
+.mosa-wrap.up .mosa { transform: translateY(0); }
+.mosa-wrap.dive .mosa { transform: translateY(105%) rotate(12deg); transition: transform .9s ease-in; }
+.mosa-wrap.lunge .mosa { animation: mosa-lunge .6s ease-out; }
+.mosa-wrap.hit .mosa { animation: mosa-hit .5s ease-out; }
+@keyframes mosa-lunge { 40% { transform: translate(-16%, -4%) rotate(-8deg); } }
+@keyframes mosa-hit { 30% { transform: translate(10%, 8%) rotate(8deg); } }
+.splash-drop { position: fixed; width: 14px; height: 14px; border-radius: 50% 50% 50% 0; background: #cfe6ef; z-index: 60; pointer-events: none;
+  animation: splash-fly .8s ease-out forwards; }
+@keyframes splash-fly { 0% { transform: translate(0, 0) scale(1); opacity: 1; } 100% { transform: translate(var(--dx), var(--dy)) scale(.4); opacity: 0; } }
 
 /* ---------- Jungle walk ---------- */
 .walk { flex: 1; min-height: 0; position: relative; overflow: hidden; }
@@ -1006,10 +1025,10 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
       <div class="waves two"></div>
     </div>
     <div class="trip">
-      <button class="boat" id="boat" aria-label="Boat">
+      <div class="boat" id="boat" role="button" tabindex="0" aria-label="Boat">
         <svg class="boat-art" viewBox="0 0 220 140">
           <g class="wake"><path d="M8 116 q-20 -6 -40 2 M14 126 q-26 -4 -50 8" stroke="#cfe6ef" stroke-width="5" fill="none" stroke-linecap="round"/></g>
-          <g class="hull-group">
+          <g class="rock-group"><g class="hull-group">
             <path d="M150 38 V4" stroke="#3b2413" stroke-width="4"/>
             <path d="M150 6 L192 16 L150 26 Z" fill="#f2a93b"/>
             <circle cx="164" cy="16" r="3.5" fill="#3b2413"/><circle cx="158" cy="11" r="1.8" fill="#3b2413"/><circle cx="163" cy="9.5" r="1.8" fill="#3b2413"/><circle cx="168" cy="11" r="1.8" fill="#3b2413"/>
@@ -1021,13 +1040,30 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
             <path d="M8 80 L212 80 L188 122 Q110 134 30 122 Z" fill="#f4e8cc" stroke="#3b2413" stroke-width="3" stroke-linejoin="round"/>
             <path d="M15 92 L205 92 L199 103 L21 103 Z" fill="#e4572a"/>
             <circle cx="42" cy="86" r="0" fill="none"/>
-          </g>
+          </g></g>
         </svg>
+        <div class="mosa-wrap" id="mosa" role="button" aria-label="Mosasaurus">
+          <svg class="mosa" viewBox="0 0 220 200" aria-hidden="true">
+            <path d="M206 200 Q196 76 112 58 Q74 50 46 62 L44 94 Q84 86 112 100 Q160 122 168 200 Z" fill="#5a86a2" stroke="#2d4a5c" stroke-width="3" stroke-linejoin="round"/>
+            <path d="M48 92 Q86 88 112 100 Q156 120 166 200 L150 200 Q144 130 108 110 Q84 100 50 102 Z" fill="#c7dbe6"/>
+            <path d="M118 104 L96 146 L142 114 Z" fill="#46708a" stroke="#2d4a5c" stroke-width="3" stroke-linejoin="round"/>
+            <path d="M120 62 l8 -12 M144 72 l10 -10 M164 88 l12 -8" stroke="#46708a" stroke-width="6" stroke-linecap="round"/>
+            <path d="M48 62 Q22 56 4 70 Q20 80 48 78 Z" fill="#5a86a2" stroke="#2d4a5c" stroke-width="3" stroke-linejoin="round"/>
+            <path d="M46 88 Q24 96 8 110 Q30 108 48 100 Z" fill="#5a86a2" stroke="#2d4a5c" stroke-width="3" stroke-linejoin="round"/>
+            <path d="M48 78 Q30 84 14 104 L46 92 Z" fill="#8a2a2a"/>
+            <polyline points="10,74 14,80 18,75 22,81 26,76 30,82 34,77 38,82 42,77" fill="none" stroke="#fff" stroke-width="3" stroke-linejoin="round"/>
+            <polyline points="14,104 18,98 22,102 26,96 30,100 34,94 38,98 42,92" fill="none" stroke="#fff" stroke-width="3" stroke-linejoin="round"/>
+            <circle cx="54" cy="68" r="8" fill="#fff" stroke="#2d4a5c" stroke-width="2"/><circle cx="51" cy="68" r="4.5" fill="#1d1d1b"/><circle cx="49.5" cy="66" r="1.6" fill="#fff"/>
+            <path d="M44 56 l14 4" stroke="#2d4a5c" stroke-width="4" stroke-linecap="round"/>
+            <ellipse cx="186" cy="196" rx="40" ry="8" fill="#cfe6ef" opacity=".8"/>
+            <path d="M150 196 q4 -16 10 -2 M200 196 q6 -18 12 0 M174 194 q2 -12 8 -2" stroke="#cfe6ef" stroke-width="5" fill="none" stroke-linecap="round"/>
+          </svg>
+        </div>
         <svg class="tap-hint" viewBox="0 0 84 84" aria-hidden="true">
           <circle cx="42" cy="42" r="38" fill="none" stroke="#f4e8cc" stroke-width="5" stroke-dasharray="10 8"/>
           <path d="M36 62 V30 q0 -6 5 -6 q5 0 5 6 v14 l12 2 q6 1 5 8 l-3 12 q-1 4 -5 4 H44 Z" fill="#f4e8cc" stroke="#3b2413" stroke-width="2.5" stroke-linejoin="round"/>
         </svg>
-      </button>
+      </div>
     </div>
   </section>
 
@@ -4046,7 +4082,68 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
     island.style.setProperty("--s", st.s);
   }
   placeBoat();
-  boat.addEventListener("click", function () {
+  // ---------- the Mosasaurus attacks the boat (Roy's idea) ----------
+  var mosaEl = $("mosa"), mosaHits = 0, mosaAttack = false, mosaTimer = null;
+  var SEA_BADGE =
+    '<circle cx="55" cy="55" r="50" fill="#5a86a2" stroke="#3b2413" stroke-width="5"/>' +
+    '<circle cx="55" cy="55" r="38" fill="#0d2a3d"/>' +
+    '<path d="M86 74 Q80 40 54 36 Q40 34 30 40 L30 52 Q44 48 56 54 Q72 62 74 74 Z" fill="#7fb0dc"/>' +
+    '<path d="M30 40 Q20 38 14 44 Q20 48 30 46 Z M30 50 Q20 54 16 60 Q24 58 30 54 Z" fill="#7fb0dc"/>' +
+    '<circle cx="34" cy="42" r="3" fill="#fff"/>' +
+    '<path d="M24 78 q8 -5 16 0 q8 5 16 0 q8 -5 16 0 q8 5 16 0" stroke="#cfe6ef" stroke-width="3" fill="none"/>';
+  function splashDrops(el, n) {
+    var r = el.getBoundingClientRect();
+    for (var i = 0; i < (n || 10); i++) {
+      var d = document.createElement("span");
+      d.className = "splash-drop";
+      d.style.left = (r.left + r.width * (0.2 + Math.random() * 0.6)) + "px";
+      d.style.top = (r.top + r.height * (0.5 + Math.random() * 0.4)) + "px";
+      d.style.setProperty("--dx", (Math.random() * 160 - 80) + "px");
+      d.style.setProperty("--dy", (-60 - Math.random() * 120) + "px");
+      document.body.appendChild(d);
+      setTimeout(d.remove.bind(d), 850);
+    }
+  }
+  function mosaLunge() {
+    if (!mosaAttack) return;
+    mosaEl.classList.remove("lunge"); void mosaEl.offsetWidth; mosaEl.classList.add("lunge");
+    boat.classList.remove("jolt"); void boat.offsetWidth; boat.classList.add("jolt");
+    roar(0.8, 0.9); splash(); splashDrops(boat, 8);
+  }
+  function mosaAttacks() {
+    mosaAttack = true; mosaHits = 0;
+    mosaEl.classList.remove("dive", "hit", "lunge");
+    rumble();
+    setTimeout(function () {
+      mosaEl.classList.add("up");
+      boat.classList.add("attacked");
+      splash(); roar(0.8, 1.3); splashDrops(mosaEl, 14);
+      say("Whoa! A giant Mosasaurus is attacking our boat! Tap the Mosasaurus to splash it away!");
+      mosaTimer = setInterval(mosaLunge, 2600);
+    }, 700);
+  }
+  function hitMosa() {
+    if (!mosaAttack || !mosaEl.classList.contains("up")) return;
+    mosaHits += 1;
+    splash(); splashDrops(mosaEl, 10);
+    mosaEl.classList.remove("hit", "lunge"); void mosaEl.offsetWidth; mosaEl.classList.add("hit");
+    if (mosaHits === 1) { grunt(); say("Splash! Again! Tap it again!"); return; }
+    if (mosaHits === 2) { grunt(); say("It's getting scared! One more time!"); return; }
+    mosaAttack = false; clearInterval(mosaTimer);
+    mosaEl.classList.remove("up"); mosaEl.classList.add("dive");
+    boat.classList.remove("attacked");
+    roar(1.1, 0.8); setTimeout(splash, 500);
+    setTimeout(function () { splashDrops(mosaEl, 16); }, 500);
+    if (!state.found.seaHero) {
+      state.found.seaHero = true; save();
+      addStar(mosaEl);
+      showBadge("Sea Hero", "You saved the boat from the Mosasaurus!", SEA_BADGE);
+    }
+    say("Bye bye, Mosasaurus! You saved the boat! Tap the boat to sail on!");
+  }
+  boat.addEventListener("click", function (e) {
+    if (e.target.closest("#mosa")) { hitMosa(); return; }
+    if (mosaAttack) { say("Tap the Mosasaurus! Splash it away!"); return; }
     if (sailing || boatStep >= 3) return;
     sailing = true;
     boat.classList.add("started");
@@ -4058,6 +4155,7 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
     if (boatStep === 2) say("Splash! I can see the volcano! Keep going!");
     setTimeout(function () {
       sailing = false;
+      if (boatStep === 2) { mosaAttacks(); return; }
       if (boatStep < 3) return;
       horn();
       if (!state.found.boat) {
