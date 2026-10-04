@@ -730,6 +730,23 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
 }
 .run-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 var(--wood-dark); }
 .run-btn[disabled] { opacity: .4; }
+/* caught by the raptors: a cartoon dust cloud, then try again (Roy's idea) */
+.chomp-cloud { position: absolute; bottom: 14%; width: 34%; transform: translateX(-50%); z-index: 4; pointer-events: none; animation: cloudpuff .35s ease-in-out infinite alternate; }
+.chomp-cloud svg { width: 100%; height: auto; display: block; }
+.caught-card {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 6;
+  background: var(--bone); color: var(--wood-dark); border: 6px solid var(--ember); border-radius: 26px;
+  padding: 18px 26px; text-align: center; width: min(86%, 420px);
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  animation: rise .5s cubic-bezier(.3, 1.4, .5, 1);
+}
+.caught-card strong { font-family: var(--font-sign); font-weight: 400; font-size: clamp(1.6rem, 5vw, 2.4rem); color: var(--ember); }
+.caught-card span { font-size: 1.2rem; font-weight: 700; }
+.caught-card button {
+  background: var(--leaf); color: var(--bone); border: 4px solid var(--wood-dark); border-radius: 999px;
+  font-size: 1.5rem; font-weight: 800; padding: 8px 32px;
+}
+@keyframes cloudpuff { to { transform: translateX(-50%) scale(1.08) rotate(3deg); } }
 @keyframes road { to { background-position-x: -70px; } }
 @keyframes bounce { to { transform: translateY(-7%); } }
 @keyframes spin { to { transform: translateX(-30%) rotate(360deg); } }
@@ -1120,6 +1137,20 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
       <div class="raptor r3" id="raptor3"></div>
       <div class="runner-kid" id="runner-kid"></div>
       <button class="run-btn" id="run-btn" aria-label="Run">RUN!</button>
+      <div class="chomp-cloud" id="chomp-cloud" hidden>
+        <svg viewBox="0 0 240 160" aria-hidden="true">
+          <circle cx="60" cy="100" r="46" fill="#e8d8b8"/><circle cx="120" cy="70" r="56" fill="#f4e8cc"/><circle cx="180" cy="100" r="46" fill="#e8d8b8"/><circle cx="120" cy="116" r="44" fill="#f4e8cc"/>
+          <path d="M40 60 l-14 -10 M200 56 l16 -12 M30 130 l-16 6 M212 130 l16 6" stroke="#a8844f" stroke-width="5" stroke-linecap="round"/>
+          <path d="M70 40 l3 8 8 1 -6 5 2 8 -7 -4 -7 4 2 -8 -6 -5 8 -1 Z M170 30 l3 8 8 1 -6 5 2 8 -7 -4 -7 4 2 -8 -6 -5 8 -1 Z" fill="#f2d24b"/>
+          <path d="M84 98 q10 -14 22 0 M134 98 q10 -14 22 0" stroke="#5a7a3a" stroke-width="8" fill="none" stroke-linecap="round"/>
+          <text x="120" y="92" text-anchor="middle" font-family="Alfa Slab One, Georgia, serif" font-size="30" fill="#e4572a" stroke="#3b2413" stroke-width="1.5" paint-order="stroke">CHOMP!</text>
+        </svg>
+      </div>
+      <div class="caught-card" id="caught-card" hidden>
+        <strong>CHOMP CHOMP!</strong>
+        <span>Oh no! The raptors caught you! Tap faster to get to the gate!</span>
+        <button id="try-again">Try again!</button>
+      </div>
     </div>
   </section>
 
@@ -3782,7 +3813,29 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
     return BLUE_SVG.split("#4a86c8").join(body).split("#3c70ac").join(dark).split("#9cc6ec").join(belly).split("#24456f").join(stripe)
       .replace("<svg ", '<svg preserveAspectRatio="xMidYMax meet" ');
   }
+  // if you're too slow, the raptors catch you: CHOMP! Then try again (Roy's idea)
+  function caught() {
+    chaseOn = false;
+    cancelAnimationFrame(chaseRaf);
+    runBtn.disabled = true;
+    chase.classList.remove("running");
+    kidEl.classList.add("inside");
+    var cloud = $("chomp-cloud");
+    cloud.style.left = kidX + "%";
+    cloud.hidden = false;
+    roar(1.4, 1); setTimeout(function () { roar(1.6, 0.8); }, 250);
+    munch(); setTimeout(munch, 700);
+    shakeGround2();
+    say("CHOMP CHOMP! Oh no! The raptors caught you!");
+    setTimeout(function () {
+      if (viewChase.hidden) return;
+      $("caught-card").hidden = false;
+      say("The raptors got you! Tap the RUN button faster to get to the gate. Try again!");
+    }, 2200);
+  }
+  $("try-again").addEventListener("click", function (e) { e.stopPropagation(); boing(); startChase(); });
   function startChase() {
+    $("chomp-cloud").hidden = true; $("caught-card").hidden = true;
     viewChase.hidden = false;
     chase.classList.remove("shut", "running");
     kidEl.classList.remove("inside");
@@ -3819,9 +3872,10 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
   function chaseTick(t) {
     if (!chaseOn) return;
     var dt = Math.min(0.1, (t - lastT) / 1000); lastT = t;
-    packX = Math.min(packX + 11 * dt, kidX - 11);
-    if (kidX - packX < 13 && t - lastWarn > 2500) { lastWarn = t; say(pick(["Faster! Tap tap tap!", "They're right behind you! Run!", "Keep going! Run run run!"])); }
+    packX = packX + 9 * dt;
+    if (kidX - packX < 14 && t - lastWarn > 2500) { lastWarn = t; say(pick(["Faster! Tap tap tap!", "They're right behind you! Run!", "Keep going! Run run run!"])); }
     placeChase();
+    if (kidX - packX <= 4) { caught(); return; }
     chaseRaf = requestAnimationFrame(chaseTick);
   }
   function runStep() {
