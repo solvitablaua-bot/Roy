@@ -626,6 +626,49 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
 .expedition[data-place="desert"] .tint { background: linear-gradient(rgba(201, 139, 74, .3), rgba(160, 100, 50, .7)); }
 .expedition[data-place="volcano"] .tint { background: radial-gradient(ellipse at 80% 0%, rgba(228, 87, 42, .55), transparent 55%), linear-gradient(rgba(30, 20, 20, .3), rgba(30, 20, 20, .7)); }
 @keyframes flip { from { transform: perspective(900px) rotateY(-30deg); opacity: .2; } }
+/* ---------- Memory Game: find two of the same dinosaur (Roy's idea) ---------- */
+.memory { flex: 1; min-height: 0; position: relative; pointer-events: auto; display: flex; flex-direction: column; }
+.mem-levels { flex: 1; min-height: 0; display: flex; gap: 16px; justify-content: center; align-items: center; flex-wrap: wrap; padding: 8px; }
+.mem-level {
+  width: 30%; min-width: 150px; max-width: 260px;
+  background: var(--canopy); border: 5px solid var(--amber); border-radius: 24px;
+  padding: 14px 12px 12px; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  font-size: 1.5rem; font-weight: 800; text-align: center;
+}
+.mem-level svg { width: 100%; height: auto; display: block; }
+.mem-level b { color: var(--amber); letter-spacing: 3px; font-size: 1.3rem; }
+.mem-level:active { transform: scale(.95); }
+.mem-board {
+  flex: 1; min-height: 0;
+  display: grid; gap: 10px; padding: 10px;
+  background: linear-gradient(135deg, #7a4a24, #5a3418);
+  border: 4px solid var(--wood-dark); border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, .55);
+}
+.mcard {
+  position: relative; min-height: 0; min-width: 0;
+  border-radius: 14px; cursor: pointer;
+  transition: transform .15s ease-in;
+}
+.mcard.flipping { transform: scaleX(0); }
+.mcard .mback, .mcard .mface { position: absolute; inset: 0; border-radius: 14px; overflow: hidden; }
+.mcard .mback {
+  background: radial-gradient(circle at 50% 50%, #f2a93b, #c9793f);
+  border: 4px solid var(--wood-dark);
+}
+.mcard .mback svg { position: absolute; left: 15%; top: 15%; width: 70%; height: 70%; }
+.mcard .mface { background: var(--bone); border: 4px solid #a8844f; }
+.mcard .mface svg { position: absolute; left: 6%; top: 6%; width: 88%; height: 70%; overflow: visible; }
+.mcard .mface span {
+  position: absolute; left: 4px; right: 4px; bottom: 4px;
+  font-size: clamp(.7rem, 1.6vw, 1rem); font-weight: 800; color: var(--wood-dark);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center;
+}
+.mcard.matched .mface { border-color: #3f8a4a; box-shadow: 0 0 0 4px #5fb37c, 0 0 20px #5fb37c; }
+.mcard.matched { animation: hop .55s cubic-bezier(.3, 1.4, .5, 1); }
+.mcard.miss .mface { border-color: var(--ember); }
+
 /* ---------- Pet Shop: people buy baby pet dinosaurs (Roy's idea) ---------- */
 .shop {
   flex: 1; min-height: 0; pointer-events: auto;
@@ -1040,6 +1083,10 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
       <svg viewBox="0 0 64 64"><rect x="10" y="26" width="44" height="30" rx="3" fill="#f4e8cc" stroke="#3b2413" stroke-width="3"/><path d="M6 26 L12 12 H52 L58 26 Z" fill="#e4572a"/><path d="M18 12 L16 26 M30 12 V26 M42 12 L44 26" stroke="#f4e8cc" stroke-width="4"/><rect x="16" y="34" width="14" height="14" rx="2" fill="#7fb0dc"/><circle cx="24" cy="42" r="4" fill="#5fb37c"/><rect x="36" y="34" width="12" height="22" fill="#a8844f"/></svg>
       Pet Shop
 </button>
+    <button class="place" data-place="memory" id="place-memory">
+      <svg viewBox="0 0 64 64"><rect x="6" y="12" width="26" height="38" rx="4" fill="#f2a93b" stroke="#3b2413" stroke-width="3" transform="rotate(-8 19 31)"/><rect x="30" y="12" width="26" height="38" rx="4" fill="#f4e8cc" stroke="#3b2413" stroke-width="3" transform="rotate(8 43 31)"/><circle cx="43" cy="29" r="7" fill="#4a86c8"/><circle cx="45" cy="27" r="2" fill="#1d1d1b"/><path d="M15 34 q-3 -6 2 -7 q4 1 1 7 Z" fill="#3b2413"/></svg>
+      Memory
+</button>
   </nav>
   </section>
 
@@ -1052,6 +1099,17 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
         <path d="M36 62 V30 q0 -6 5 -6 q5 0 5 6 v14 l12 2 q6 1 5 8 l-3 12 q-1 4 -5 4 H44 Z" fill="#f4e8cc" stroke="#3b2413" stroke-width="2.5" stroke-linejoin="round"/>
         <path d="M8 20 h22 M8 20 l8 -6 M8 20 l8 6" stroke="#f4e8cc" stroke-width="4" fill="none" stroke-linecap="round"/>
       </svg>
+    </div>
+  </section>
+
+  <section class="view" id="view-memory" hidden>
+    <div class="memory">
+      <div class="mem-levels" id="mem-levels">
+        <div class="mem-level" role="button" tabindex="0" data-level="easy"><svg viewBox="0 0 200 130" aria-hidden="true"><rect x="10.0" y="10.0" width="53.3" height="50.0" rx="5" fill="#f2a93b" stroke="#3b2413" stroke-width="2.5"/><rect x="73.3" y="10.0" width="53.3" height="50.0" rx="5" fill="#f2a93b" stroke="#3b2413" stroke-width="2.5"/><rect x="136.7" y="10.0" width="53.3" height="50.0" rx="5" fill="#f2a93b" stroke="#3b2413" stroke-width="2.5"/><rect x="10.0" y="70.0" width="53.3" height="50.0" rx="5" fill="#f2a93b" stroke="#3b2413" stroke-width="2.5"/><rect x="73.3" y="70.0" width="53.3" height="50.0" rx="5" fill="#f2a93b" stroke="#3b2413" stroke-width="2.5"/><rect x="136.7" y="70.0" width="53.3" height="50.0" rx="5" fill="#f2a93b" stroke="#3b2413" stroke-width="2.5"/></svg>Small<b>&#9733;</b></div>
+        <div class="mem-level" role="button" tabindex="0" data-level="medium"><svg viewBox="0 0 200 130" aria-hidden="true"><rect x="10.0" y="10.0" width="37.5" height="30.0" rx="5" fill="#f2a93b" stroke="#3b2413" stroke-width="2.5"/><rect x="57.5" y="10.0" width="37.5" height="30.0" rx="5" fill="#f2a93b" stroke="#3b2413" stroke-width="2.5"/><rect x="105.0" y="10.0" width="37.5" height="30.0" rx="5" fill="#f2a93b" stroke="#3b2413" stroke-width="2.5"/><rect x="152.5" y="10.0" width="37.5" height="30.0" rx="5" fill="#f2a93b" stroke="#3b2413" stroke-width="2.5"/><rect x="10.0" y="50.0" width="37.5" height="30.0" rx="5" fill="#f2a93b" stroke="#3b2413" stroke-width="2.5"/><rect x="57.5" y="50.0" width="37.5" height="30.0" rx="5" fill="#f2a93b" stroke="#3b2413" stroke-width="2.5"/><rect x="105.0" y="50.0" width="37.5" height="30.0" rx="5" fill="#f2a93b" stroke="#3b2413" stroke-width="2.5"/><rect x="152.5" y="50.0" width="37.5" height="30.0" rx="5" fill="#f2a93b" stroke="#3b2413" stroke-width="2.5"/><rect x="10.0" y="90.0" width="37.5" height="30.0" rx="5" fill="#f2a93b" stroke="#3b2413" stroke-width="2.5"/><rect x="57.5" y="90.0" width="37.5" height="30.0" rx="5" fill="#f2a93b" stroke="#3b2413" stroke-width="2.5"/><rect x="105.0" y="90.0" width="37.5" height="30.0" rx="5" fill="#f2a93b" stroke="#3b2413" stroke-width="2.5"/><rect x="152.5" y="90.0" width="37.5" height="30.0" rx="5" fill="#f2a93b" stroke="#3b2413" stroke-width="2.5"/></svg>Middle<b>&#9733;&#9733;</b></div>
+        <div class="mem-level" role="button" tabindex="0" data-level="hard"><svg viewBox="0 0 200 130" aria-hidden="true"><rect x="10.0" y="10.0" width="37.5" height="20.0" rx="5" fill="#f2a93b" stroke="#3b2413" stroke-width="2.5"/><rect x="57.5" y="10.0" width="37.5" height="20.0" rx="5" fill="#f2a93b" stroke="#3b2413" stroke-width="2.5"/><rect x="105.0" y="10.0" width="37.5" height="20.0" rx="5" fill="#f2a93b" stroke="#3b2413" stroke-width="2.5"/><rect x="152.5" y="10.0" width="37.5" height="20.0" rx="5" fill="#f2a93b" stroke="#3b2413" stroke-width="2.5"/><rect x="10.0" y="40.0" width="37.5" height="20.0" rx="5" fill="#f2a93b" stroke="#3b2413" stroke-width="2.5"/><rect x="57.5" y="40.0" width="37.5" height="20.0" rx="5" fill="#f2a93b" stroke="#3b2413" stroke-width="2.5"/><rect x="105.0" y="40.0" width="37.5" height="20.0" rx="5" fill="#f2a93b" stroke="#3b2413" stroke-width="2.5"/><rect x="152.5" y="40.0" width="37.5" height="20.0" rx="5" fill="#f2a93b" stroke="#3b2413" stroke-width="2.5"/><rect x="10.0" y="70.0" width="37.5" height="20.0" rx="5" fill="#f2a93b" stroke="#3b2413" stroke-width="2.5"/><rect x="57.5" y="70.0" width="37.5" height="20.0" rx="5" fill="#f2a93b" stroke="#3b2413" stroke-width="2.5"/><rect x="105.0" y="70.0" width="37.5" height="20.0" rx="5" fill="#f2a93b" stroke="#3b2413" stroke-width="2.5"/><rect x="152.5" y="70.0" width="37.5" height="20.0" rx="5" fill="#f2a93b" stroke="#3b2413" stroke-width="2.5"/><rect x="10.0" y="100.0" width="37.5" height="20.0" rx="5" fill="#f2a93b" stroke="#3b2413" stroke-width="2.5"/><rect x="57.5" y="100.0" width="37.5" height="20.0" rx="5" fill="#f2a93b" stroke="#3b2413" stroke-width="2.5"/><rect x="105.0" y="100.0" width="37.5" height="20.0" rx="5" fill="#f2a93b" stroke="#3b2413" stroke-width="2.5"/><rect x="152.5" y="100.0" width="37.5" height="20.0" rx="5" fill="#f2a93b" stroke="#3b2413" stroke-width="2.5"/></svg>Big<b>&#9733;&#9733;&#9733;</b></div>
+      </div>
+      <div class="mem-board" id="mem-board" hidden></div>
     </div>
   </section>
 
@@ -1574,6 +1632,7 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
     if (btn.dataset.place === "care") { openMap(true); return; }
     if (btn.dataset.place === "missions" || btn.dataset.place === "book") { openBook(); return; }
     if (btn.dataset.place === "shop") { openShop(); return; }
+    if (btn.dataset.place === "memory") { openMemory(); return; }
     clunk();
     btn.classList.remove("wiggle"); void btn.offsetWidth; btn.classList.add("wiggle");
     say(placeLines[btn.dataset.place]);
@@ -1597,6 +1656,7 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
     $("place-care").classList.toggle("next", !!state.found.map && !state.found.chef);
     $("place-missions").classList.remove("next");
     $("place-shop").classList.toggle("next", !!state.found.bookOpened && !state.found.sales);
+    $("place-memory").classList.toggle("next", !!state.found.sales && !state.found.memoryWins);
   }
   updateBook();
 
@@ -1617,7 +1677,7 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
   }
   homeBtn.addEventListener("click", function () {
     clearMission(true); activeMission = null;
-    viewLab.hidden = true; viewMap.hidden = true; viewMission.hidden = true; viewBook.hidden = true; foundBox.hidden = true; viewShop.hidden = true; shopOpen = false; viewPark.hidden = false; homeBtn.hidden = true;
+    viewLab.hidden = true; viewMap.hidden = true; viewMission.hidden = true; viewBook.hidden = true; foundBox.hidden = true; viewShop.hidden = true; shopOpen = false; viewMemory.hidden = true; memoryLock = true; viewPark.hidden = false; homeBtn.hidden = true;
     say("Welcome back to the park gate! Where shall we go?");
   });
 
@@ -2892,6 +2952,109 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
     say(t.name + " is in cage " + (idx + 1) + "! Tap the cage to say hello.");
   });
   $("again-btn").addEventListener("click", function () { clearMission(true); openBook(); });
+
+  // ---------- Memory Game: tap cards, dinosaurs pop out, find two the same (Roy's idea) ----------
+  var viewMemory = $("view-memory"), memLevels = $("mem-levels"), memBoard = $("mem-board");
+  var MEM_LEVELS = {
+    easy: { pairs: 3, cols: 3, rows: 2, stars: 1, word: "small" },
+    medium: { pairs: 6, cols: 4, rows: 3, stars: 2, word: "middle" },
+    hard: { pairs: 8, cols: 4, rows: 4, stars: 3, word: "big" }
+  };
+  var CARD_BACK = '<svg viewBox="0 0 60 60" aria-hidden="true"><circle cx="30" cy="30" r="27" fill="none" stroke="#3b2413" stroke-width="3" stroke-dasharray="6 5"/>' +
+    '<ellipse cx="30" cy="38" rx="9" ry="10" fill="#3b2413"/><path d="M27 30 L18 14 M30 28 L30 10 M33 30 L42 14" stroke="#3b2413" stroke-width="6" stroke-linecap="round"/></svg>';
+  var memDeck = [], memFirst = null, memoryLock = true, memMatched = 0, memLevel = null;
+  var MEMORY_BADGE =
+    '<circle cx="55" cy="55" r="50" fill="#9b6fc4" stroke="#3b2413" stroke-width="5"/><circle cx="55" cy="55" r="38" fill="#f4e8cc"/>' +
+    '<rect x="26" y="32" width="26" height="38" rx="4" fill="#f2a93b" stroke="#3b2413" stroke-width="3" transform="rotate(-8 39 51)"/>' +
+    '<rect x="56" y="32" width="26" height="38" rx="4" fill="#f2a93b" stroke="#3b2413" stroke-width="3" transform="rotate(8 69 51)"/>' +
+    '<path d="M38 52 l5 5 l9 -11 M64 52 l5 5 l9 -11" stroke="#3f8a4a" stroke-width="4" fill="none" stroke-linecap="round"/>';
+  function shuffle(a) { for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+  function openMemory() {
+    viewPark.hidden = true; viewMemory.hidden = false; homeBtn.hidden = false;
+    showMemLevels();
+    chime();
+    say("Memory game! Tap two cards. If the same dinosaur pops out of both, you found a match! Pick a small, middle or big game!");
+  }
+  function showMemLevels() {
+    memoryLock = true;
+    memBoard.hidden = true; memLevels.hidden = false;
+  }
+  memLevels.addEventListener("click", function (e) {
+    var b = e.target.closest(".mem-level");
+    if (b) startMemory(b.dataset.level);
+  });
+  function startMemory(level) {
+    var L = MEM_LEVELS[level];
+    memLevel = level; memFirst = null; memMatched = 0; memoryLock = false;
+    var picks = shuffle(DINOS.slice()).slice(0, L.pairs);
+    memDeck = shuffle(picks.concat(picks));
+    var upright = window.innerHeight > window.innerWidth;
+    var cols = upright ? L.rows : L.cols, rows = upright ? L.cols : L.rows;
+    if (level === "hard") { cols = 4; rows = 4; }
+    memBoard.style.gridTemplateColumns = "repeat(" + cols + ", minmax(0, 1fr))";
+    memBoard.style.gridTemplateRows = "repeat(" + rows + ", minmax(0, 1fr))";
+    memBoard.innerHTML = memDeck.map(function (d, i) {
+      return '<div class="mcard" role="button" tabindex="0" data-i="' + i + '" aria-label="Card">' +
+        '<div class="mback">' + CARD_BACK + '</div>' +
+        '<div class="mface" hidden><svg preserveAspectRatio="xMidYMid meet"' + d.svg.slice(4) + '<span>' + shortName(d) + '</span></div>' +
+        '</div>';
+    }).join("");
+    memLevels.hidden = true; memBoard.hidden = false;
+    rustle();
+    say("Find the pairs! Tap a card.");
+  }
+  function flipCard(card, up, done) {
+    card.classList.add("flipping");
+    setTimeout(function () {
+      card.querySelector(".mback").hidden = up;
+      card.querySelector(".mface").hidden = !up;
+      card.classList.toggle("up", up);
+      card.classList.remove("flipping");
+      if (done) setTimeout(done, 160);
+    }, 150);
+  }
+  memBoard.addEventListener("click", function (e) {
+    var card = e.target.closest(".mcard");
+    if (!card || memoryLock || card.classList.contains("up") || card.classList.contains("flipping")) return;
+    var d = memDeck[Number(card.dataset.i)];
+    tone(660, 0, 0.08, "triangle", 0.2);
+    if (!memFirst) { memFirst = card; flipCard(card, true); return; }
+    var first = memFirst, f = memDeck[Number(first.dataset.i)];
+    memFirst = null; memoryLock = true;
+    flipCard(card, true, function () {
+      if (f === d) {
+        first.classList.add("matched"); card.classList.add("matched");
+        d.sound(); chime();
+        memMatched += 1;
+        var L = MEM_LEVELS[memLevel];
+        if (memMatched < L.pairs) {
+          say(pick(["A match! Two " + shortName(d) + "!", "Yes! " + shortName(d) + " and " + shortName(d) + "!", "Great memory! Two " + shortName(d) + "!"]));
+          memoryLock = false;
+          return;
+        }
+        memoryWin(L);
+        return;
+      }
+      first.classList.add("miss"); card.classList.add("miss");
+      tone(330, 0, 0.18, "sine", 0.15, 250);
+      setTimeout(function () {
+        first.classList.remove("miss"); card.classList.remove("miss");
+        flipCard(first, false); flipCard(card, false, function () { memoryLock = false; });
+      }, 1100);
+    });
+  });
+  function memoryWin(L) {
+    fanfare(); hearts();
+    for (var k = 0; k < L.stars; k++) setTimeout(function () { addStar(memBoard); }, 400 + k * 300);
+    state.found.memoryWins = (state.found.memoryWins || 0) + 1; save(); updateBook();
+    say("You found all the pairs! What a great memory, Roy!");
+    if (state.found.memoryWins === 1) setTimeout(function () { showBadge("Dino Memory", "You won the memory game!", MEMORY_BADGE); }, 1600);
+    setTimeout(function () {
+      if (viewMemory.hidden) return;
+      showMemLevels();
+      say("Do you want to play again? Pick a small, middle or big game!");
+    }, 4200);
+  }
 
   // ---------- Pet Shop: people come in and buy baby pet dinosaurs (Roy's idea) ----------
   var viewShop = $("view-shop"), tanksEl = $("tanks"), wishEl = $("wish"), customerEl = $("customer");

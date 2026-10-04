@@ -46,6 +46,8 @@ Keep Memory.md up to date at all times. Every time we start a new session, read 
 - Roy's feedback on the Pet Shop (spoken): "I want to see the people who are coming inside the pet shop. I want to see their faces and their whole body." Roy cares about the people in his world, not only the dinosaurs, and wants them big and detailed.
 - Roy's eighth idea (spoken): "Now from the Dino Book, build all the missions that are described in the Dino Book." Roy noticed the missions all played the same way (tap the bushes). Each mission should do what its page says.
 - Different kinds of play keep missions fresh for Roy: following footprints, listening for a sound, watching for someone peeking, hopping across stones, and spotting the odd one out.
+- Roy's ninth idea (spoken): "I want a memory game of dinosaurs in my park. When you tap on cards, dinosaurs pop out. You have to find two of the same dinosaurs." This became the Memory game.
+- Choosing a small, middle or big game lets Roy pick how hard it is, and the bigger game gives more stars.
 - Empty cages are a good way to keep Roy's ideas coming: each one has a "?" sign, and Tops asks "Roy, which dinosaur should live here?"
 - Idea: the game itself could listen to Roy too, for example saying a name out loud to name a new dinosaur.
 
@@ -103,7 +105,8 @@ Keep Memory.md up to date at all times. Every time we start a new session, read 
   13. Giant Footprints: follow 3 huge footprints (rumble and shake) to a giant leg, tap it and "look up" to find Argentinosaurus.
   - All 11 adventure missions were played through from start to finish in a test browser on iPad and phone sizes. Preview updated at the same link.
 - 2026-10-03: Roy's parent asked to publish the game live so Roy can share the link with his friends. Recommended way: share the existing preview from its Share menu with "anyone with the link" (only the account owner can do this; Claude cannot change sharing). Alternative offered: a free GitHub Pages website, which needs the repository to be public and Pages switched on in the repository settings.
-- **Next:** Check with Roy that the shop and the new missions work on his iPad. Then ask what he wants next.
+- 2026-10-04: **Built the Memory game, from Roy's idea** (new Memory button on the park map, so there are now 7 areas). Roy picks Small (6 cards, 1 star), Middle (12 cards, 2 stars) or Big (16 cards, 3 stars). The cards lie face down with a dinosaur footprint on the back. Tap a card and it flips over to show a dinosaur from Roy's park with its name. Tap a second card: if it is the same dinosaur, both glow green, hop, and the dinosaur makes its sound ("A match! Two Spinosaurus!"). If not, they turn red for a moment and flip back. Find all the pairs to win stars; the first win gives the Dino Memory badge. The game uses the dinosaurs in Roy's park, including new species found on missions. Cards stand upright on an iPad held upright. Played through Small and Big games in a test browser at iPad (both ways round) and phone sizes. Preview updated at the same link.
+- **Next:** Check with Roy that the shop, the missions and the memory game work on his iPad. Then ask what he wants next.
 
 ## Important decisions
 
@@ -134,3 +137,4 @@ Keep Memory.md up to date at all times. Every time we start a new session, read 
 - 2026-10-03: Mission play styles are set in `MISSIONS` in `Roy/game/index.html` with a `play` field (search, eggs, trail, listen, decoys, lava, peek) plus options such as `hint`, `size` and `alarm`. New missions can reuse these.
 - 2026-10-03: New mission layouts use plain percentage sizes instead of container units, which older iPads may not support.
 - 2026-10-03: Sharing the game publicly is safe for friends to play: there are no accounts, no chat, no ads, and nothing is sent anywhere. Each player's stars and dinosaurs are saved only on their own device. The game shows Roy's first name ("ROY'S DINO PARK") but nothing else about him.
+- 2026-10-04: The memory cards flip with a simple squash-and-swap animation instead of a 3D turn, because 3D card flips can look broken in Safari on the iPad. The card pictures sit in fixed-size boxes, following the Pet Shop lesson.
