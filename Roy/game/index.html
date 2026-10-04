@@ -925,6 +925,60 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
 @keyframes bit { to { transform: translate(var(--dx), var(--dy)) rotate(var(--r)); opacity: 0; } }
 @keyframes pop { 50% { transform: scale(1.3); } }
 @keyframes bob { to { transform: translateY(-6px) rotate(-3deg); } }
+/* ---------- Dino Escape: a dinosaur breaks out of the game into the house (Roy's idea) ---------- */
+.escape { flex: 1; min-height: 0; position: relative; overflow: hidden; border-radius: 18px; pointer-events: auto; }
+.esc-pick { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-auto-rows: minmax(0, 1fr); gap: 12px; padding: 12px;
+  background: radial-gradient(ellipse at 50% 30%, #2e5b3a, #10261a); }
+.esc-choice { position: relative; background: rgba(244, 232, 204, .12); border: 4px solid var(--amber); border-radius: 20px; cursor: pointer; }
+.esc-choice:active { transform: scale(.96); }
+.esc-choice .box { position: absolute; left: 8%; right: 8%; top: 6%; bottom: 26%; }
+.esc-choice .box svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.esc-choice span { position: absolute; left: 0; right: 0; bottom: 6%; text-align: center; color: var(--bone); font-weight: 800; font-size: clamp(.9rem, 2.4vw, 1.3rem); }
+.esc-glass { position: absolute; inset: 0; cursor: pointer;
+  background: linear-gradient(#1f4a2c, #2e5b3a 55%, #6b8a3a 55%, #4f6b2a); }
+.esc-glass::before { content: ""; position: absolute; inset: 0;
+  background: radial-gradient(circle at 15% 40%, #3f7a4c 0 12%, transparent 12.5%), radial-gradient(circle at 85% 36%, #3f7a4c 0 14%, transparent 14.5%), radial-gradient(circle at 50% 30%, #356b42 0 10%, transparent 10.5%); }
+.esc-glass::after { content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(120deg, transparent 30%, rgba(255, 255, 255, .16) 38%, transparent 46%, transparent 60%, rgba(255, 255, 255, .1) 64%, transparent 70%);
+  box-shadow: inset 0 0 0 10px #1d1d1b, inset 0 0 0 14px #5d625c; border-radius: 18px; }
+.esc-glass .esc-dino { position: absolute; left: 15%; right: 15%; top: 12%; bottom: 8%; transition: transform .25s; }
+.esc-glass .esc-dino svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.esc-glass.bump .esc-dino { animation: esc-bump .35s ease-out; }
+@keyframes esc-bump { 40% { transform: scale(1.18) translateY(-3%); } }
+.esc-glass.bump { animation: shake .4s ease; }
+.esc-cracks { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2; }
+.esc-cracks path { opacity: 0; transition: opacity .15s; }
+.esc-glass[data-crack="1"] .k1, .esc-glass[data-crack="2"] .k1, .esc-glass[data-crack="2"] .k2,
+.esc-glass[data-crack="3"] .esc-cracks path { opacity: 1; }
+.shard { position: fixed; width: 0; height: 0; z-index: 70; pointer-events: none;
+  border-left: 18px solid transparent; border-right: 18px solid transparent; border-bottom: 34px solid rgba(207, 230, 239, .85);
+  animation: shard-fly 1s ease-out forwards; }
+@keyframes shard-fly { to { transform: translate(var(--dx), var(--dy)) rotate(var(--r)); opacity: 0; } }
+.house { position: absolute; inset: 0; background: #f3dfb4; }
+.house > svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.house .hspot { cursor: pointer; }
+.house .hspot.done { opacity: 1; }
+#house-dino { transition: transform .9s cubic-bezier(.3, .1, .2, 1); cursor: pointer; }
+#house-dino .hop { transform-box: fill-box; transform-origin: 50% 100%; }
+#house-dino.bounce .hop { animation: hd-bounce .45s ease-in-out 3; }
+#house-dino.stomp .hop { animation: hd-stomp .5s ease-in-out 2; }
+@keyframes hd-bounce { 50% { transform: translateY(-60px) scaleY(1.05); } }
+@keyframes hd-stomp { 25% { transform: rotate(-5deg); } 75% { transform: rotate(5deg); } }
+#lamp { transform-box: fill-box; transform-origin: 50% 100%; transition: transform .6s cubic-bezier(.5, 0, .7, 1.4); }
+#lamp.fallen { transform: rotate(-80deg); }
+#fridge-door { transform-box: fill-box; transform-origin: 100% 50%; transition: transform .5s; }
+#fridge-door.open { transform: scaleX(.12); }
+#sofa-seat { transform-box: fill-box; transform-origin: 50% 100%; }
+#sofa-seat.squash { animation: squash .45s ease-in-out 3; }
+@keyframes squash { 50% { transform: scaleY(.8); } }
+.toy-pop { position: fixed; z-index: 60; pointer-events: none; font-size: 0; animation: toy-fly 1.2s ease-out forwards; }
+.toy-pop svg { width: 46px; height: 46px; }
+@keyframes toy-fly { 0% { transform: translate(0, 0) rotate(0); } 50% { transform: translate(calc(var(--dx) * .5), -120px) rotate(180deg); } 100% { transform: translate(var(--dx), 30px) rotate(360deg); opacity: 0; } }
+.esc-back { position: absolute; right: 12px; bottom: 12px; z-index: 3;
+  background: var(--leaf); color: var(--bone); border: 4px solid var(--wood-dark); border-radius: 999px;
+  font-size: 1.3rem; font-weight: 800; padding: 10px 24px; box-shadow: 0 5px 0 var(--wood-dark); }
+.esc-back:active { transform: translateY(3px); box-shadow: 0 2px 0 var(--wood-dark); }
+@media (max-width: 560px) { .esc-back { font-size: 1.05rem; padding: 8px 16px; } }
 @keyframes shake { 15%, 45%, 75% { transform: translateX(-7px); } 30%, 60%, 90% { transform: translateX(7px); } }
 @keyframes tap { 0%, 100% { transform: translateX(-50%) scale(1); opacity: .9; } 50% { transform: translateX(-50%) scale(.82); opacity: .6; } }
 @keyframes flicker { to { transform: scaleY(1.15) scaleX(.9); } }
@@ -1320,6 +1374,10 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
       <svg viewBox="0 0 64 64"><rect x="6" y="12" width="26" height="38" rx="4" fill="#f2a93b" stroke="#3b2413" stroke-width="3" transform="rotate(-8 19 31)"/><rect x="30" y="12" width="26" height="38" rx="4" fill="#f4e8cc" stroke="#3b2413" stroke-width="3" transform="rotate(8 43 31)"/><circle cx="43" cy="29" r="7" fill="#4a86c8"/><circle cx="45" cy="27" r="2" fill="#1d1d1b"/><path d="M15 34 q-3 -6 2 -7 q4 1 1 7 Z" fill="#3b2413"/></svg>
       Memory
 </button>
+    <button class="place" data-place="escape" id="place-escape">
+      <svg viewBox="0 0 64 64"><rect x="6" y="10" width="52" height="36" rx="4" fill="#1d1d1b"/><rect x="10" y="14" width="44" height="28" fill="#2e5b3a"/><path d="M30 14 l4 10 l-8 6 l10 4 l-4 8 M34 24 l10 -4 M26 30 l-12 2" stroke="#cfe6ef" stroke-width="2.5" fill="none" stroke-linejoin="round"/><path d="M28 50 h8 l4 8 h-16 Z" fill="#5d625c"/><path d="M36 30 q8 -12 20 -6 q4 4 0 8 l-10 2 Z" fill="#7a8f3c" stroke="#3b2413" stroke-width="2"/><circle cx="48" cy="27" r="2" fill="#1d1d1b"/></svg>
+      Dino Escape
+</button>
   </nav>
   </section>
 
@@ -1333,6 +1391,91 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
         <path d="M36 62 V30 q0 -6 5 -6 q5 0 5 6 v14 l12 2 q6 1 5 8 l-3 12 q-1 4 -5 4 H44 Z" fill="#f4e8cc" stroke="#3b2413" stroke-width="2.5" stroke-linejoin="round"/>
         <path d="M8 20 h22 M8 20 l8 -6 M8 20 l8 6" stroke="#f4e8cc" stroke-width="4" fill="none" stroke-linecap="round"/>
       </svg>
+    </div>
+  </section>
+
+  <section class="view" id="view-house" hidden>
+    <div class="escape">
+      <div class="esc-pick" id="esc-pick"></div>
+      <div class="esc-glass" id="esc-glass" role="button" tabindex="0" aria-label="Glass" hidden>
+        <div class="esc-dino" id="esc-dino"></div>
+        <svg class="esc-cracks" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+          <path class="k1" d="M50 45 L42 30 L46 18 L38 4 M50 45 L64 36 L70 22 M50 45 L58 58 L72 62" stroke="#f4f8fa" stroke-width=".7" fill="none"/>
+          <path class="k2" d="M50 45 L34 50 L20 46 L6 54 M50 45 L46 64 L38 80 L42 96 M64 36 L82 30 L96 34" stroke="#f4f8fa" stroke-width=".7" fill="none"/>
+          <path class="k3" d="M42 30 L26 24 L10 14 M58 58 L66 78 L60 96 M72 62 L88 70 L98 66 M34 50 L24 66 L8 72 M46 18 L58 8 L56 0" stroke="#f4f8fa" stroke-width=".7" fill="none"/>
+        </svg>
+      </div>
+      <div class="house" id="house" hidden>
+        <svg id="house-svg" viewBox="0 0 800 600" preserveAspectRatio="xMidYMax meet">
+          <rect x="-400" y="-400" width="1600" height="830" fill="#f3dfb4"/>
+          <path d="M-400 0 H1200" stroke="none"/>
+          <g opacity=".35" stroke="#e2c58f" stroke-width="10"><path d="M40 -400 V430 M120 -400 V430 M200 -400 V430 M280 -400 V430 M360 -400 V430 M440 -400 V430 M520 -400 V430 M600 -400 V430 M680 -400 V430 M760 -400 V430"/></g>
+          <rect x="-400" y="430" width="1600" height="400" fill="#a8744a"/>
+          <path d="M-400 470 H1200 M-400 520 H1200 M-400 575 H1200" stroke="#8a5a31" stroke-width="3"/>
+          <rect x="-400" y="422" width="1600" height="14" fill="#6e4524"/>
+          <g aria-hidden="true">
+            <circle cx="400" cy="-110" r="60" fill="#f4e8cc" stroke="#6e4524" stroke-width="10"/>
+            <path d="M400 -110 V-150 M400 -110 L428 -96" stroke="#3b2413" stroke-width="7" stroke-linecap="round"/>
+            <rect x="90" y="-220" width="160" height="120" fill="#7fb0dc" stroke="#a8744a" stroke-width="12"/>
+            <path d="M110 -120 Q150 -170 180 -150 Q200 -190 230 -120 Z" fill="#5fb37c"/><circle cx="210" cy="-190" r="12" fill="#f9d27a"/>
+            <rect x="560" y="-230" width="150" height="130" fill="#f9d27a" stroke="#a8744a" stroke-width="12"/>
+            <path d="M590 -120 q10 -40 40 -40 q30 0 40 -30 q10 20 -10 40 l10 30 Z" fill="#4a86c8"/><circle cx="650" cy="-170" r="4" fill="#1d1d1b"/>
+          </g>
+          <ellipse cx="400" cy="520" rx="250" ry="48" fill="#4a86c8" opacity=".85"/>
+          <ellipse cx="400" cy="520" rx="200" ry="36" fill="none" stroke="#f2a93b" stroke-width="6"/>
+          <g class="hspot" data-spot="window" role="button" aria-label="Window">
+            <rect x="50" y="80" width="170" height="170" rx="6" fill="#9cd2f0" stroke="#6e4524" stroke-width="12"/>
+            <ellipse cx="100" cy="130" rx="30" ry="14" fill="#fff"/><ellipse cx="170" cy="170" rx="24" ry="10" fill="#fff"/>
+            <path d="M50 210 Q100 180 135 200 Q170 184 220 206 V250 H50 Z" fill="#5fb37c"/>
+            <path d="M135 80 V250 M50 165 H220" stroke="#6e4524" stroke-width="8"/>
+            <path d="M40 70 Q60 140 40 260 L30 260 V70 Z M230 70 Q210 140 230 260 L240 260 V70 Z" fill="#e4572a"/>
+          </g>
+          <g class="hspot" data-spot="tv" role="button" aria-label="TV">
+            <rect x="300" y="90" width="200" height="130" rx="10" fill="#1d1d1b"/>
+            <rect x="312" y="100" width="176" height="110" fill="#2e5b3a"/>
+            <circle cx="350" cy="150" r="24" fill="#3f7a4c"/><circle cx="450" cy="140" r="28" fill="#3f7a4c"/>
+            <rect x="312" y="182" width="176" height="28" fill="#6b8a3a"/>
+            <path d="M400 100 l8 30 l-20 16 l26 10 l-8 30 M408 130 l30 -12 M388 146 l-34 6 M414 156 l28 20" stroke="#cfe6ef" stroke-width="3.5" fill="none" stroke-linejoin="round"/>
+            <polygon points="392,128 418,124 426,150 404,166 380,150" fill="#10261a"/>
+            <rect x="390" y="220" width="20" height="14" fill="#5d625c"/>
+            <rect x="330" y="232" width="140" height="10" rx="5" fill="#6e4524"/>
+          </g>
+          <g class="hspot" data-spot="sofa" role="button" aria-label="Sofa">
+            <rect x="30" y="300" width="270" height="80" rx="30" fill="#2a8f88"/>
+            <g id="sofa-seat"><rect x="40" y="360" width="250" height="56" rx="16" fill="#35b0a6"/>
+            <path d="M165 364 V412" stroke="#2a8f88" stroke-width="4"/></g>
+            <rect x="14" y="340" width="40" height="90" rx="18" fill="#2a8f88"/>
+            <rect x="276" y="340" width="40" height="90" rx="18" fill="#2a8f88"/>
+            <rect x="60" y="316" width="60" height="44" rx="14" fill="#f2a93b" transform="rotate(-8 90 338)"/>
+            <rect x="34" y="426" width="14" height="14" fill="#3b2413"/><rect x="282" y="426" width="14" height="14" fill="#3b2413"/>
+          </g>
+          <g class="hspot" data-spot="toys" role="button" aria-label="Toy box">
+            <rect x="460" y="372" width="110" height="74" rx="8" fill="#e4572a" stroke="#3b2413" stroke-width="4"/>
+            <rect x="452" y="360" width="126" height="20" rx="6" fill="#f2a93b" stroke="#3b2413" stroke-width="4"/>
+            <circle cx="490" cy="410" r="10" fill="#f9d27a"/><path d="M530 398 l8 14 h-16 Z" fill="#7fb0dc"/>
+            <text x="515" y="440" text-anchor="middle" font-family="Baloo 2, Trebuchet MS, sans-serif" font-weight="800" font-size="16" fill="#f4e8cc">TOYS</text>
+          </g>
+          <g class="hspot" data-spot="lamp" role="button" aria-label="Lamp">
+            <g id="lamp">
+              <ellipse cx="620" cy="432" rx="28" ry="8" fill="#3b2413"/>
+              <rect x="616" y="250" width="8" height="182" fill="#5d625c"/>
+              <path d="M584 260 L600 196 H640 L656 260 Z" fill="#f9d27a" stroke="#c98a2a" stroke-width="4" stroke-linejoin="round"/>
+            </g>
+          </g>
+          <g class="hspot" data-spot="fridge" role="button" aria-label="Fridge">
+            <rect x="670" y="170" width="120" height="262" rx="12" fill="#e9eef0" stroke="#9aa4a8" stroke-width="4"/>
+            <rect x="676" y="176" width="108" height="250" rx="8" fill="#fff6dc"/>
+            <path d="M684 250 H776 M684 330 H776" stroke="#d8c48a" stroke-width="4"/>
+            <rect x="690" y="224" width="26" height="22" rx="4" fill="#e4572a"/><circle cx="740" cy="236" r="12" fill="#5fb37c"/>
+            <rect x="692" y="300" width="20" height="28" rx="4" fill="#f4e8cc" stroke="#9aa4a8" stroke-width="2"/><ellipse cx="750" cy="316" rx="20" ry="10" fill="#f2a93b"/>
+            <rect x="700" y="388" width="60" height="16" rx="6" fill="#7fb0dc"/>
+            <rect id="fridge-door" x="670" y="170" width="120" height="262" rx="12" fill="#dfe6e9" stroke="#9aa4a8" stroke-width="4"/>
+            <rect x="684" y="210" width="8" height="60" rx="4" fill="#9aa4a8"/>
+          </g>
+          <g id="house-dino" style="transform: translate(330px, 300px)"><g class="hop" id="house-dino-art"></g></g>
+        </svg>
+        <button class="esc-back" id="esc-back">Back into the game!</button>
+      </div>
     </div>
   </section>
 
@@ -1926,9 +2069,187 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
     if (btn.dataset.place === "missions" || btn.dataset.place === "book") { openBook(); return; }
     if (btn.dataset.place === "shop") { openShop(); return; }
     if (btn.dataset.place === "memory") { openMemory(); return; }
+    if (btn.dataset.place === "escape") { openEscape(); return; }
     clunk();
     btn.classList.remove("wiggle"); void btn.offsetWidth; btn.classList.add("wiggle");
     say(placeLines[btn.dataset.place]);
+  });
+
+
+  // ---------- Dino Escape: a dinosaur breaks out of the game and comes into the house (Roy's idea) ----------
+  var viewHouse = $("view-house"), escPick = $("esc-pick"), escGlass = $("esc-glass"), escDinoBox = $("esc-dino");
+  var house = $("house"), houseDino = $("house-dino"), houseDinoArt = $("house-dino-art"), escBack = $("esc-back");
+  var ESC_IDS = ["trex", "blue", "trike", "stego", "spino", "ankylo"];
+  var escDino = null, escCrack = 0, escDone = {}, escBusy = false, escTimers = [];
+  var HOUSE_SPOTS = {
+    window: [40, 290], tv: [290, 270], sofa: [70, 190], toys: [300, 300], lamp: [420, 300], fridge: [470, 300]
+  };
+  var ESCAPE_BADGE =
+    '<circle cx="55" cy="55" r="50" fill="#f2a93b" stroke="#3b2413" stroke-width="5"/>' +
+    '<rect x="22" y="26" width="66" height="46" rx="5" fill="#1d1d1b"/><rect x="27" y="31" width="56" height="36" fill="#2e5b3a"/>' +
+    '<path d="M52 31 l4 12 l-10 6 l12 4 l-4 14 M56 43 l14 -6" stroke="#cfe6ef" stroke-width="2.5" fill="none"/>' +
+    '<path d="M58 52 q14 -20 32 -8 q4 6 -2 10 l-16 4 Z" fill="#7a8f3c" stroke="#3b2413" stroke-width="2"/><circle cx="80" cy="48" r="2.5" fill="#1d1d1b"/>' +
+    '<path d="M44 80 h22 l4 10 h-30 Z" fill="#5d625c"/>';
+  var MESS_BADGE =
+    '<circle cx="55" cy="55" r="50" fill="#2a8f88" stroke="#3b2413" stroke-width="5"/>' +
+    '<path d="M24 74 h62 v10 h-62 Z" fill="#6e4524"/><rect x="28" y="54" width="54" height="22" rx="8" fill="#35b0a6" stroke="#3b2413" stroke-width="2"/>' +
+    '<path d="M70 52 l-14 -22" stroke="#5d625c" stroke-width="4"/><path d="M44 24 L52 14 H66 L70 26 Z" fill="#f9d27a" transform="rotate(-40 58 22)"/>' +
+    '<circle cx="36" cy="40" r="6" fill="#e4572a"/><path d="M80 30 l6 10 h-12 Z" fill="#7fb0dc"/>';
+  function later(fn, ms) { escTimers.push(setTimeout(fn, ms)); }
+  function placeHouseDino(x, y, sc) {
+    houseDino.style.transform = "translate(" + x + "px, " + y + "px) scale(" + (sc || 1) + ")";
+  }
+  function openEscape() {
+    viewPark.hidden = true; viewHouse.hidden = false; homeBtn.hidden = false;
+    escGlass.hidden = true; house.hidden = true; escPick.hidden = false;
+    escPick.innerHTML = ESC_IDS.map(function (id) {
+      var d = dinoById(id);
+      return '<div class="esc-choice" role="button" tabindex="0" data-id="' + id + '"><div class="box">' + d.svg + '</div><span>' + shortName(d) + '</span></div>';
+    }).join("");
+    chime();
+    say("Shh! Some dinosaurs want to escape out of the game! Who should come out? Pick one!");
+  }
+  escPick.addEventListener("click", function (e) {
+    var c = e.target.closest(".esc-choice");
+    if (!c) return;
+    escDino = dinoById(c.dataset.id);
+    escCrack = 0; escDone = {}; escBusy = false;
+    escGlass.dataset.crack = 0;
+    escDinoBox.innerHTML = escDino.svg;
+    escPick.hidden = true; escGlass.hidden = false;
+    if (escDino.sound) escDino.sound();
+    say(shortName(escDino) + " wants to come out of the game! Tap the screen to help " + shortName(escDino) + " bang on the glass!");
+  });
+  function tinkle() { for (var i = 0; i < 9; i++) tone(1800 + Math.random() * 1800, i * 0.05, 0.25, "triangle", 0.12, 1200); }
+  function shards() {
+    var r = escGlass.getBoundingClientRect();
+    for (var i = 0; i < 22; i++) {
+      var sh = document.createElement("span");
+      sh.className = "shard";
+      sh.style.left = (r.left + r.width * (0.2 + Math.random() * 0.6)) + "px";
+      sh.style.top = (r.top + r.height * (0.2 + Math.random() * 0.6)) + "px";
+      sh.style.setProperty("--dx", (Math.random() * 600 - 300) + "px");
+      sh.style.setProperty("--dy", (Math.random() * 500 - 150) + "px");
+      sh.style.setProperty("--r", (Math.random() * 720 - 360) + "deg");
+      document.body.appendChild(sh);
+      setTimeout(sh.remove.bind(sh), 1050);
+    }
+  }
+  escGlass.addEventListener("click", function () {
+    if (escBusy) return;
+    escCrack += 1;
+    escGlass.dataset.crack = Math.min(escCrack, 3);
+    escGlass.classList.remove("bump"); void escGlass.offsetWidth; escGlass.classList.add("bump");
+    bonk(); clunk();
+    if (escCrack === 1) { say("BANG! A crack! Again!"); return; }
+    if (escCrack === 2) { say("BANG BANG! The glass is breaking! One more!"); return; }
+    escBusy = true;
+    later(function () {
+      tinkle(); splash(); shards(); roar(0.8, 1.6); rumble();
+      escGlass.hidden = true; house.hidden = false;
+      houseDinoArt.innerHTML = escDino.svg.replace("<svg ", '<svg x="0" y="0" width="260" height="200" ');
+      houseDino.style.transition = "none";
+      placeHouseDino(370, 120, 0.2);
+      void houseDino.getBoundingClientRect();
+      houseDino.style.transition = "";
+      later(function () { placeHouseDino(270, 300, 1); houseDino.classList.remove("stomp"); void houseDino.getBoundingClientRect(); houseDino.classList.add("stomp"); }, 60);
+      ["lamp", "fridge-door", "sofa-seat"].forEach(function (id) { $(id).classList.remove("fallen", "open", "squash"); });
+      say("CRASH! " + shortName(escDino) + " broke out of the game! Now " + shortName(escDino) + " is in the house! Tap things in the house and see what happens!");
+      if (!state.found.escape) {
+        state.found.escape = true; save();
+        addStar(house);
+        later(function () { showBadge("Dino Escape", "A dinosaur came out of the game!", ESCAPE_BADGE); }, 900);
+      }
+      later(function () { escBusy = false; }, 1000);
+    }, 350);
+  });
+  function foodWord(d) {
+    var diet = DIET[d.id] || ["leaves"];
+    if (diet[0] === "meat") return "all the sausages";
+    if (diet[0] === "fish") return "all the fish sticks";
+    return "all the salad";
+  }
+  function toyBurst(fromEl) {
+    var r = fromEl.getBoundingClientRect();
+    var toys = ['<svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="16" fill="#e4572a"/><path d="M6 18 h28" stroke="#f4e8cc" stroke-width="4"/></svg>',
+      '<svg viewBox="0 0 40 40"><rect x="6" y="6" width="28" height="28" rx="4" fill="#4a86c8"/><text x="20" y="28" text-anchor="middle" font-size="20" font-weight="800" fill="#fff">A</text></svg>',
+      '<svg viewBox="0 0 40 40"><circle cx="20" cy="24" r="12" fill="#a8744a"/><circle cx="20" cy="10" r="8" fill="#a8744a"/><circle cx="13" cy="5" r="4" fill="#a8744a"/><circle cx="27" cy="5" r="4" fill="#a8744a"/><circle cx="17" cy="9" r="1.5" fill="#1d1d1b"/><circle cx="23" cy="9" r="1.5" fill="#1d1d1b"/></svg>',
+      '<svg viewBox="0 0 40 40"><path d="M20 4 l5 11 12 1 -9 8 3 12 -11 -6 -11 6 3 -12 -9 -8 12 -1z" fill="#f2a93b"/></svg>'];
+    for (var i = 0; i < 8; i++) {
+      var t = document.createElement("span");
+      t.className = "toy-pop"; t.innerHTML = toys[i % toys.length];
+      t.style.left = (r.left + r.width / 2 - 23) + "px"; t.style.top = (r.top) + "px";
+      t.style.setProperty("--dx", (Math.random() * 360 - 180) + "px");
+      t.style.animationDelay = (i * 0.06) + "s";
+      document.body.appendChild(t);
+      setTimeout(t.remove.bind(t), 1700);
+    }
+  }
+  house.addEventListener("click", function (e) {
+    if (escBusy || !escDino) return;
+    if (e.target.closest("#esc-back")) return;
+    if (e.target.closest("#house-dino")) {
+      if (escDino.sound) escDino.sound();
+      houseDino.classList.remove("stomp"); void houseDino.getBoundingClientRect(); houseDino.classList.add("stomp");
+      say(shortName(escDino) + " likes your house!");
+      return;
+    }
+    var spot = e.target.closest(".hspot");
+    if (!spot) return;
+    var what = spot.dataset.spot, n = shortName(escDino), pos = HOUSE_SPOTS[what];
+    escBusy = true;
+    placeHouseDino(pos[0], pos[1], what === "sofa" ? 0.9 : 1);
+    stomp();
+    later(function () {
+      if (what === "sofa") {
+        houseDino.classList.remove("bounce"); void houseDino.getBoundingClientRect(); houseDino.classList.add("bounce");
+        $("sofa-seat").classList.remove("squash"); void houseDino.getBoundingClientRect(); $("sofa-seat").classList.add("squash");
+        boing(); later(boing, 450); later(boing, 900);
+        say("Boing boing boing! " + n + " is jumping on the sofa!");
+      } else if (what === "fridge") {
+        $("fridge-door").classList.add("open");
+        later(function () { munch(); }, 400); later(function () { munch(); }, 1000);
+        say("The fridge! Munch munch! " + n + " ate " + foodWord(escDino) + "!");
+      } else if (what === "lamp") {
+        $("lamp").classList.toggle("fallen");
+        later(function () { clunk(); tinkle(); }, 450);
+        say($("lamp").classList.contains("fallen") ? "Oops! CRASH! " + n + " knocked over the lamp!" : n + " picked the lamp up again. Good dinosaur!");
+      } else if (what === "window") {
+        houseDino.classList.remove("stomp"); void houseDino.getBoundingClientRect(); houseDino.classList.add("stomp");
+        roar(0.8, 1.6);
+        say("ROAR! " + n + " is saying hello to the neighbours out of the window!");
+      } else if (what === "toys") {
+        toyBurst(spot); boing();
+        say(n + " found the toy box! Toys everywhere!");
+      } else if (what === "tv") {
+        chime();
+        say("Look! That's Jurassic World in the TV! " + n + " came out of there!");
+      }
+      escDone[what] = true;
+      if (Object.keys(escDone).length === 6 && !state.found.bigMess) {
+        state.found.bigMess = true; save();
+        later(function () {
+          addStar(house);
+          showBadge("Big Mess", n + " played with everything in the house!", MESS_BADGE);
+          say("What a big mess! " + n + " played with everything in the house!");
+        }, 2200);
+      }
+      later(function () { escBusy = false; }, 900);
+    }, 900);
+  });
+  function stomp() { tone(70, 0, 0.18, "sine", 0.5, 40); tone(70, 0.3, 0.18, "sine", 0.5, 40); }
+  escBack.addEventListener("click", function () {
+    if (!escDino) return;
+    escBusy = true;
+    placeHouseDino(370, 120, 0.15);
+    tone(300, 0, 0.6, "sine", 0.3, 1200); chime();
+    say("Bye bye, " + shortName(escDino) + "! Back into the game you go! Whoosh!");
+    later(function () {
+      escBusy = false;
+      house.hidden = true;
+      openEscape();
+      say("Whoosh! " + shortName(escDino) + " is back in the game! Who should come out next?");
+    }, 1400);
   });
 
   // ---------- Egg Lab ----------
@@ -1970,7 +2291,7 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
   }
   homeBtn.addEventListener("click", function () {
     clearMission(true); activeMission = null; gm.hidden = true;
-    viewLab.hidden = true; viewMap.hidden = true; viewMission.hidden = true; viewBook.hidden = true; foundBox.hidden = true; viewShop.hidden = true; shopOpen = false; viewMemory.hidden = true; memoryLock = true; viewPark.hidden = false; homeBtn.hidden = true;
+    viewLab.hidden = true; viewMap.hidden = true; viewMission.hidden = true; viewBook.hidden = true; foundBox.hidden = true; viewShop.hidden = true; shopOpen = false; viewMemory.hidden = true; memoryLock = true; viewHouse.hidden = true; escTimers.forEach(clearTimeout); viewPark.hidden = false; homeBtn.hidden = true;
     say("Welcome back to the park gate! Where shall we go?");
   });
 
