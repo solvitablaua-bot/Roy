@@ -520,7 +520,7 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
 .print.next { opacity: 1; animation: pulse 1s ease-in-out infinite; }
 .print.done { opacity: .85; }
 .alarm { position: absolute; inset: 0; pointer-events: none; z-index: 4; animation: alarm .45s ease-in-out 6 alternate; }
-.expedition.stomp { animation: shake .4s ease; }
+.expedition.stomp, .chase.stomp { animation: shake .4s ease; }
 .feather { position: absolute; width: 5%; pointer-events: none; z-index: 3; animation: featherfall 3.2s linear forwards; }
 .critter.peekup { animation: peek 1.9s ease forwards; }
 .lava {
@@ -626,6 +626,56 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
 .expedition[data-place="desert"] .tint { background: linear-gradient(rgba(201, 139, 74, .3), rgba(160, 100, 50, .7)); }
 .expedition[data-place="volcano"] .tint { background: radial-gradient(ellipse at 80% 0%, rgba(228, 87, 42, .55), transparent 55%), linear-gradient(rgba(30, 20, 20, .3), rgba(30, 20, 20, .7)); }
 @keyframes flip { from { transform: perspective(900px) rotateY(-30deg); opacity: .2; } }
+/* ---------- Raptor Run: run to the gate before the raptors catch you (Roy's idea) ---------- */
+.chase {
+  flex: 1; min-height: 0; position: relative; overflow: hidden; pointer-events: auto;
+  border: 4px solid var(--wood-dark); border-radius: 20px;
+  background: linear-gradient(#173326, #1d4528 60%, #2a5634);
+  touch-action: manipulation; cursor: pointer;
+}
+.chase .path {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 24%;
+  background: linear-gradient(#c9a76a, #a8844f);
+  border-top: 5px solid #8a6a3a;
+}
+.chase .path::after {
+  content: ""; position: absolute; left: 0; right: 0; top: 40%; height: 6px;
+  background: repeating-linear-gradient(90deg, #dcbd85 0 30px, transparent 30px 70px);
+  animation: road .5s linear infinite paused;
+}
+.chase.running .path::after { animation-play-state: running; }
+.chase .bushes { position: absolute; left: 0; right: 0; bottom: 22%; height: 30%; pointer-events: none; }
+.chase .bushes svg { width: 100%; height: 100%; display: block; }
+.c-gate { position: absolute; right: 2%; bottom: 20%; width: 18%; height: 62%; pointer-events: none; }
+.c-gate svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.c-door { transform-box: fill-box; transform-origin: 100% 50%; transform: scaleX(.12); transition: transform .25s ease-in; }
+.chase.shut .c-door { transform: scaleX(1); }
+.runner-kid { position: absolute; bottom: 19%; width: 9%; height: 36%; transform: translateX(-50%); pointer-events: none; transition: left .12s linear, opacity .25s; z-index: 3; }
+.runner-kid.inside { opacity: 0; }
+.runner-kid svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.chase.running .runner-kid svg { animation: bounce .22s ease-in-out infinite alternate; }
+.raptor { position: absolute; bottom: 19%; width: 15%; height: 26%; transform: translateX(-50%); pointer-events: none; z-index: 2; }
+.raptor svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.chase.running .raptor svg { animation: bounce .2s ease-in-out infinite alternate; }
+.raptor.r2 { bottom: 22%; z-index: 1; } .raptor.r3 { bottom: 16%; z-index: 2; }
+.raptor.dizzy svg { animation: wiggle .6s ease 3; }
+.raptor .stars-spin { position: absolute; left: 50%; top: -18%; width: 60%; transform: translateX(-30%); display: none; }
+.raptor.dizzy .stars-spin { display: block; animation: spin 1s linear infinite; }
+.run-btn {
+  position: absolute; right: 3%; bottom: 3%; z-index: 5;
+  width: 120px; height: 120px; border-radius: 50%;
+  background: radial-gradient(circle at 40% 35%, #ff8a5c, var(--ember));
+  border: 6px solid var(--wood-dark); color: var(--bone);
+  font-family: var(--font-sign); font-size: 1.7rem;
+  box-shadow: 0 6px 0 var(--wood-dark);
+}
+.run-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 var(--wood-dark); }
+.run-btn[disabled] { opacity: .4; }
+@keyframes road { to { background-position-x: -70px; } }
+@keyframes bounce { to { transform: translateY(-7%); } }
+@keyframes spin { to { transform: translateX(-30%) rotate(360deg); } }
+@media (max-width: 560px) { .run-btn { width: 92px; height: 92px; font-size: 1.3rem; } }
+
 /* ---------- Memory Game: find two of the same dinosaur (Roy's idea) ---------- */
 .memory { flex: 1; min-height: 0; position: relative; pointer-events: auto; display: flex; flex-direction: column; }
 .mem-levels { flex: 1; min-height: 0; display: flex; gap: 16px; justify-content: center; align-items: center; flex-wrap: wrap; padding: 8px; }
@@ -987,6 +1037,30 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
           <path d="M36 62 V30 q0 -6 5 -6 q5 0 5 6 v14 l12 2 q6 1 5 8 l-3 12 q-1 4 -5 4 H44 Z" fill="#f4e8cc" stroke="#3b2413" stroke-width="2.5" stroke-linejoin="round"/>
         </svg>
       </button>
+    </div>
+  </section>
+
+  <section class="view" id="view-chase" hidden>
+    <div class="chase" id="chase">
+      <div class="bushes"><svg viewBox="0 0 400 100" preserveAspectRatio="none" aria-hidden="true">
+        <ellipse cx="30" cy="90" rx="60" ry="40" fill="#24522f"/><ellipse cx="110" cy="95" rx="50" ry="34" fill="#2e6b3d"/>
+        <ellipse cx="200" cy="92" rx="70" ry="38" fill="#24522f"/><ellipse cx="290" cy="96" rx="50" ry="30" fill="#2e6b3d"/>
+      </svg></div>
+      <div class="path"></div>
+      <div class="c-gate"><svg viewBox="0 0 100 200" preserveAspectRatio="none" aria-hidden="true">
+        <rect x="0" y="20" width="20" height="180" fill="#6e4524"/><rect x="80" y="20" width="20" height="180" fill="#6e4524"/>
+        <rect x="-6" y="10" width="112" height="22" rx="4" fill="#3b2413"/>
+        <text x="50" y="26" text-anchor="middle" font-family="Alfa Slab One, Georgia, serif" font-size="11" fill="#f2a93b">ROY'S PARK</text>
+        <rect x="20" y="32" width="60" height="168" fill="#f9d27a" opacity=".55"/>
+        <g class="c-door"><rect x="20" y="32" width="60" height="168" fill="#8a5a31" stroke="#3b2413" stroke-width="4"/>
+        <rect x="26" y="70" width="48" height="16" fill="url(#c-hazard)"/></g>
+        <defs><pattern id="c-hazard" width="12" height="12" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="6" height="12" fill="#f2a93b"/><rect x="6" width="6" height="12" fill="#1d1d1b"/></pattern></defs>
+      </svg></div>
+      <div class="raptor r1" id="raptor1"></div>
+      <div class="raptor r2" id="raptor2"></div>
+      <div class="raptor r3" id="raptor3"></div>
+      <div class="runner-kid" id="runner-kid"></div>
+      <button class="run-btn" id="run-btn" aria-label="Run">RUN!</button>
     </div>
   </section>
 
@@ -3263,6 +3337,104 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
   var viewSea = $("view-sea"), viewJungle = $("view-jungle");
   var boat = $("boat"), island = $("island");
   var moonBtn = $("moon");
+
+  // ---------- Raptor Run: run to the gate so the raptor pack can't catch you (Roy's idea) ----------
+  var viewChase = $("view-chase"), chase = $("chase"), runBtn = $("run-btn"), kidEl = $("runner-kid");
+  var raptors = [$("raptor1"), $("raptor2"), $("raptor3")];
+  var RUNNER_BADGE =
+    '<circle cx="55" cy="55" r="50" fill="#5fb37c" stroke="#3b2413" stroke-width="5"/><circle cx="55" cy="55" r="38" fill="#f4e8cc"/>' +
+    '<path d="M30 40 h24 M24 54 h30 M30 68 h24" stroke="#a8844f" stroke-width="5" stroke-linecap="round"/>' +
+    '<path d="M60 76 l8 -20 l-8 -10 l10 -10 l12 10 l-6 30 Z" fill="#e4572a"/>';
+  var STAR_SPIN = '<svg class="stars-spin" viewBox="0 0 60 30" aria-hidden="true"><path d="M10 15 l3 6 6 1 -4 4 1 6 -6 -3 -6 3 1 -6 -4 -4 6 -1 z M44 6 l3 6 6 1 -4 4 1 6 -6 -3 -6 3 1 -6 -4 -4 6 -1 z" fill="#f2d24b"/></svg>';
+  var chaseOn = false, kidX = 12, packX = -30, lastT = 0, lastWarn = 0, chaseRaf = 0, chaseStarted = false;
+  function raptorSvg(body, dark, belly, stripe) {
+    return BLUE_SVG.split("#4a86c8").join(body).split("#3c70ac").join(dark).split("#9cc6ec").join(belly).split("#24456f").join(stripe)
+      .replace("<svg ", '<svg preserveAspectRatio="xMidYMax meet" ');
+  }
+  function startChase() {
+    viewChase.hidden = false;
+    chase.classList.remove("shut", "running");
+    kidEl.classList.remove("inside");
+    kidX = 12; packX = -34; chaseOn = false; chaseStarted = false;
+    var kid = newPerson(); kid.kind = "kid"; kid.outfit = "ranger"; kid.name = "Roy";
+    kidEl.innerHTML = personSvg(kid, false);
+    raptors[0].innerHTML = raptorSvg("#6b8f4a", "#557336", "#cfe0a8", "#3b5224") + STAR_SPIN;
+    raptors[1].innerHTML = raptorSvg("#8a8f86", "#6d726a", "#d8dbd2", "#4a4e47") + STAR_SPIN;
+    raptors[2].innerHTML = raptorSvg("#a8703a", "#86562a", "#eccfa6", "#5a3a1a") + STAR_SPIN;
+    raptors.forEach(function (r) { r.classList.remove("dizzy"); });
+    placeChase();
+    runBtn.disabled = false;
+    say("Shh! A pack of raptors is waiting by the park gate! When they jump out, tap RUN as fast as you can to get to the gate!");
+    setTimeout(function () {
+      if (viewChase.hidden) return;
+      roar(1.3, 1.2);
+      setTimeout(function () { roar(1.5, 1); }, 300);
+      packX = kidX - 20;
+      chaseStarted = true;
+      chaseOn = true;
+      chase.classList.add("running");
+      say("Raptors! RUN! Tap tap tap!");
+      lastT = performance.now();
+      cancelAnimationFrame(chaseRaf);
+      chaseRaf = requestAnimationFrame(chaseTick);
+    }, 4200);
+  }
+  function placeChase() {
+    kidEl.style.left = kidX + "%";
+    raptors[0].style.left = packX + "%";
+    raptors[1].style.left = (packX - 9) + "%";
+    raptors[2].style.left = (packX - 17) + "%";
+  }
+  function chaseTick(t) {
+    if (!chaseOn) return;
+    var dt = Math.min(0.1, (t - lastT) / 1000); lastT = t;
+    packX = Math.min(packX + 11 * dt, kidX - 11);
+    if (kidX - packX < 13 && t - lastWarn > 2500) { lastWarn = t; say(pick(["Faster! Tap tap tap!", "They're right behind you! Run!", "Keep going! Run run run!"])); }
+    placeChase();
+    chaseRaf = requestAnimationFrame(chaseTick);
+  }
+  function runStep() {
+    if (!chaseOn) {
+      if (!chaseStarted) say("Wait for it... get ready to run!");
+      return;
+    }
+    kidX = Math.min(kidX + 4.2, 86);
+    tone(500 + kidX * 6, 0, 0.05, "triangle", 0.15);
+    placeChase();
+    if (kidX >= 86) finishChase();
+  }
+  function finishChase() {
+    chaseOn = false;
+    cancelAnimationFrame(chaseRaf);
+    runBtn.disabled = true;
+    kidEl.style.left = "93%";
+    kidEl.classList.add("inside");
+    setTimeout(function () {
+      chase.classList.add("shut");
+      clunk();
+      setTimeout(function () {
+        chase.classList.remove("running");
+        packX = 74; placeChase();
+        tone(90, 0, 0.25, "square", 0.25, 50); shakeGround2();
+        raptors.forEach(function (r) { r.classList.add("dizzy"); });
+        boing();
+        if (!state.found.raptorRun) {
+          state.found.raptorRun = true; save();
+          addStar(runBtn);
+          setTimeout(function () { showBadge("Raptor Runner", "You ran faster than the raptors!", RUNNER_BADGE); }, 900);
+        }
+        say("Phew! You made it inside the gate! The raptors went BONK into the door! Silly raptors!");
+        setTimeout(function () {
+          if (viewChase.hidden) return;
+          viewChase.hidden = true; viewPark.hidden = false; moonBtn.hidden = false;
+          say("You are safe at Roy's Dino Park! Tap the big gate to open it!");
+        }, 4200);
+      }, 450);
+    }, 250);
+  }
+  function shakeGround2() { chase.classList.remove("stomp"); void chase.offsetWidth; chase.classList.add("stomp"); }
+  runBtn.addEventListener("click", function (e) { e.stopPropagation(); runStep(); });
+  chase.addEventListener("click", runStep);
   moonBtn.hidden = true;
   var BOAT_BADGE =
     '<circle cx="55" cy="55" r="50" fill="#7fb0dc" stroke="#3b2413" stroke-width="5"/>' +
@@ -3335,8 +3507,8 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
       $("peeker").classList.remove("show");
       say("Look! There's the gate! Let's go!");
       setTimeout(function () {
-        viewJungle.hidden = true; viewPark.hidden = false; moonBtn.hidden = false;
-        say("Here we are at Roy's Dino Park! Tap the big gate to open it!");
+        viewJungle.hidden = true;
+        startChase();
       }, 1800);
     }
   });
