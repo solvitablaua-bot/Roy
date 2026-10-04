@@ -2128,10 +2128,34 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
       clue: "Here is a clue: I'm small, fast, and covered in feathers!",
       fact: "Real Velociraptors were only as big as a turkey, and they had feathers!",
       svg: biped({ c: "#a8703a", d: "#86562a", b: "#eccfa6", snout: 10, headR: 0.75, neck: 6, arm: 16,
-        x: function () { return '<path d="M132 100 L180 126 L166 132 L172 142 L150 140 L134 118 Z" fill="#6e4524"/><path d="M20 66 L2 50 L10 72 Z M30 72 L10 60 L20 80 Z" fill="#6e4524"/><path d="M110 166 q-6 -12 4 -16" stroke="#f4e8cc" stroke-width="3" fill="none"/>'; } }) }
+        x: function () { return '<path d="M132 100 L180 126 L166 132 L172 142 L150 140 L134 118 Z" fill="#6e4524"/><path d="M20 66 L2 50 L10 72 Z M30 72 L10 60 L20 80 Z" fill="#6e4524"/><path d="M110 166 q-6 -12 4 -16" stroke="#f4e8cc" stroke-width="3" fill="none"/>'; } }) },
+    { id: "edmonto", name: "Edmontosaurus", sound: function () { tone(150, 0, 0.8, "sawtooth", 0.1, 190); tone(225, 0, 0.8, "triangle", 0.12, 280); },
+      clue: "Here is a clue: I have a mouth like a duck!",
+      fact: "Edmontosaurus had a wide duck bill and hundreds of teeth for chewing plants!",
+      svg: quad({ c: "#7a8a5a", d: "#5f6e44", b: "#d6dcb6", neckUp: 14,
+        x: function (hx, hy) { return '<ellipse cx="' + (hx + 34) + '" cy="' + (hy + 6) + '" rx="16" ry="7" fill="#c9b07a"/>' +
+          '<path d="M66 76 l6 -10 M86 70 l6 -10 M106 68 l6 -10 M126 70 l6 -10" stroke="#5f6e44" stroke-width="6" stroke-linecap="round"/>'; } }) },
+    { id: "deino", name: "Deinocheirus", sound: function () { grunt(); chirp(); },
+      clue: "Here is a clue: I have super long arms with big claws!",
+      fact: "Deinocheirus had giant arms as long as a grown-up, and a big hump on its back!",
+      svg: biped({ c: "#9a7a5a", d: "#7a5c3e", b: "#e6d2b4", neck: 16, snout: 6, headR: 0.75, arm: 34,
+        pre: function () { return '<path d="M70 82 Q100 20 130 82 Z" fill="#c97a4a"/>'; },
+        x: function () { return '<path d="M156 136 l14 18 M152 138 l8 22 M148 138 l2 22" stroke="#f4e8cc" stroke-width="4" stroke-linecap="round"/>'; } }) },
+    { id: "dread", name: "Dreadnoughtus", sound: function () { tone(55, 0, 2, "sine", 0.35, 40); rumble(); },
+      clue: "Here is a clue: I'm super, super big and heavy!",
+      fact: "Dreadnoughtus was as heavy as lots of elephants put together!",
+      svg: quad({ c: "#6a7a8a", d: "#525f6c", b: "#c6d0da", neckUp: 42, neckX: 14, headR: 0.7, tailY: 132, bodyRy: 38 }) },
+    { id: "pachyrhino", name: "Pachyrhinosaurus", sound: grunt,
+      clue: "Here is a clue: I have a big thick bump on my nose!",
+      fact: "Pachyrhinosaurus had a big bumpy pad on its nose instead of a horn!",
+      svg: quad({ c: "#a87a5a", d: "#86593c", b: "#e8cdb0", neckUp: 4,
+        pre: function (hx, hy) { return fan(hx - 6, hy - 6, 24, 40, 200, 280, 4, "#f4e8cc") + '<ellipse cx="' + (hx - 6) + '" cy="' + (hy - 8) + '" rx="26" ry="24" fill="#d9a35a"/>'; },
+        x: function (hx, hy) { return '<ellipse cx="' + (hx + 22) + '" cy="' + (hy - 8) + '" rx="12" ry="8" fill="#c9a36a" stroke="#86593c" stroke-width="2"/>'; } }) }
   ];
   function dayNumber() { var t = new Date(); return Math.floor(new Date(t.getFullYear(), t.getMonth(), t.getDate()).getTime() / 86400000); }
-  function todaysMystery() { return MYSTERY[dayNumber() % MYSTERY.length]; }
+  // two Mystery Cages, each with a different secret dinosaur every day
+  function todaysMystery(slot) { return MYSTERY[(dayNumber() * 2 + (slot || 0)) % MYSTERY.length]; }
+  function mysteryKey(slot) { return slot ? "mystery2-" + today() : "mystery-" + today(); }
   var TARP = '<svg viewBox="0 0 160 140" preserveAspectRatio="none" aria-hidden="true">' +
     '<path d="M10 140 Q14 40 60 26 Q80 6 100 26 Q146 40 150 140 Z" fill="#6b4a9b"/>' +
     '<path d="M30 140 Q40 70 70 40 M120 140 Q116 80 96 44" stroke="#4a3270" stroke-width="5" fill="none"/>' +
@@ -2180,17 +2204,17 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
   function buildWorld() {
     CAGE_COUNT = Math.max(20, DINOS.length);
     mysteryIdx = CAGE_COUNT;
-    var H = 60 + Math.ceil((CAGE_COUNT + 1) / 5) * 300 + 10;
+    var H = 60 + Math.ceil((CAGE_COUNT + 2) / 5) * 300 + 10;
     world.style.height = H + "px";
     var pts = [];
-    for (var i = 0; i <= CAGE_COUNT; i++) { var c = cagePos(i); pts.push((c.x + 125) + "," + (c.y + 205)); }
+    for (var i = 0; i <= CAGE_COUNT + 1; i++) { var c = cagePos(i); pts.push((c.x + 125) + "," + (c.y + 205)); }
     var trees = "";
     var tseed = 3;
     function r() { tseed = (tseed * 16807) % 2147483647; return tseed / 2147483647; }
     for (var t = 0; t < 46 + (H - 1270) / 30; t++) {
       var tx = r() * 1700 + 20, ty = r() * (H - 70) + 20;
       var near = false;
-      for (var q = 0; q <= CAGE_COUNT; q++) { var cp = cagePos(q); if (tx > cp.x - 30 && tx < cp.x + 270 && ty > cp.y - 40 && ty < cp.y + 250) near = true; }
+      for (var q = 0; q <= CAGE_COUNT + 1; q++) { var cp = cagePos(q); if (tx > cp.x - 30 && tx < cp.x + 270 && ty > cp.y - 40 && ty < cp.y + 250) near = true; }
       if (near) continue;
       trees += '<use href="#tree" x="' + tx.toFixed(0) + '" y="' + ty.toFixed(0) + '"/>';
     }
@@ -2217,9 +2241,11 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
       html += '<button class="cage' + (d ? "" : " empty") + (d && state.found["saw-" + d.id] ? " visited" : "") +
         '" data-cage="' + k + '" style="left:' + pos.x + 'px;top:' + pos.y + 'px" aria-label="' + (d ? d.name : "Empty cage") + '">' + inner + '<div class="needs"></div></button>';
     }
-    var mp = cagePos(mysteryIdx);
-    html += '<button class="cage mystery-cage" data-mystery="1" data-cage="' + mysteryIdx + '" style="left:' + mp.x + 'px;top:' + mp.y + 'px" aria-label="Mystery cage">' +
-      cageBack("mystery") + '<div class="tarp">' + TARP + '</div>' + cageFront("MYSTERY", "?") + '</button>';
+    [0, 1].forEach(function (slot) {
+      var mp = cagePos(mysteryIdx + slot);
+      html += '<button class="cage mystery-cage" data-mystery="' + (slot + 1) + '" data-cage="' + (mysteryIdx + slot) + '" style="left:' + mp.x + 'px;top:' + mp.y + 'px" aria-label="Mystery cage ' + (slot + 1) + '">' +
+        cageBack("mystery") + '<div class="tarp">' + (slot ? TARP.split("#6b4a9b").join("#2f7a7a").split("#4a3270").join("#1f5555") : TARP) + '</div>' + cageFront("MYSTERY " + (slot + 1), "?") + '</button>';
+    });
     world.innerHTML = html;
   }
   buildWorld();
@@ -2249,7 +2275,7 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
   world.addEventListener("click", function (e) {
     var cage = e.target.closest(".cage");
     if (!cage) return;
-    if (cage.dataset.mystery) { openMystery(); return; }
+    if (cage.dataset.mystery) { openMystery(Number(cage.dataset.mystery) - 1); return; }
     var d = DINOS[Number(cage.dataset.cage)];
     if (!d) {
       clunk();
@@ -2298,10 +2324,12 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
     '<circle cx="55" cy="55" r="50" fill="#9b6fc4" stroke="#3b2413" stroke-width="5"/><circle cx="55" cy="55" r="38" fill="#4a3270"/>' +
     '<text x="55" y="74" text-anchor="middle" font-family="Alfa Slab One, Georgia, serif" font-size="52" fill="#f2d24b">?</text>';
   function setClueDots() { $("clue-dots").querySelectorAll("span").forEach(function (sp, i) { sp.classList.toggle("on", i < clueStep); }); }
-  function openMystery() {
-    var m = todaysMystery();
+  var mysterySlot = 0;
+  function openMystery(slot) {
+    mysterySlot = slot || 0;
+    var m = todaysMystery(mysterySlot);
     mysteryOn = m; current = null; clueStep = 0;
-    var solved = state.found["mystery-" + today()];
+    var solved = state.found[mysteryKey(mysterySlot)];
     visit.classList.add("mystery");
     visitDino.innerHTML = m.svg;
     visitDino.setAttribute("aria-label", "Mystery dinosaur");
@@ -2314,7 +2342,7 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
       $("visit-name").textContent = m.name;
       $("visit-fact").textContent = m.fact;
       m.sound();
-      say("You already found today's mystery dinosaur. It's " + m.name + "! Come back tomorrow for a new one!");
+      say("You already found this mystery dinosaur today. It's " + m.name + "! " + (state.found[mysteryKey(1 - mysterySlot)] ? "Come back tomorrow for new ones!" : "Have you tried the other Mystery Cage?"));
       return;
     }
     visitDino.classList.add("shadow");
@@ -2338,7 +2366,7 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
     $("visit-name").textContent = m.name;
     $("visit-fact").textContent = m.fact;
     say("Ta-da! It's " + m.name + "! " + m.fact + " Did you guess it?");
-    state.found["mystery-" + today()] = true; save();
+    state.found[mysteryKey(mysterySlot)] = true; save();
     addStar(visitDino);
     if (!state.found.mysterySolver) {
       state.found.mysterySolver = true; save();
@@ -2349,7 +2377,7 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
     var pos = cagePos(mysteryIdx);
     mapScroll.scrollTo({ left: Math.max(0, pos.x - 120), top: Math.max(0, pos.y - 60), behavior: "smooth" });
     tone(300, 0, 0.5, "sine", 0.2, 700);
-    say("Here's the Mystery Cage! Tap it to meet today's secret dinosaur!");
+    say("Here are the two Mystery Cages! Each one has a different secret dinosaur. Tap one!");
   });
   $("visit-close").addEventListener("click", closeVisit);
   visit.addEventListener("click", function (e) { if (e.target === visit) closeVisit(); });
