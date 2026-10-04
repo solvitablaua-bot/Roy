@@ -28,7 +28,7 @@ A website where Roy builds his own dinosaur park game, step by step. It should b
 
 - At the start of every session, read `Claude.md` and `Memory.md` to gain full project context.
 - Keep `Memory.md` up to date at all times: what we are learning, key takeaways and ideas, progress, and important decisions.
-- Design for a six-year-old: big buttons, pictures and sounds over text, very short words, no failure states that feel like losing. Exception, because Roy asked for it: in the Raptor Run the raptors can catch you if you are too slow. Keep any such moment cartoon-like and silly (a dust cloud and "CHOMP!", nothing gory or scary) with an instant "Try again!".
+- Design for a six-year-old: big buttons, pictures and sounds over text, very short words, no failure states that feel like losing. Exceptions, because Roy asked for them: in the Raptor Run the raptors can catch you if you are too slow, and on the boat trip the Mosasaurus can sink the boat if you are too slow. Keep any such moment cartoon-like and silly (a dust cloud and "CHOMP!", or bubbles and "GLUG GLUG!", nothing gory or scary) with an instant "Try again!".
 - It must work on an iPad in Safari with touch. No mouse-only or hover-only interactions.
 - No accounts, ads, chat, payments or external links. Save progress on the device only.
 - Use original art, sounds and names. The design should look and feel like the movies without copying official logos, characters or assets.
