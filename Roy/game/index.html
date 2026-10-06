@@ -1016,7 +1016,32 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
 .ln-top { position: absolute; top: 12px; right: 12px; z-index: 4; display: flex; gap: 10px; }
 .ln-round { width: 70px; height: 70px; border-radius: 50%; background: var(--amber); border: 4px solid var(--wood-dark); box-shadow: 0 5px 0 var(--wood-dark); padding: 10px; }
 .ln-round svg { width: 100%; height: 100%; }
-.ln-say { position: absolute; left: 12px; top: 12px; z-index: 4; max-width: min(70%, 520px);
+/* holograms: while the camera films the real room, a glowing hologram dinosaur suddenly appears (Roy's idea) */
+.ln-holo { position: absolute; width: 56vmin; height: 43vmin; margin: -43vmin 0 0 -28vmin; z-index: 1; cursor: pointer;
+  animation: holo-in 1.2s ease-out; }
+.ln-holo.out { animation: holo-out .9s ease-in forwards; }
+.ln-holo .beam { position: absolute; left: 10%; right: 10%; bottom: -6%; top: -10%; pointer-events: none;
+  background: linear-gradient(to top, rgba(110, 230, 255, .45), rgba(110, 230, 255, 0) 85%);
+  clip-path: polygon(38% 100%, 62% 100%, 100% 0, 0 0); }
+.ln-holo .pad { position: absolute; left: 30%; right: 30%; bottom: -8%; height: 9%; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(ellipse, #e8fbff, #6ee6ff 40%, rgba(110, 230, 255, 0) 72%); animation: holo-pad 1.2s ease-in-out infinite alternate; }
+.ln-holo .art { position: absolute; inset: 0; opacity: .78; animation: holo-flicker 2.6s steps(1) infinite, holo-float 2s ease-in-out infinite alternate; }
+.ln-holo .art svg { position: absolute; inset: 0; width: 100%; height: 100%;
+  filter: grayscale(1) sepia(1) hue-rotate(150deg) saturate(4) brightness(1.25) drop-shadow(0 0 12px #6ee6ff); }
+.ln-holo .lines { position: absolute; inset: 0; pointer-events: none; mix-blend-mode: screen;
+  -webkit-mask-image: radial-gradient(ellipse 45% 45% at 50% 55%, #000 55%, transparent 100%); mask-image: radial-gradient(ellipse 45% 45% at 50% 55%, #000 55%, transparent 100%);
+  background: repeating-linear-gradient(to bottom, rgba(180, 245, 255, .28) 0 2px, transparent 2px 6px); animation: holo-scan 1.5s linear infinite; }
+.ln-holo.glitch .art { animation: holo-glitch .4s steps(2) 2; }
+.ln-holo .tag { position: absolute; left: 50%; top: -8%; transform: translateX(-50%); white-space: nowrap; pointer-events: none;
+  color: #bff6ff; font-weight: 800; font-size: clamp(.8rem, 2.4vmin, 1.1rem); letter-spacing: 2px; text-shadow: 0 0 8px #6ee6ff; }
+@keyframes holo-in { 0% { transform: scaleY(.02) scaleX(1.4); opacity: 0; filter: brightness(3); } 40% { transform: scaleY(1.1) scaleX(.9); opacity: 1; } 70% { transform: scaleY(.95); } 100% { transform: none; filter: none; } }
+@keyframes holo-out { 0% { transform: none; opacity: 1; } 60% { transform: scaleY(1.1) scaleX(.2); } 100% { transform: scaleY(.02) scaleX(0); opacity: 0; } }
+@keyframes holo-flicker { 0%, 100% { opacity: .78; } 47% { opacity: .78; } 48% { opacity: .3; } 50% { opacity: .85; } 81% { opacity: .5; } 82% { opacity: .8; } }
+@keyframes holo-float { to { transform: translateY(-3%); } }
+@keyframes holo-scan { to { background-position: 0 12px; } }
+@keyframes holo-pad { to { opacity: .6; } }
+@keyframes holo-glitch { 0% { transform: translateX(-6%) skewX(8deg); opacity: .4; } 50% { transform: translateX(5%) skewX(-6deg); opacity: .9; } 100% { transform: none; } }
+.ln-say { position: absolute; left: 12px; top: 12px; z-index: 4; max-width: min(70%, 520px); box-sizing: border-box;
   background: var(--bone); color: var(--wood-dark); border: 4px solid var(--wood-dark); border-radius: 20px; padding: 8px 16px; font-weight: 800; font-size: clamp(1rem, 2.6vmin, 1.3rem); pointer-events: none; }
 @media (max-width: 560px) { .ln-shoot { width: 88px; height: 88px; font-size: 1.15rem; } .ln-pick { width: 58px; height: 52px; } .ln-round { width: 56px; height: 56px; } .ln-say { max-width: calc(100% - 160px); } }
 .bk-shard { position: fixed; z-index: 310; pointer-events: none; width: 70px; height: 90px;
@@ -2359,17 +2384,57 @@ body.quake .app { animation: shake .4s ease; }
       if (!ok) { closeLauncher(); noCamera(d); return; }
       chime();
       lnTalk("Tap where " + shortName(d) + " should land in your room. Then press SHOOT!");
+      scheduleHolo(6000);
     });
+  }
+  // ---------- holograms: while the camera films the real room, a hologram dinosaur suddenly appears (Roy's idea) ----------
+  var holoTimer = null, holoEl = null;
+  var HOLO_BADGE =
+    '<circle cx="55" cy="55" r="50" fill="#0d2a3d" stroke="#6ee6ff" stroke-width="5"/>' +
+    '<path d="M42 92 h26 L86 30 H24 Z" fill="#6ee6ff" opacity=".3"/><ellipse cx="55" cy="92" rx="16" ry="5" fill="#bff6ff"/>' +
+    '<path d="M34 62 q12 -24 34 -14 q6 6 -2 12 l-14 4 Z" fill="#6ee6ff" opacity=".85"/><circle cx="60" cy="52" r="2.5" fill="#0d2a3d"/>' +
+    '<path d="M28 40 H82 M28 50 H82 M28 60 H82 M28 70 H82" stroke="#bff6ff" stroke-width="1.5" opacity=".5"/>';
+  function holoSound() { tone(200, 0, 0.7, "sawtooth", 0.06, 1400); tone(1200, 0.35, 0.5, "sine", 0.1, 1800); tone(900, 0.5, 0.3, "triangle", 0.08); }
+  function scheduleHolo(ms) {
+    clearTimeout(holoTimer);
+    holoTimer = setTimeout(showHolo, ms || (8000 + Math.random() * 7000));
+  }
+  function showHolo() {
+    if (!lnOn || !camStream) return;
+    if (holoEl) holoEl.remove();
+    var w = window.innerWidth, h = window.innerHeight;
+    var d = DINOS[Math.floor(Math.random() * DINOS.length)];
+    var el = document.createElement("div");
+    el.className = "ln-holo"; el.dataset.id = d.id;
+    el.innerHTML = '<div class="beam"></div><div class="pad"></div><div class="art">' + d.svg + '</div><div class="lines"></div><div class="tag">HOLOGRAM</div>';
+    var x = Math.round(w * (0.25 + Math.random() * 0.5)), y = Math.round(h * (0.55 + Math.random() * 0.15));
+    el.style.left = x + "px"; el.style.top = y + "px"; el.style.zIndex = y;
+    lnLayer.appendChild(el); holoEl = el;
+    holoSound();
+    lnTalk("Whoa! Bzzzt! A hologram of " + shortName(d) + " appeared in your room! Tap it!");
+    if (!state.found.hologram) {
+      state.found.hologram = true; save();
+      addStar(starsEl);
+      showBadge("Hologram Spotter", "You saw a dinosaur hologram in your room!", HOLO_BADGE);
+    }
+    later(function () { hideHolo(el); }, 7500);
+  }
+  function hideHolo(el) {
+    if (!el || !el.parentNode || el.classList.contains("out")) return;
+    el.classList.add("out");
+    tone(1400, 0, 0.5, "sine", 0.08, 200);
+    setTimeout(function () { el.remove(); if (holoEl === el) holoEl = null; }, 950);
+    scheduleHolo();
   }
   function noCamera(d) {
     say("The camera can't open here. Ask a grown-up to help! For now, " + shortName(d) + " breaks out of the screen!");
     setTimeout(function () { breakout(d, true); }, 2500);
   }
   function closeLauncher() {
-    lnOn = false; ln.hidden = true; stopCamera(); lnLayer.innerHTML = "";
+    lnOn = false; ln.hidden = true; stopCamera(); lnLayer.innerHTML = ""; clearTimeout(holoTimer); holoEl = null;
   }
   ln.addEventListener("pointerdown", function (e) {
-    if (e.target.closest(".ln-bar, .ln-top, .ln-dino")) return;
+    if (e.target.closest(".ln-bar, .ln-top, .ln-dino, .ln-holo")) return;
     setAim(e.clientX, e.clientY);
     tone(880, 0, 0.08, "triangle", 0.15);
   });
@@ -2422,6 +2487,15 @@ body.quake .app { animation: shake .4s ease; }
     requestAnimationFrame(frame);
   });
   lnLayer.addEventListener("click", function (e) {
+    var hz = e.target.closest(".ln-holo");
+    if (hz && !hz.classList.contains("out")) {
+      var hd = dinoById(hz.dataset.id);
+      if (hd.sound) hd.sound();
+      holoSound();
+      hz.classList.remove("glitch"); void hz.offsetWidth; hz.classList.add("glitch");
+      lnTalk(pick(["Bzzt! The " + shortName(hd) + " hologram is flickering!", "It's not real, it's made of light! Zzzzap!", "Hello, hologram " + shortName(hd) + "!"]));
+      return;
+    }
     var el = e.target.closest(".ln-dino");
     if (!el || el.classList.contains("flying")) return;
     var d = dinoById(el.dataset.id);
