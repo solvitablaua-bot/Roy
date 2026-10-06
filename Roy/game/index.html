@@ -1034,7 +1034,14 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
 .ln-holo.glitch .art { animation: holo-glitch .4s steps(2) 2; }
 .ln-holo .tag { position: absolute; left: 50%; top: -8%; transform: translateX(-50%); white-space: nowrap; pointer-events: none;
   color: #bff6ff; font-weight: 800; font-size: clamp(.8rem, 2.4vmin, 1.1rem); letter-spacing: 2px; text-shadow: 0 0 8px #6ee6ff; }
-@keyframes holo-in { 0% { transform: scaleY(.02) scaleX(1.4); opacity: 0; filter: brightness(3); } 40% { transform: scaleY(1.1) scaleX(.9); opacity: 1; } 70% { transform: scaleY(.95); } 100% { transform: none; filter: none; } }
+@keyframes holo-in { 0% { opacity: 0; } 10% { opacity: 1; } 100% { opacity: 1; } }
+.ln-holo .art, .ln-holo .lines { animation-fill-mode: both; }
+.ln-holo.rising .art, .ln-holo.rising .lines { animation: holo-rise 2.2s ease-out both; }
+@keyframes holo-rise { 0% { clip-path: inset(100% 0 0 0); -webkit-clip-path: inset(100% 0 0 0); transform: translateY(14%); filter: brightness(2.5); } 100% { clip-path: inset(0 0 0 0); -webkit-clip-path: inset(0 0 0 0); transform: none; filter: none; } }
+.ln-holo .ripple { position: absolute; width: 80px; height: 80px; margin: -40px 0 0 -40px; border-radius: 50%; pointer-events: none;
+  border: 3px solid rgba(190, 248, 255, .9); box-shadow: 0 0 14px #6ee6ff; animation: holo-ripple .7s ease-out forwards; }
+@keyframes holo-ripple { from { transform: scale(.2); opacity: 1; } to { transform: scale(2.2); opacity: 0; } }
+.ln-holo.ghost .art { opacity: .35; transition: opacity .2s; }
 @keyframes holo-out { 0% { transform: none; opacity: 1; } 60% { transform: scaleY(1.1) scaleX(.2); } 100% { transform: scaleY(.02) scaleX(0); opacity: 0; } }
 @keyframes holo-flicker { 0%, 100% { opacity: .78; } 47% { opacity: .78; } 48% { opacity: .3; } 50% { opacity: .85; } 81% { opacity: .5; } 82% { opacity: .8; } }
 @keyframes holo-float { to { transform: translateY(-3%); } }
@@ -2409,9 +2416,11 @@ body.quake .app { animation: shake .4s ease; }
     el.innerHTML = '<div class="beam"></div><div class="pad"></div><div class="art">' + d.svg + '</div><div class="lines"></div><div class="tag">HOLOGRAM</div>';
     var x = Math.round(w * (0.25 + Math.random() * 0.5)), y = Math.round(h * (0.55 + Math.random() * 0.15));
     el.style.left = x + "px"; el.style.top = y + "px"; el.style.zIndex = y;
+    el.classList.add("rising");
     lnLayer.appendChild(el); holoEl = el;
-    holoSound();
-    lnTalk("Whoa! Bzzzt! A hologram of " + shortName(d) + " appeared in your room! Tap it!");
+    later(function () { el.classList.remove("rising"); }, 2300);
+    holoSound(); rumble();
+    lnTalk("Whoa! Bzzzt! A hologram of " + shortName(d) + " is coming up out of the ground! Touch it!");
     if (!state.found.hologram) {
       state.found.hologram = true; save();
       addStar(starsEl);
@@ -2433,7 +2442,19 @@ body.quake .app { animation: shake .4s ease; }
   function closeLauncher() {
     lnOn = false; ln.hidden = true; stopCamera(); lnLayer.innerHTML = ""; clearTimeout(holoTimer); holoEl = null;
   }
+  function holoRipple(e) {
+    var hz = e.target.closest && e.target.closest(".ln-holo");
+    if (!hz || hz.classList.contains("out")) return;
+    var now = Date.now(); if (now - (hz._rip || 0) < 120) return; hz._rip = now;
+    var r = hz.getBoundingClientRect(), rp = document.createElement("span");
+    rp.className = "ripple"; rp.style.left = (e.clientX - r.left) + "px"; rp.style.top = (e.clientY - r.top) + "px";
+    hz.appendChild(rp); setTimeout(rp.remove.bind(rp), 750);
+    hz.classList.add("ghost"); clearTimeout(hz._gt); hz._gt = setTimeout(function () { hz.classList.remove("ghost"); }, 400);
+    tone(700 + Math.random() * 500, 0, 0.12, "sine", 0.05);
+  }
+  ln.addEventListener("pointermove", function (e) { if (e.buttons || e.pointerType === "touch") holoRipple(e); });
   ln.addEventListener("pointerdown", function (e) {
+    holoRipple(e);
     if (e.target.closest(".ln-bar, .ln-top, .ln-dino, .ln-holo")) return;
     setAim(e.clientX, e.clientY);
     tone(880, 0, 0.08, "triangle", 0.15);
@@ -2493,7 +2514,7 @@ body.quake .app { animation: shake .4s ease; }
       if (hd.sound) hd.sound();
       holoSound();
       hz.classList.remove("glitch"); void hz.offsetWidth; hz.classList.add("glitch");
-      lnTalk(pick(["Bzzt! The " + shortName(hd) + " hologram is flickering!", "It's not real, it's made of light! Zzzzap!", "Hello, hologram " + shortName(hd) + "!"]));
+      lnTalk(pick(["Whoosh! Your finger went right through it, like a ghost!", "It's not real, it's made of light! You can go right through it!", "Spooky! " + shortName(hd) + " is a ghost hologram! Woooo!"]));
       return;
     }
     var el = e.target.closest(".ln-dino");
