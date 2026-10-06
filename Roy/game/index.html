@@ -445,6 +445,21 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
 .mud.sand { background: radial-gradient(circle at 35% 35%, #e8cf96, #b08a4a 70%); width: 20%; }
 /* the golden dinosaur in the last Mystery Cage (Roy's idea) */
 .visit-dino.golden svg { filter: drop-shadow(0 0 14px rgba(249, 210, 122, .9)); }
+/* Ghost World: every dinosaur is a see-through glowing ghost (Roy's idea). Switched with the ghost button. */
+body.ghosts .cage .dino svg,
+body.ghosts .visit-dino:not(.shadow):not(.golden):not(.ghosty) svg,
+body.ghosts #mosa .mosa,
+body.ghosts .raptor svg,
+body.ghosts .gate-trex svg,
+body.ghosts .peeker,
+body.ghosts .mcard .mface svg,
+body.ghosts .blue-btn svg,
+body.ghosts .esc-choice .box svg,
+body.ghosts .bk-dino svg,
+body.ghosts .ln-dino svg,
+body.ghosts .ln-pick svg {
+  filter: grayscale(1) sepia(1) hue-rotate(150deg) saturate(4) brightness(1.25) drop-shadow(0 0 10px #6ee6ff); opacity: .75; }
+.icon-btn.ghost-on { background: rgba(110, 230, 255, .3); border-color: #6ee6ff; box-shadow: 0 0 12px #6ee6ff; }
 /* mystery dinosaurs are ghost holograms (Roy's idea): see-through, glowing, floating, rising out of the ground */
 .visit-dino.ghosty { position: relative; }
 .visit-dino.ghosty svg { opacity: .72; filter: grayscale(1) sepia(1) hue-rotate(150deg) saturate(4) brightness(1.25) drop-shadow(0 0 14px #6ee6ff);
@@ -1143,6 +1158,9 @@ body.quake .app { animation: shake .4s ease; }
     <div class="top-right">
       <button class="icon-btn" id="home" hidden aria-label="Back to the park gate">
         <svg viewBox="0 0 32 32"><path d="M4 30V12h6v18M22 30V12h6v18" fill="#a8844f"/><path d="M2 12 L6 4 H26 L30 12 Z" fill="#6e4524"/><path d="M10 16h12v14H10z" fill="#f9d27a"/></svg>
+      </button>
+      <button class="icon-btn" id="ghost-btn" aria-label="Ghost dinosaurs">
+        <svg viewBox="0 0 32 32"><path d="M7 28 V14 a9 9 0 0 1 18 0 V28 l-3 -3 -3 3 -3 -3 -3 3 -3 -3 Z" fill="#e8fbff" stroke="#6ee6ff" stroke-width="1.5"/><circle cx="12.5" cy="14" r="2.2" fill="#1d1d1b"/><circle cx="19.5" cy="14" r="2.2" fill="#1d1d1b"/><ellipse cx="16" cy="20" rx="2.5" ry="3" fill="#1d1d1b"/></svg>
       </button>
       <button class="icon-btn" id="sound" aria-label="Sound on">
         <svg viewBox="0 0 32 32" id="sound-icon"></svg>
@@ -3228,7 +3246,7 @@ body.quake .app { animation: shake .4s ease; }
       isHungry(d) ? " " + shortName(d) + " is hungry!" : isDirty(d) ? " " + shortName(d) + " is muddy!" : "";
     visit.classList.toggle("bones", !!d.bones);
     if (d.bones) say("These are " + d.name + "! " + d.fact + " Bones don't need food or baths!");
-    else say("This is " + d.name + "! " + d.fact + status);
+    else say((state.ghosts ? "Woooo! This is the ghost of " : "This is ") + d.name + "! " + d.fact + status);
     if (!state.found["saw-" + d.id]) {
       state.found["saw-" + d.id] = true; save();
       cage.classList.add("visited");
@@ -5099,6 +5117,20 @@ body.quake .app { animation: shake .4s ease; }
     setTimeout(function () { bush.classList.remove("peekaboo"); }, 1600);
     discover("peekaboo", bush, "Peekaboo! A baby dinosaur was hiding in the bush! You found a secret!") ||
       say("Peekaboo! Hee hee!");
+  });
+
+  // ---------- Ghost World on and off: every dinosaur is a ghost (Roy's idea) ----------
+  if (state.ghosts === undefined) state.ghosts = true;
+  function drawGhosts() {
+    document.body.classList.toggle("ghosts", !!state.ghosts);
+    $("ghost-btn").classList.toggle("ghost-on", !!state.ghosts);
+    $("ghost-btn").setAttribute("aria-label", state.ghosts ? "Ghost dinosaurs on" : "Ghost dinosaurs off");
+  }
+  drawGhosts();
+  $("ghost-btn").addEventListener("click", function () {
+    state.ghosts = !state.ghosts; save(); drawGhosts();
+    if (state.ghosts) { tone(300, 0, 0.9, "sine", 0.12, 520); tone(520, 0.8, 0.9, "sine", 0.1, 260); say("Woooo! All the dinosaurs are ghosts now! Spooky!"); }
+    else { chime(); say("Ta-da! The dinosaurs are back to normal!"); }
   });
 
   // ---------- sound on and off ----------
