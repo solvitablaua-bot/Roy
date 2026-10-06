@@ -445,6 +445,21 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
 .mud.sand { background: radial-gradient(circle at 35% 35%, #e8cf96, #b08a4a 70%); width: 20%; }
 /* the golden dinosaur in the last Mystery Cage (Roy's idea) */
 .visit-dino.golden svg { filter: drop-shadow(0 0 14px rgba(249, 210, 122, .9)); }
+/* mystery dinosaurs are ghost holograms (Roy's idea): see-through, glowing, floating, rising out of the ground */
+.visit-dino.ghosty { position: relative; }
+.visit-dino.ghosty svg { opacity: .72; filter: grayscale(1) sepia(1) hue-rotate(150deg) saturate(4) brightness(1.25) drop-shadow(0 0 14px #6ee6ff);
+  animation: ghostfloat 2.4s ease-in-out infinite alternate; }
+.visit-dino.ghosty.golden svg { filter: brightness(1.1) drop-shadow(0 0 16px rgba(249, 210, 122, .95)); }
+.visit-dino.ghosty::after { content: ""; position: absolute; inset: 0; pointer-events: none; mix-blend-mode: screen;
+  background: repeating-linear-gradient(to bottom, rgba(180, 245, 255, .25) 0 2px, transparent 2px 6px); animation: holo-scan 1.5s linear infinite;
+  -webkit-mask-image: radial-gradient(ellipse 48% 45% at 50% 55%, #000 50%, transparent 100%); mask-image: radial-gradient(ellipse 48% 45% at 50% 55%, #000 50%, transparent 100%); }
+.visit-dino.ghosty.golden::after { background: repeating-linear-gradient(to bottom, rgba(255, 240, 180, .25) 0 2px, transparent 2px 6px); }
+.visit-dino.ghosty.rise svg { animation: holo-rise 2s ease-out both; }
+.visit-dino.ghosty.hop svg { animation: hop .55s cubic-bezier(.3, 1.4, .5, 1); }
+.visit-dino.ghosty.see svg { opacity: .3; transition: opacity .2s; }
+@keyframes ghostfloat { 0% { transform: translateY(0); opacity: .72; } 45% { opacity: .78; } 50% { opacity: .45; } 55% { opacity: .78; } 100% { transform: translateY(-5%); opacity: .7; } }
+.ghost-ripple { position: absolute; width: 80px; height: 80px; margin: -40px 0 0 -40px; border-radius: 50%; pointer-events: none; z-index: 2;
+  border: 3px solid rgba(190, 248, 255, .9); box-shadow: 0 0 14px #6ee6ff; animation: holo-ripple .7s ease-out forwards; }
 /* the Golden Monster made of gold (Roy's idea). Roy later asked for him to be BAD: a greedy gold-stealing villain */
 .gold-monster {
   position: fixed; inset: 0; z-index: 10; pointer-events: auto;
@@ -3236,7 +3251,7 @@ body.quake .app { animation: shake .4s ease; }
   });
   function closeVisit() {
     visit.hidden = true; current = null; mysteryOn = null; visit.classList.remove("bones");
-    visit.classList.remove("mystery"); visitDino.classList.remove("shadow", "reveal", "golden"); $("clue-dots").hidden = true;
+    visit.classList.remove("mystery"); visitDino.classList.remove("shadow", "reveal", "golden", "ghosty", "rise", "see"); $("clue-dots").hidden = true;
     stage.querySelectorAll(".gold-sparkle").forEach(function (x) { x.remove(); });
     resetCare(); updateNeeds();
   }
@@ -3261,12 +3276,12 @@ body.quake .app { animation: shake .4s ease; }
     resetCare();
     if (solved) {
       clueStep = 3; setClueDots();
-      visitDino.classList.remove("shadow");
+      visitDino.classList.remove("shadow"); visitDino.classList.add("ghosty");
       if (mysterySlot === GOLD_SLOT) goldShine();
       $("visit-name").textContent = m.name;
       $("visit-fact").textContent = m.fact;
       m.sound();
-      say("You already found this mystery dinosaur today. It's " + m.name + "! " + (mysteriesLeft() ? "There are " + mysteriesLeft() + " more Mystery Cages to solve today!" : "You solved every Mystery Cage today! Come back tomorrow for new ones!"));
+      say("You already found this mystery ghost today. It's " + m.name + "! " + (mysteriesLeft() ? "There are " + mysteriesLeft() + " more Mystery Cages to solve today!" : "You solved every Mystery Cage today! Come back tomorrow for new ones!"));
       return;
     }
     visitDino.classList.add("shadow");
@@ -3372,6 +3387,17 @@ body.quake .app { animation: shake .4s ease; }
     '<circle cx="55" cy="55" r="50" fill="#f2c84a" stroke="#9c6a12" stroke-width="5"/><circle cx="55" cy="55" r="38" fill="#fbe7a0"/>' +
     '<path d="M30 70 Q30 40 52 36 Q60 26 74 32 Q86 40 80 52 L70 56 L72 74 Z" fill="#d19a1e"/><circle cx="70" cy="42" r="3" fill="#3b2413"/>' +
     '<path d="M22 30 l2 6 6 2 -6 2 -2 6 -2 -6 -6 -2 6 -2 Z M86 70 l2 6 6 2 -6 2 -2 6 -2 -6 -6 -2 6 -2 Z" fill="#fff"/>';
+  function ghostWoo() { tone(300, 0, 0.9, "sine", 0.12, 520); tone(520, 0.8, 0.9, "sine", 0.1, 260); }
+  function ghostRipple(e) {
+    if (!visitDino.classList.contains("ghosty")) return;
+    var now = Date.now(); if (now - (visitDino._rip || 0) < 120) return; visitDino._rip = now;
+    var r = visitDino.getBoundingClientRect(), rp = document.createElement("span");
+    rp.className = "ghost-ripple"; rp.style.left = (e.clientX - r.left) + "px"; rp.style.top = (e.clientY - r.top) + "px";
+    visitDino.appendChild(rp); setTimeout(rp.remove.bind(rp), 750);
+    visitDino.classList.add("see"); clearTimeout(visitDino._gt); visitDino._gt = setTimeout(function () { visitDino.classList.remove("see"); }, 400);
+  }
+  visitDino.addEventListener("pointerdown", ghostRipple);
+  visitDino.addEventListener("pointermove", function (e) { if (e.buttons || e.pointerType === "touch") ghostRipple(e); });
   function goldShine() {
     visitDino.classList.add("golden");
     stage.querySelectorAll(".gold-sparkle").forEach(function (x) { x.remove(); });
@@ -3387,27 +3413,30 @@ body.quake .app { animation: shake .4s ease; }
     var m = mysteryOn;
     if (clueStep >= 3) {
       if (mysterySlot === GOLD_SLOT) { goldMonster(); return; }
-      m.sound(); say(m.fact); return;
+      m.sound(); ghostWoo();
+      say(pick(["Whoosh! Your finger went right through the ghost!", "Woooo! It's a ghost hologram! You can't touch it!", "Spooky! " + m.name + " is made of light!"]));
+      return;
     }
     clueStep += 1; setClueDots();
     visitDino.classList.remove("hop"); void visitDino.offsetWidth; visitDino.classList.add("hop");
     if (clueStep === 1) { m.sound(); say("Listen! That's how it sounds! Tap again for another clue."); return; }
     if (clueStep === 2) { boing(); say(m.clue + " Who could it be? Tap again to find out!"); $("visit-fact").textContent = m.clue.replace("Here is a clue: ", ""); return; }
-    visitDino.classList.remove("shadow"); void visitDino.offsetWidth; visitDino.classList.add("reveal");
-    fanfare(); hearts(); m.sound();
+    visitDino.classList.remove("shadow"); void visitDino.offsetWidth; visitDino.classList.add("ghosty", "rise");
+    setTimeout(function () { visitDino.classList.remove("rise"); }, 2100);
+    fanfare(); m.sound(); ghostWoo(); rumble();
     $("visit-name").textContent = m.name;
     $("visit-fact").textContent = m.fact;
     if (mysterySlot === GOLD_SLOT) {
       goldShine();
       [0, 0.15, 0.3, 0.45].forEach(function (t, i) { tone(1047 + i * 262, t + 0.5, 0.3, "triangle", 0.2); });
-      say("Ta-da! It's a golden " + m.name.replace("Golden ", "") + "! Its skin is made of shiny gold! Did you guess it?");
+      say("Woooo! A golden ghost is rising out of the ground! It's a golden " + m.name.replace("Golden ", "") + "! Did you guess it?");
       if (!state.found.goldenDino) {
         state.found.goldenDino = true; save();
         setTimeout(function () { showBadge("Golden Dinosaur", "You found the golden dinosaur!", GOLD_BADGE); }, 2200);
       }
       setTimeout(function () { if (mysteryOn && mysterySlot === GOLD_SLOT) goldMonster(); }, 5200);
     } else {
-      say("Ta-da! It's " + m.name + "! " + m.fact + " Did you guess it?");
+      say("Woooo! A ghost is rising out of the ground! It's the ghost of " + m.name + "! " + m.fact + " Did you guess it?");
     }
     state.found[mysteryKey(mysterySlot)] = true; save();
     addStar(visitDino);
