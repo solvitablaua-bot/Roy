@@ -4452,13 +4452,12 @@ body.quake .app { animation: shake .4s ease; }
     state.found.memoryWins = (state.found.memoryWins || 0) + 1; save(); updateBook();
     say("You found all the pairs! What a great memory, Roy!");
     if (state.found.memoryWins === 1) setTimeout(function () { showBadge("Dino Memory", "You won the memory game!", MEMORY_BADGE); }, 1600);
-    var prize = state.found.memoryWins < BLASTERS.length ? BLASTERS[state.found.memoryWins] : null;
+    var prize = state.found.memoryWins + 1 < BLASTERS.length ? BLASTERS[state.found.memoryWins + 1] : null;
     if (prize) {
-      state.blaster = prize.id; save();
       setTimeout(function () {
         showBadge("New Blaster!", "You won the " + prize.name + "!", blasterBadge(prize));
         pfft();
-        say("You found all the pairs! Your prize is a new sleepy dart blaster: the " + prize.name + "!" + (prize.mega ? " It makes dinosaurs sleepy with just 2 darts!" : ""));
+        say("You found all the pairs! Your prize is a new sleepy dart blaster: the " + prize.name + "! Tap it on your blaster shelf to use it!");
       }, state.found.memoryWins === 1 ? 4200 : 1800);
     }
     setTimeout(function () {
@@ -4471,18 +4470,19 @@ body.quake .app { animation: shake .4s ease; }
   // ---------- sleepy dart blasters: win the memory game to get a new one (Roy's idea) ----------
   var BLASTERS = [
     { id: "ranger", name: "Ranger Blaster", barrel: "#5d625c", mid: "#e4572a", grip: "#2e5b3a", line: "#3f7a4c", pom: "#e98bd0" },
+    { id: "rainbow", name: "Mega Rainbow Blaster", barrel: "#7a4ab0", mid: "rainbow", grip: "#4a86c8", line: "#fff", pom: "#e98bd0", mega: true },
     { id: "jungle", name: "Jungle Blaster", barrel: "#3f7a4c", mid: "#6b8a3a", grip: "#2e5b3a", line: "#a8c45a", pom: "#f9d27a" },
     { id: "lava", name: "Lava Blaster", barrel: "#3b2413", mid: "#e4372a", grip: "#f2a93b", line: "#e4572a", pom: "#ff7a3a" },
     { id: "ice", name: "Ice Blaster", barrel: "#cfe6ef", mid: "#7fb0dc", grip: "#4a86c8", line: "#cfe6ef", pom: "#ffffff" },
     { id: "sea", name: "Sea Blaster", barrel: "#5a86a2", mid: "#2a8f88", grip: "#0d2a3d", line: "#7fe0d0", pom: "#7fe0d0" },
-    { id: "golden", name: "Golden Blaster", barrel: "#b07d16", mid: "#f2c84a", grip: "#f2c84a", line: "#fff3b0", pom: "#f2a93b" },
-    { id: "rainbow", name: "Mega Rainbow Blaster", barrel: "#7a4ab0", mid: "rainbow", grip: "#4a86c8", line: "#fff", pom: "#e98bd0", mega: true }
+    { id: "golden", name: "Golden Blaster", barrel: "#b07d16", mid: "#f2c84a", grip: "#f2c84a", line: "#fff3b0", pom: "#f2a93b" }
   ];
-  function blastersOwned() { return Math.min(BLASTERS.length, 1 + (state.found.memoryWins || 0)); }
+  // Roy asked for the Mega Rainbow Blaster when dinosaurs break out, so Ranger and Rainbow are owned from the start
+  function blastersOwned() { return Math.min(BLASTERS.length, 2 + (state.found.memoryWins || 0)); }
   function myBlaster() {
     var owned = blastersOwned();
     for (var i = 0; i < owned; i++) if (BLASTERS[i].id === state.blaster) return BLASTERS[i];
-    return BLASTERS[owned - 1];
+    return BLASTERS[1];
   }
   var rainbowN = 0;
   function blasterInner(b) {
