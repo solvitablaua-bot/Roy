@@ -2599,7 +2599,7 @@ body.quake .app { animation: shake .4s ease; }
     say("Whoosh! All the dinosaurs went back into the game! Who should come out next?");
   });
   // ---------- the meteor: after a minute in the park, a meteor flies at the island (Roy's idea) ----------
-  var METEOR_TAPS = 10, METEOR_TIME = 10000;
+  var METEOR_TAPS = 3, METEOR_TIME = 10000;
   var meteorSky = $("meteor-sky"), meteorEl = $("meteor"), meteorOn = false, meteorHits = 0, meteorStart = 0, meteorWait = 0, meteorRaf = null;
   var METEOR_BADGE =
     '<circle cx="55" cy="55" r="50" fill="#e4572a" stroke="#3b2413" stroke-width="5"/>' +
@@ -2621,9 +2621,9 @@ body.quake .app { animation: shake .4s ease; }
     if (meteorOn) return;
     meteorOn = true; meteorHits = 0;
     meteorEl.querySelectorAll(".mcracks path").forEach(function (c) { c.setAttribute("opacity", "0"); });
-    meteorSky.hidden = false; meteorEl.style.display = "";
+    meteorSky.hidden = false; meteorEl.style.display = ""; meteorEl.style.opacity = "";
     siren(); rumble();
-    say("Uh oh! A giant METEOR is falling on Dino Island! Tap it lots to smash it, quick!");
+    say("Uh oh! A giant METEOR is falling on Dino Island! Tap it 3 times to smash it, quick!");
     meteorStart = performance.now();
     function fly(t) {
       if (!meteorOn) return;
@@ -2644,18 +2644,20 @@ body.quake .app { animation: shake .4s ease; }
     rockBits(e.clientX, e.clientY, 6);
     meteorEl.classList.remove("hit"); void meteorEl.offsetWidth; meteorEl.classList.add("hit");
     var cs = meteorEl.querySelectorAll(".mcracks path");
-    cs.forEach(function (c, i) { if (meteorHits >= (i + 1) * 3) c.setAttribute("opacity", "1"); });
+    cs.forEach(function (c, i) { if (meteorHits >= i + 1) c.setAttribute("opacity", "1"); });
     // every tap pushes the meteor back a little
     meteorStart += 250;
-    if (meteorHits === 3) say("Crack! Keep tapping!");
-    if (meteorHits === 7) say("It's breaking! Faster!");
+    if (meteorHits === 1) say("Crack! Keep tapping!");
+    if (meteorHits === 2) say("It's breaking! One more!");
     if (meteorHits >= METEOR_TAPS) smashMeteor();
   });
   function smashMeteor() {
     meteorOn = false; cancelAnimationFrame(meteorRaf);
     var r = meteorEl.getBoundingClientRect();
     rockBits(r.left + r.width / 2, r.top + r.height / 2, 30);
-    meteorEl.style.display = "none";
+    // keep catching the finger for a moment, so the last tap doesn't fall through onto the cage card
+    meteorEl.style.opacity = "0";
+    setTimeout(function () { meteorEl.style.display = "none"; meteorEl.style.opacity = ""; }, 500);
     splash(); fanfare(); tinkle();
     say("BOOM! You smashed the meteor into tiny pieces! Dino Island is safe! You saved all the dinosaurs!");
     setTimeout(function () { meteorSky.hidden = true; }, 900);
@@ -2680,7 +2682,7 @@ body.quake .app { animation: shake .4s ease; }
   });
   // count a minute while Roy is in the big park with the cages
   setInterval(function () {
-    var inPark = !viewMap.hidden && visit.hidden && !bkActive && gm.hidden && !meteorOn && $("meteor-boom").hidden && !document.hidden;
+    var inPark = !viewMap.hidden && !bkActive && gm.hidden && !meteorOn && $("meteor-boom").hidden && !document.hidden;
     if (!inPark) { if (viewMap.hidden) meteorWait = 0; return; }
     meteorWait += 1;
     if (meteorWait >= 60) { meteorWait = 0; startMeteor(); }
