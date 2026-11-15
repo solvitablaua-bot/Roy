@@ -479,6 +479,12 @@ body.ghosts .ln-pick svg {
 .meteor-boom { position: fixed; inset: 0; z-index: 275; display: flex; align-items: center; justify-content: center; pointer-events: auto;
   background: radial-gradient(circle at 50% 60%, rgba(242, 169, 59, .9), rgba(120, 60, 30, .92) 45%, rgba(30, 20, 15, .95) 80%); }
 .meteor-boom[hidden] { display: none; }
+/* after a meteor hit, the dinosaurs in the cages are only bones (Roy's idea) */
+body.park-dead .world { filter: sepia(.5) brightness(.75); }
+body.park-dead .needs { display: none; }
+body.park-dead .cage:not([data-mystery]) .dino { visibility: hidden; }
+body.park-dead .cage:not([data-mystery]):not(.empty)::after { content: ""; position: absolute; left: 25%; right: 25%; bottom: 22%; height: 30%;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 70'%3E%3Cg stroke='%236e5a3a' stroke-width='3' fill='%23efe3c4'%3E%3Cpath d='M10 52 h60 a6 6 0 1 1 6 6 a6 6 0 1 1 -6 6 h-60 a6 6 0 1 1 -6 -6 a6 6 0 1 1 6 -6z'/%3E%3Cpath d='M40 30 l40 18 a6 6 0 1 1 8 2 a6 6 0 1 1 -4 7 l-40 -18 a6 6 0 1 1 -8 -2 a6 6 0 1 1 4 -7z'/%3E%3Cellipse cx='92' cy='30' rx='20' ry='16'/%3E%3C/g%3E%3Ccircle cx='86' cy='28' r='4' fill='%233b2413'/%3E%3Ccircle cx='98' cy='28' r='4' fill='%233b2413'/%3E%3C/svg%3E") center bottom / contain no-repeat; pointer-events: none; }
 /* the Golden Monster made of gold (Roy's idea). Roy later asked for him to be BAD: a greedy gold-stealing villain */
 .gold-monster {
   position: fixed; inset: 0; z-index: 10; pointer-events: auto;
@@ -1848,8 +1854,8 @@ body.quake .app { animation: shake .4s ease; }
 <div class="meteor-boom" id="meteor-boom" hidden>
   <div class="caught-card" style="position:relative;left:auto;top:auto;transform:none">
     <strong>KABOOM!</strong>
-    <span>Oh no! The meteor hit Dino Island! Tap the meteor faster next time!</span>
-    <button id="meteor-again">Start the game again!</button>
+    <span>Oh no! The meteor hit Dino Island! All the dinosaurs turned into bones!</span>
+    <button id="meteor-again">OK</button>
   </div>
 </div>
 <div class="breakout" id="breakout" hidden>
@@ -2668,21 +2674,30 @@ body.quake .app { animation: shake .4s ease; }
     }
     meteorWait = 0;
   }
+  var parkDead = false;
   function meteorImpact() {
     meteorOn = false; cancelAnimationFrame(meteorRaf);
     meteorSky.hidden = true;
+    if (!visit.hidden) closeVisit();
+    parkDead = true; document.body.classList.add("park-dead");
     var f = document.createElement("div"); f.className = "meteor-flash"; document.body.appendChild(f); setTimeout(f.remove.bind(f), 1300);
     roar(0.4, 2.5); rumble(); splash(); quake();
     $("meteor-boom").hidden = false;
-    say("KABOOM! Oh no! The meteor hit Dino Island! We have to start the game all over again!");
+    say("KABOOM! Oh no! The meteor hit Dino Island! All the dinosaurs turned into bones!");
   }
   $("meteor-again").addEventListener("click", function () {
-    // back to the very start of the game: the boat trip. Stars, badges and dinosaurs are kept.
-    location.reload();
+    // Roy doesn't want the game to start over: the park just stays full of bones until he leaves it
+    $("meteor-boom").hidden = true;
+    say("Only bones are left in the cages. Go back to the park gate, and the rangers will hatch new dinosaurs from their eggs!");
   });
+  function reviveParkIfDead() {
+    if (!parkDead) return false;
+    parkDead = false; document.body.classList.remove("park-dead");
+    return true;
+  }
   // count a minute while Roy is in the big park with the cages
   setInterval(function () {
-    var inPark = !viewMap.hidden && !bkActive && gm.hidden && !meteorOn && $("meteor-boom").hidden && !document.hidden;
+    var inPark = !viewMap.hidden && !parkDead && !bkActive && gm.hidden && !meteorOn && $("meteor-boom").hidden && !document.hidden;
     if (!inPark) { if (viewMap.hidden) meteorWait = 0; return; }
     meteorWait += 1;
     if (meteorWait >= 60) { meteorWait = 0; startMeteor(); }
@@ -2738,6 +2753,7 @@ body.quake .app { animation: shake .4s ease; }
   homeBtn.addEventListener("click", function () {
     clearMission(true); activeMission = null; gm.hidden = true;
     viewLab.hidden = true; viewMap.hidden = true; viewMission.hidden = true; viewBook.hidden = true; foundBox.hidden = true; viewShop.hidden = true; shopOpen = false; viewMemory.hidden = true; memoryLock = true; viewHouse.hidden = true; escTimers.forEach(clearTimeout); stopCamera(); viewPark.hidden = false; homeBtn.hidden = true;
+    if (reviveParkIfDead()) hatchedAgain = true;
     say("Welcome back to the park gate! Where shall we go?");
   });
 
@@ -3317,11 +3333,16 @@ body.quake .app { animation: shake .4s ease; }
   }
   buildWorld();
 
+  var hatchedAgain = false;
   function openMap(care) {
     viewPark.hidden = true; viewMap.hidden = false; homeBtn.hidden = false;
     boing();
     updateNeeds();
-    if (care) {
+    if (hatchedAgain) {
+      hatchedAgain = false;
+      chime();
+      say("Hooray! The rangers hatched new dinosaurs from their eggs! Your park is full of dinosaurs again! Watch out for meteors!");
+    } else if (care) {
       var h = DINOS.filter(isHungry).length, m = DINOS.filter(isDirty).length;
       say(h || m
         ? "Time to look after your dinosaurs! A bowl means hungry. A mud drop means muddy. Tap a cage!"
@@ -3343,6 +3364,11 @@ body.quake .app { animation: shake .4s ease; }
     var cage = e.target.closest(".cage");
     if (!cage) return;
     if (cage.dataset.mystery) { openMystery(Number(cage.dataset.mystery) - 1); return; }
+    if (parkDead && DINOS[Number(cage.dataset.cage)]) {
+      clunk();
+      say("Only bones are left. The meteor hit Dino Island! Go back to the park gate, and the rangers will hatch new dinosaurs from their eggs!");
+      return;
+    }
     var d = DINOS[Number(cage.dataset.cage)];
     if (!d) {
       clunk();
