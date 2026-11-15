@@ -1097,6 +1097,13 @@ body.park-dead .cage:not([data-mystery]):not(.empty)::after { content: ""; posit
 @keyframes bk-shard { from { transform: translate(0, 0) scale(.6) rotate(0); opacity: 1; } to { transform: translate(var(--dx), var(--dy)) scale(3.2) rotate(var(--r)); opacity: 0; } }
 body.quake .app { animation: shake .4s ease; }
 /* sleepy darts: shoot the escaped dinosaur so it falls asleep and goes back in (Roy's idea) */
+/* the escape timer: put the dinosaur to sleep before it runs out, or it runs off with 3 stars (Roy's idea) */
+.bk-timer { position: absolute; left: 0; right: 0; top: 0; height: 16px; z-index: 3; background: rgba(29, 29, 27, .6); pointer-events: none; }
+.bk-timer[hidden] { display: none; }
+.bk-timer span { position: absolute; left: 0; top: 0; bottom: 0; width: 100%; background: linear-gradient(90deg, #e4372a, #f2a93b 40%, #5fb37c); }
+.bk-minus { position: fixed; z-index: 320; left: 24px; top: 70px; font-family: var(--font-sign); font-size: 2.6rem; color: #e4372a;
+  text-shadow: 0 3px 0 #1d1d1b; pointer-events: none; animation: minus-pop 2.2s ease-out forwards; }
+@keyframes minus-pop { 0% { transform: scale(.4); opacity: 0; } 20% { transform: scale(1.3); opacity: 1; } 80% { opacity: 1; } 100% { transform: translateY(40px); opacity: 0; } }
 .bk-gun { position: absolute; left: 50%; bottom: -10px; width: 120px; height: 190px; margin-left: -60px; z-index: 2; pointer-events: none;
   transform-origin: 50% 85%; transition: transform .12s; }
 .bk-gun svg { width: 100%; height: 100%; }
@@ -1863,6 +1870,7 @@ body.quake .app { animation: shake .4s ease; }
   <div class="bk-hole" id="bk-hole"></div>
   <div class="bk-danger" id="bk-danger" hidden>DANGER!</div>
   <div class="bk-dino" id="bk-dino" role="button" tabindex="0" aria-label="Dinosaur"><div class="flip"><div class="step" id="bk-art"></div></div></div>
+  <div class="bk-timer" id="bk-timer" hidden><span id="bk-timer-fill"></span></div>
   <div class="bk-gun" id="bk-gun" hidden><svg viewBox="0 0 120 190" aria-hidden="true">
     <rect x="44" y="0" width="32" height="96" rx="8" fill="#5d625c" stroke="#1d1d1b" stroke-width="4"/>
     <rect x="50" y="8" width="20" height="10" rx="3" fill="#1d1d1b"/>
@@ -2296,7 +2304,38 @@ body.quake .app { animation: shake .4s ease; }
       bkTalk(shortName(d) + " is out! Shoot " + shortName(d) + " with " + bkNeed + " sleepy darts from your " + gunB.name + "! Tap " + shortName(d) + " to shoot!");
       walkAbout();
       bkWalk = setInterval(walkAbout, 1700);
+      if (!fromMenu) startBkTimer();
     }, 3600);
+  }
+  var BK_LIMIT = 15000, bkTimer = null;
+  function startBkTimer() {
+    var f = $("bk-timer-fill");
+    f.style.transition = "none"; f.style.width = "100%";
+    $("bk-timer").hidden = false; void f.offsetWidth;
+    f.style.transition = "width " + (BK_LIMIT / 1000) + "s linear"; f.style.width = "0%";
+    clearTimeout(bkTimer); bkTimer = setTimeout(runAway, BK_LIMIT);
+  }
+  function stopBkTimer() { clearTimeout(bkTimer); $("bk-timer").hidden = true; }
+  // too slow: the dinosaur runs away with 3 stars (Roy's idea)
+  function runAway() {
+    if (!bkLoose) return;
+    bkLoose = false; clearInterval(bkWalk); stopBkTimer();
+    $("bk-gun").hidden = true;
+    bkDino.classList.remove("left");
+    bkDino.style.left = (window.innerWidth + 500) + "px";
+    roar(0.9, 1.2); stomp();
+    var n = Math.min(3, state.stars);
+    state.stars -= n; save();
+    starCount.textContent = state.stars;
+    var m = document.createElement("div"); m.className = "bk-minus"; m.textContent = "-" + n + " ★";
+    if (n) { document.body.appendChild(m); setTimeout(m.remove.bind(m), 2300); bleh(); }
+    say(n ? "Oh no! " + shortName(escDino) + " ran away and took " + n + " of your stars! Next time, shoot your sleepy darts faster!"
+          : "Oh no! " + shortName(escDino) + " ran away! Next time, shoot your sleepy darts faster!");
+    later(function () {
+      bkDino.classList.remove("loose", "hop"); bkDino.querySelectorAll(".stuck").forEach(function (x) { x.remove(); });
+      bk.classList.add("healing");
+    }, 2200);
+    later(function () { bk.hidden = true; bkActive = false; bk.className = "breakout"; }, 3300);
   }
   function walkAbout() {
     if (!bkLoose) return;
@@ -2368,7 +2407,7 @@ body.quake .app { animation: shake .4s ease; }
     requestAnimationFrame(fly);
   });
   function fallAsleep() {
-    bkLoose = false; clearInterval(bkWalk);
+    bkLoose = false; clearInterval(bkWalk); stopBkTimer();
     $("bk-gun").hidden = true;
     bkDino.classList.remove("wobble"); bkDino.classList.add("sleepy");
     bkTalk("Zzz... " + shortName(escDino) + " fell asleep!");
@@ -2704,14 +2743,15 @@ body.quake .app { animation: shake .4s ease; }
   }, 1000);
 
   // surprise! now and then a dinosaur breaks out of the screen anywhere in the game
-  var nextSurprise = Date.now() + (3 + Math.random() * 3) * 60000;
+  var playSecs = 0;
   setInterval(function () {
-    if (Date.now() < nextSurprise || bkActive) return;
-    var busy = !viewSea.hidden || !viewChase.hidden || !viewMission.hidden || !visit.hidden || !foundBox.hidden || !gm.hidden || meteorOn || document.hidden;
+    var busy = bkActive || meteorOn || lnOn || !gm.hidden || document.hidden || !viewSea.hidden || !viewChase.hidden || !$("meteor-boom").hidden;
     if (busy) return;
-    nextSurprise = Date.now() + (4 + Math.random() * 4) * 60000;
+    playSecs += 1;
+    if (playSecs < 60) return;
+    playSecs = 0;
     breakout(dinoById(ESC_IDS[Math.floor(Math.random() * ESC_IDS.length)]), false);
-  }, 20000);
+  }, 1000);
 
   // ---------- Egg Lab ----------
   var viewPark = $("view-park"), viewLab = $("view-lab"), homeBtn = $("home");
