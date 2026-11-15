@@ -460,6 +460,25 @@ body.ghosts .ln-dino svg,
 body.ghosts .ln-pick svg {
   filter: grayscale(1) sepia(1) hue-rotate(150deg) saturate(4) brightness(1.25) drop-shadow(0 0 10px #6ee6ff); opacity: .75; }
 .icon-btn.ghost-on { background: rgba(110, 230, 255, .3); border-color: #6ee6ff; box-shadow: 0 0 12px #6ee6ff; }
+/* the meteor: after a minute in the park a meteor flies at the island; tap it to smash it (Roy's idea) */
+.meteor-sky { position: fixed; inset: 0; z-index: 250; pointer-events: none; overflow: hidden; }
+.meteor-sky[hidden] { display: none; }
+.meteor-sky::before { content: ""; position: absolute; inset: 0; box-shadow: inset 0 0 0 10px rgba(228, 55, 42, .8), inset 0 0 80px rgba(228, 55, 42, .6);
+  animation: danger-blink .5s steps(2) infinite; }
+.meteor-sign { position: absolute; left: 50%; bottom: 6%; transform: translateX(-50%); font-family: var(--font-sign); font-size: clamp(1.6rem, 7vmin, 3.4rem);
+  color: #1d1d1b; padding: 4px 24px; border: 6px solid #1d1d1b; border-radius: 12px; white-space: nowrap;
+  background: repeating-linear-gradient(45deg, #e4572a 0 22px, #f2a93b 22px 44px); animation: danger-blink .4s steps(2) infinite; }
+.meteor { position: absolute; width: 34vmin; height: 34vmin; margin: -17vmin 0 0 -17vmin; pointer-events: auto; cursor: pointer; }
+.meteor svg { width: 100%; height: 100%; overflow: visible; }
+.meteor.hit svg { animation: meteor-hit .25s ease-out; }
+@keyframes meteor-hit { 40% { transform: scale(.88) rotate(-8deg); filter: brightness(1.8); } }
+.rock-bit { position: fixed; z-index: 260; width: 22px; height: 18px; border-radius: 40% 60% 50% 45%; pointer-events: none;
+  background: radial-gradient(circle at 35% 35%, #8a7a6a, #4a3a2e); box-shadow: 0 0 8px #f2a93b; animation: shard-fly .9s ease-out forwards; }
+.meteor-flash { position: fixed; inset: 0; z-index: 270; pointer-events: none; background: #fff6d0; animation: mflash 1.2s ease-out forwards; }
+@keyframes mflash { 0% { opacity: 1; } 100% { opacity: 0; } }
+.meteor-boom { position: fixed; inset: 0; z-index: 275; display: flex; align-items: center; justify-content: center; pointer-events: auto;
+  background: radial-gradient(circle at 50% 60%, rgba(242, 169, 59, .9), rgba(120, 60, 30, .92) 45%, rgba(30, 20, 15, .95) 80%); }
+.meteor-boom[hidden] { display: none; }
 /* mystery dinosaurs are ghost holograms (Roy's idea): see-through, glowing, floating, rising out of the ground */
 .visit-dino.ghosty { position: relative; }
 .visit-dino.ghosty svg { opacity: .72; filter: grayscale(1) sepia(1) hue-rotate(150deg) saturate(4) brightness(1.25) drop-shadow(0 0 14px #6ee6ff);
@@ -1826,6 +1845,28 @@ body.quake .app { animation: shake .4s ease; }
   </div>
 </div>
 
+<div class="meteor-sky" id="meteor-sky" hidden>
+  <div class="meteor-sign">METEOR!</div>
+  <div class="meteor" id="meteor" role="button" aria-label="Meteor"><svg viewBox="0 0 200 200" aria-hidden="true">
+    <defs><radialGradient id="mfire" cx="70%" cy="30%" r="80%"><stop offset="0" stop-color="#fff3b0"/><stop offset=".35" stop-color="#f2a93b"/><stop offset=".7" stop-color="#e4372a"/><stop offset="1" stop-color="#e4372a" stop-opacity="0"/></radialGradient></defs>
+    <path d="M150 50 L230 -40 L200 -20 L250 -60 L175 10 Z M135 40 L190 -60 L165 0 Z M160 70 L260 10 L195 60 Z" fill="url(#mfire)" opacity=".9"/>
+    <circle cx="100" cy="100" r="70" fill="url(#mfire)" opacity=".55"/>
+    <path d="M45 95 Q40 55 80 42 Q120 30 145 60 Q165 90 150 125 Q130 160 92 158 Q55 152 45 120 Z" fill="#6e5a48" stroke="#3b2413" stroke-width="5"/>
+    <circle cx="85" cy="80" r="13" fill="#4a3a2e"/><circle cx="120" cy="115" r="17" fill="#4a3a2e"/><circle cx="75" cy="128" r="9" fill="#4a3a2e"/><circle cx="125" cy="70" r="7" fill="#4a3a2e"/>
+    <g class="mcracks" stroke="#f9d27a" stroke-width="4" fill="none" stroke-linejoin="round">
+      <path class="c1" d="M100 60 L95 85 L110 98 L100 120" opacity="0"/>
+      <path class="c2" d="M60 100 L82 105 L95 125 L88 150" opacity="0"/>
+      <path class="c3" d="M140 85 L118 95 L125 120 L145 130" opacity="0"/>
+    </g>
+  </svg></div>
+</div>
+<div class="meteor-boom" id="meteor-boom" hidden>
+  <div class="caught-card" style="position:relative;left:auto;top:auto;transform:none">
+    <strong>KABOOM!</strong>
+    <span>Oh no! The meteor hit Dino Island! Tap the meteor faster next time!</span>
+    <button id="meteor-again">Start the game again!</button>
+  </div>
+</div>
 <div class="breakout" id="breakout" hidden>
   <svg class="bk-cracks" id="bk-cracks" aria-hidden="true"></svg>
   <div class="bk-hole" id="bk-hole"></div>
@@ -2572,11 +2613,99 @@ body.quake .app { animation: shake .4s ease; }
     closeLauncher();
     say("Whoosh! All the dinosaurs went back into the game! Who should come out next?");
   });
+  // ---------- the meteor: after a minute in the park, a meteor flies at the island (Roy's idea) ----------
+  var METEOR_TAPS = 10, METEOR_TIME = 10000;
+  var meteorSky = $("meteor-sky"), meteorEl = $("meteor"), meteorOn = false, meteorHits = 0, meteorStart = 0, meteorWait = 0, meteorRaf = null;
+  var METEOR_BADGE =
+    '<circle cx="55" cy="55" r="50" fill="#e4572a" stroke="#3b2413" stroke-width="5"/>' +
+    '<path d="M70 40 L100 10 M62 34 L84 4 M78 50 L104 30" stroke="#f9d27a" stroke-width="6" stroke-linecap="round"/>' +
+    '<circle cx="50" cy="60" r="24" fill="#6e5a48" stroke="#3b2413" stroke-width="4"/>' +
+    '<path d="M50 40 L46 56 L58 64 L50 80 M30 58 L46 56 M58 64 L72 60" stroke="#f9d27a" stroke-width="3" fill="none"/>';
+  function rockBits(x, y, n) {
+    for (var i = 0; i < n; i++) {
+      var b = document.createElement("span"); b.className = "rock-bit";
+      b.style.left = x + "px"; b.style.top = y + "px";
+      b.style.setProperty("--dx", (Math.random() * 400 - 200) + "px");
+      b.style.setProperty("--dy", (Math.random() * 400 - 250) + "px");
+      b.style.setProperty("--r", (Math.random() * 720 - 360) + "deg");
+      document.body.appendChild(b); setTimeout(b.remove.bind(b), 950);
+    }
+  }
+  function siren() { [0, 0.5, 1, 1.5].forEach(function (t) { tone(660, t, 0.25, "square", 0.08, 880); tone(880, t + 0.25, 0.25, "square", 0.08, 660); }); }
+  function startMeteor() {
+    if (meteorOn) return;
+    meteorOn = true; meteorHits = 0;
+    meteorEl.querySelectorAll(".mcracks path").forEach(function (c) { c.setAttribute("opacity", "0"); });
+    meteorSky.hidden = false; meteorEl.style.display = "";
+    siren(); rumble();
+    say("Uh oh! A giant METEOR is falling on Dino Island! Tap it lots to smash it, quick!");
+    meteorStart = performance.now();
+    function fly(t) {
+      if (!meteorOn) return;
+      var k = Math.min(1, (t - meteorStart) / METEOR_TIME);
+      var w = window.innerWidth, h = window.innerHeight;
+      meteorEl.style.left = (w * (0.9 - 0.4 * k)) + "px";
+      meteorEl.style.top = (h * (0.08 + 0.5 * k)) + "px";
+      meteorEl.style.transform = "scale(" + (0.45 + 1.1 * k) + ")";
+      if (k >= 1) { meteorImpact(); return; }
+      meteorRaf = requestAnimationFrame(fly);
+    }
+    meteorRaf = requestAnimationFrame(fly);
+  }
+  meteorEl.addEventListener("pointerdown", function (e) {
+    if (!meteorOn) return;
+    meteorHits += 1;
+    clunk(); tone(300 + Math.random() * 200, 0, 0.12, "square", 0.12, 120);
+    rockBits(e.clientX, e.clientY, 6);
+    meteorEl.classList.remove("hit"); void meteorEl.offsetWidth; meteorEl.classList.add("hit");
+    var cs = meteorEl.querySelectorAll(".mcracks path");
+    cs.forEach(function (c, i) { if (meteorHits >= (i + 1) * 3) c.setAttribute("opacity", "1"); });
+    // every tap pushes the meteor back a little
+    meteorStart += 250;
+    if (meteorHits === 3) say("Crack! Keep tapping!");
+    if (meteorHits === 7) say("It's breaking! Faster!");
+    if (meteorHits >= METEOR_TAPS) smashMeteor();
+  });
+  function smashMeteor() {
+    meteorOn = false; cancelAnimationFrame(meteorRaf);
+    var r = meteorEl.getBoundingClientRect();
+    rockBits(r.left + r.width / 2, r.top + r.height / 2, 30);
+    meteorEl.style.display = "none";
+    splash(); fanfare(); tinkle();
+    say("BOOM! You smashed the meteor into tiny pieces! Dino Island is safe! You saved all the dinosaurs!");
+    setTimeout(function () { meteorSky.hidden = true; }, 900);
+    if (!state.found.meteor) {
+      state.found.meteor = true; save();
+      addStar(starsEl); setTimeout(function () { addStar(starsEl); }, 300);
+      showBadge("Meteor Smasher", "You saved Dino Island from the meteor!", METEOR_BADGE);
+    }
+    meteorWait = 0;
+  }
+  function meteorImpact() {
+    meteorOn = false; cancelAnimationFrame(meteorRaf);
+    meteorSky.hidden = true;
+    var f = document.createElement("div"); f.className = "meteor-flash"; document.body.appendChild(f); setTimeout(f.remove.bind(f), 1300);
+    roar(0.4, 2.5); rumble(); splash(); quake();
+    $("meteor-boom").hidden = false;
+    say("KABOOM! Oh no! The meteor hit Dino Island! We have to start the game all over again!");
+  }
+  $("meteor-again").addEventListener("click", function () {
+    // back to the very start of the game: the boat trip. Stars, badges and dinosaurs are kept.
+    location.reload();
+  });
+  // count a minute while Roy is in the big park with the cages
+  setInterval(function () {
+    var inPark = !viewMap.hidden && visit.hidden && !bkActive && gm.hidden && !meteorOn && $("meteor-boom").hidden && !document.hidden;
+    if (!inPark) { if (viewMap.hidden) meteorWait = 0; return; }
+    meteorWait += 1;
+    if (meteorWait >= 60) { meteorWait = 0; startMeteor(); }
+  }, 1000);
+
   // surprise! now and then a dinosaur breaks out of the screen anywhere in the game
   var nextSurprise = Date.now() + (3 + Math.random() * 3) * 60000;
   setInterval(function () {
     if (Date.now() < nextSurprise || bkActive) return;
-    var busy = !viewSea.hidden || !viewChase.hidden || !viewMission.hidden || !visit.hidden || !foundBox.hidden || !gm.hidden || document.hidden;
+    var busy = !viewSea.hidden || !viewChase.hidden || !viewMission.hidden || !visit.hidden || !foundBox.hidden || !gm.hidden || meteorOn || document.hidden;
     if (busy) return;
     nextSurprise = Date.now() + (4 + Math.random() * 4) * 60000;
     breakout(dinoById(ESC_IDS[Math.floor(Math.random() * ESC_IDS.length)]), false);
