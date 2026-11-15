@@ -437,6 +437,49 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
   box-shadow: 0 0 20px rgba(155, 111, 196, .9);
   animation: nudge 1.6s ease-in-out infinite;
 }
+/* the DNA Combiner: the only way to bring the dinosaurs back after a meteor (Roy's idea) */
+.find-dna {
+  position: absolute; top: 84px; right: 10px; z-index: 2;
+  width: 64px; height: 64px; border-radius: 50%; padding: 6px;
+  background: #2a9d8f; border: 4px solid var(--bone);
+  box-shadow: 0 0 22px rgba(108, 230, 210, .95);
+  animation: nudge 1.2s ease-in-out infinite;
+}
+.find-dna svg { width: 100%; height: 100%; display: block; }
+body:not(.park-dead) .find-dna { display: none; }
+/* after a meteor the mystery dinosaurs are bones too, but Roy can still open the Mystery Cages and solve them */
+body.park-dead .visit.mystery .visit-dino:not(.shadow) svg { filter: grayscale(1) sepia(.55) brightness(1.3) contrast(.85); }
+.dna-lab { position: fixed; inset: 0; z-index: 8; pointer-events: auto; background: rgba(5, 12, 20, .82);
+  display: grid; grid-template-columns: minmax(0, 1fr); place-items: center; padding: 12px; }
+.dna-lab[hidden] { display: none; }
+.dna-card { position: relative; box-sizing: border-box; width: min(100%, 640px); max-height: 100%;
+  background: radial-gradient(ellipse at 50% 40%, #1f5f6b, #0d2630 75%); border: 6px solid #6ce6d2; border-radius: 28px;
+  padding: 12px 14px 16px; display: flex; flex-direction: column; align-items: center; gap: 8px; color: var(--bone); }
+.dna-card h2 { margin: 0; padding: 0 50px; text-align: center; font-family: var(--font-sign); font-weight: 400; font-size: clamp(1.2rem, 5.2vw, 2.3rem); color: #9ff3e4; letter-spacing: 2px; }
+.dna-msg { margin: 0; font-size: clamp(1.05rem, 3vw, 1.35rem); font-weight: 800; text-align: center; min-height: 2.6em; }
+.dna-close { position: absolute; top: 8px; right: 8px; width: 52px; height: 52px; border-radius: 50%;
+  background: var(--bone); color: var(--wood-dark); border: 4px solid var(--wood-dark); font-size: 1.6rem; font-weight: 900; }
+.dna-main { display: flex; align-items: center; justify-content: center; gap: 14px; width: 100%; }
+.dna-helix { width: 170px; height: 300px; flex: 0 0 auto; }
+.dna-helix svg { width: 100%; height: 100%; display: block; overflow: visible; }
+.dna-helix.spin svg { animation: dnaspin .5s linear 6; }
+.dna-helix.done svg { filter: drop-shadow(0 0 14px #9ff3e4); }
+@keyframes dnaspin { 0% { transform: scaleX(1); } 50% { transform: scaleX(-1); } 100% { transform: scaleX(1); } }
+.dna-gap { animation: gapblink 1s ease-in-out infinite; }
+@keyframes gapblink { 50% { opacity: .25; } }
+.dna-pieces { display: grid; grid-template-columns: repeat(2, 76px); gap: 12px; }
+.dna-piece { width: 76px; height: 76px; border-radius: 20px; background: rgba(255, 255, 255, .12); border: 4px solid var(--bone); padding: 6px; }
+.dna-piece svg { width: 100%; height: 100%; display: block; }
+.dna-piece.no { animation: shakeno .4s; }
+@keyframes shakeno { 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+.dna-go { background: var(--leaf); color: var(--bone); border: 5px solid var(--wood-dark); border-radius: 999px;
+  font-family: var(--font-sign); font-size: clamp(1.6rem, 5vw, 2.2rem); padding: 8px 36px; animation: nudge 1s ease-in-out infinite; }
+.dna-go[hidden], .dna-eggs[hidden] { display: none; }
+.dna-eggs { display: flex; gap: 10px; justify-content: center; }
+.dna-eggs svg { width: 54px; height: 66px; animation: eggwob .3s ease-in-out infinite alternate; }
+.dna-eggs.pop svg { animation: eggpop .6s ease-out forwards; }
+@keyframes eggwob { from { transform: rotate(-10deg); } to { transform: rotate(10deg); } }
+@keyframes eggpop { 0% { transform: scale(1); } 40% { transform: scale(1.4); } 100% { transform: scale(0); opacity: 0; } }
 .visit.mystery .care-bar, .visit.mystery .food-tray { display: none !important; }
 .visit-dino.shadow svg { filter: brightness(0) opacity(.85); }
 .visit-dino.reveal svg { animation: revealflash .9s ease; }
@@ -482,8 +525,8 @@ body.ghosts .ln-pick svg {
 /* after a meteor hit, the dinosaurs in the cages are only bones (Roy's idea) */
 body.park-dead .world { filter: sepia(.5) brightness(.75); }
 body.park-dead .needs { display: none; }
-body.park-dead .cage:not([data-mystery]) .dino { visibility: hidden; }
-body.park-dead .cage:not([data-mystery]):not(.empty)::after { content: ""; position: absolute; left: 25%; right: 25%; bottom: 22%; height: 30%;
+body.park-dead .cage .dino, body.park-dead .cage.mystery-cage .tarp { visibility: hidden; }
+body.park-dead .cage:not(.empty)::after { content: ""; position: absolute; left: 25%; right: 25%; bottom: 22%; height: 30%;
   background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 70'%3E%3Cg stroke='%236e5a3a' stroke-width='3' fill='%23efe3c4'%3E%3Cpath d='M10 52 h60 a6 6 0 1 1 6 6 a6 6 0 1 1 -6 6 h-60 a6 6 0 1 1 -6 -6 a6 6 0 1 1 6 -6z'/%3E%3Cpath d='M40 30 l40 18 a6 6 0 1 1 8 2 a6 6 0 1 1 -4 7 l-40 -18 a6 6 0 1 1 -8 -2 a6 6 0 1 1 4 -7z'/%3E%3Cellipse cx='92' cy='30' rx='20' ry='16'/%3E%3C/g%3E%3Ccircle cx='86' cy='28' r='4' fill='%233b2413'/%3E%3Ccircle cx='98' cy='28' r='4' fill='%233b2413'/%3E%3C/svg%3E") center bottom / contain no-repeat; pointer-events: none; }
 /* the Golden Monster made of gold (Roy's idea). Roy later asked for him to be BAD: a greedy gold-stealing villain */
 .gold-monster {
@@ -1531,6 +1574,7 @@ body.quake .app { animation: shake .4s ease; }
   <section class="view" id="view-map" hidden>
     <div class="map-wrap">
       <button class="find-mystery" id="find-mystery" aria-label="Find the mystery cage">?</button>
+      <button class="find-dna" id="find-dna" aria-label="DNA Combiner"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M12 2 Q36 12 20 20 Q4 28 28 38" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M28 2 Q4 12 20 20 Q36 28 12 38" stroke="#f9d27a" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M15 7 h10 M14 33 h12 M12 13 h16 M12 27 h16" stroke="#ff8a8a" stroke-width="3" stroke-linecap="round"/></svg></button>
       <div class="map-scroll" id="map-scroll">
         <div class="world" id="world"></div>
       </div>
@@ -1858,10 +1902,23 @@ body.quake .app { animation: shake .4s ease; }
     </g>
   </svg></div>
 </div>
+<div class="dna-lab" id="dna-lab" hidden>
+  <div class="dna-card">
+    <button class="dna-close" id="dna-close" aria-label="Close">&#x2715;</button>
+    <h2>DNA COMBINER</h2>
+    <p class="dna-msg" id="dna-msg"></p>
+    <div class="dna-main">
+      <div class="dna-helix" id="dna-helix"></div>
+      <div class="dna-pieces" id="dna-pieces"></div>
+    </div>
+    <button class="dna-go" id="dna-go" hidden>COMBINE!</button>
+    <div class="dna-eggs" id="dna-eggs" hidden></div>
+  </div>
+</div>
 <div class="meteor-boom" id="meteor-boom" hidden>
   <div class="caught-card" style="position:relative;left:auto;top:auto;transform:none">
     <strong>KABOOM!</strong>
-    <span>Oh no! The meteor hit Dino Island! All the dinosaurs turned into bones!</span>
+    <span>Oh no! The meteor hit Dino Island! All the dinosaurs turned into bones! Tap the DNA button to bring them back!</span>
     <button id="meteor-again">OK</button>
   </div>
 </div>
@@ -2713,30 +2770,133 @@ body.quake .app { animation: shake .4s ease; }
     }
     meteorWait = 0;
   }
-  var parkDead = false;
+  var parkDead = !!state.parkDead;
+  if (parkDead) document.body.classList.add("park-dead");
   function meteorImpact() {
     meteorOn = false; cancelAnimationFrame(meteorRaf);
     meteorSky.hidden = true;
     if (!visit.hidden) closeVisit();
-    parkDead = true; document.body.classList.add("park-dead");
+    parkDead = true; state.parkDead = true; save(); document.body.classList.add("park-dead");
     var f = document.createElement("div"); f.className = "meteor-flash"; document.body.appendChild(f); setTimeout(f.remove.bind(f), 1300);
     roar(0.4, 2.5); rumble(); splash(); quake();
     $("meteor-boom").hidden = false;
-    say("KABOOM! Oh no! The meteor hit Dino Island! All the dinosaurs turned into bones!");
+    say("KABOOM! Oh no! The meteor hit Dino Island! All the dinosaurs turned into bones! Even the mystery dinosaurs!");
   }
   $("meteor-again").addEventListener("click", function () {
     // Roy doesn't want the game to start over: the park just stays full of bones until he leaves it
     $("meteor-boom").hidden = true;
-    say("Only bones are left in the cages. Go back to the park gate, and the rangers will hatch new dinosaurs from their eggs!");
+    say("Only bones are left in the cages. There is only one way to bring the dinosaurs back: tap the DNA button and fix the secret DNA!");
   });
-  function reviveParkIfDead() {
-    if (!parkDead) return false;
-    parkDead = false; document.body.classList.remove("park-dead");
-    return true;
+
+  // ---------- the DNA Combiner (Roy's idea): fix the broken DNA to bring all the dinosaurs back ----------
+  var dnaOn = false, dnaLab = $("dna-lab"), dnaHelix = $("dna-helix"), dnaPieces = $("dna-pieces");
+  var DNA_COLS = [["red", "#e4372a"], ["blue", "#4a86c8"], ["yellow", "#f2c84a"], ["green", "#5cc46a"]];
+  var dnaRungs = [], dnaNext = 0;
+  var DNA_BADGE =
+    '<circle cx="55" cy="55" r="50" fill="#2a9d8f" stroke="#3b2413" stroke-width="5"/><circle cx="55" cy="55" r="38" fill="#0d2630"/>' +
+    '<path d="M42 22 Q72 38 55 55 Q38 72 68 88" stroke="#fff" stroke-width="5" fill="none" stroke-linecap="round"/>' +
+    '<path d="M68 22 Q38 38 55 55 Q72 72 42 88" stroke="#f9d27a" stroke-width="5" fill="none" stroke-linecap="round"/>' +
+    '<path d="M46 30 h18 M46 80 h18" stroke="#e4372a" stroke-width="4"/><path d="M44 40 h22 M44 70 h22" stroke="#5cc46a" stroke-width="4"/>';
+  function pieceSvg(c, dash) {
+    return dash
+      ? '<rect x="4" y="30" width="62" height="20" rx="10" fill="none" stroke="#fff" stroke-width="4" stroke-dasharray="8 6"/>'
+      : '<rect x="4" y="30" width="62" height="20" rx="10" fill="' + c + '" stroke="#fff" stroke-width="3"/><circle cx="66" cy="40" r="11" fill="' + c + '" stroke="#fff" stroke-width="3"/>';
   }
+  function drawHelix() {
+    var h = '<svg viewBox="0 0 200 400" aria-hidden="true">', a = "", b = "";
+    for (var y = 0; y <= 400; y += 10) {
+      a += (y ? " L" : "M") + (40 + 14 * Math.sin(y / 32)).toFixed(1) + " " + y;
+      b += (y ? " L" : "M") + (160 - 14 * Math.sin(y / 32)).toFixed(1) + " " + y;
+    }
+    dnaRungs.forEach(function (r, i) {
+      var y = 35 + i * 66, xa = 40 + 14 * Math.sin(y / 32), xb = 160 - 14 * Math.sin(y / 32);
+      h += '<line x1="' + xa + '" y1="' + y + '" x2="100" y2="' + y + '" stroke="' + r.col[1] + '" stroke-width="16" stroke-linecap="round"/>';
+      if (r.fixed) h += '<line x1="100" y1="' + y + '" x2="' + xb + '" y2="' + y + '" stroke="' + r.col[1] + '" stroke-width="16" stroke-linecap="round"/>';
+      else h += '<rect class="' + (i === dnaNext ? "dna-gap" : "") + '" x="96" y="' + (y - 10) + '" width="' + (xb - 96) + '" height="20" rx="10" fill="none" stroke="#fff" stroke-width="3" stroke-dasharray="7 5"/>';
+      h += '<circle cx="100" cy="' + y + '" r="6" fill="#0d2630" stroke="#fff" stroke-width="2"/>';
+    });
+    h += '<path d="' + a + '" stroke="#fff" stroke-width="9" fill="none" stroke-linecap="round"/><path d="' + b + '" stroke="#f9d27a" stroke-width="9" fill="none" stroke-linecap="round"/></svg>';
+    dnaHelix.innerHTML = h;
+  }
+  function nextGap() {
+    for (var i = 0; i < dnaRungs.length; i++) if (!dnaRungs[i].fixed) return i;
+    return -1;
+  }
+  function openDna() {
+    if (!parkDead) return;
+    dnaOn = true; dnaLab.hidden = false;
+    dnaRungs = [];
+    for (var i = 0; i < 6; i++) dnaRungs.push({ col: DNA_COLS[Math.floor(Math.random() * 4)], fixed: true });
+    [0, 2, 3, 5].forEach(function (i) { dnaRungs[i].fixed = false; });
+    dnaNext = nextGap();
+    drawHelix();
+    dnaPieces.innerHTML = DNA_COLS.map(function (c, i) {
+      return '<button class="dna-piece" data-i="' + i + '" aria-label="' + c[0] + ' piece"><svg viewBox="0 0 80 80" aria-hidden="true">' + pieceSvg(c[1]) + '</svg></button>';
+    }).join("");
+    dnaHelix.classList.remove("spin", "done");
+    $("dna-go").hidden = true; $("dna-eggs").hidden = true; dnaPieces.hidden = false;
+    tone(200, 0, 0.4, "sine", 0.15, 800); tone(800, 0.3, 0.4, "sine", 0.12, 400);
+    var line = "The DNA is broken! Find the " + dnaRungs[dnaNext].col[0] + " piece to fix the blinking gap!";
+    $("dna-msg").textContent = line;
+    say("This is the secret DNA Combiner! " + line);
+  }
+  function closeDna() { dnaOn = false; dnaLab.hidden = true; }
+  $("find-dna").addEventListener("click", openDna);
+  $("dna-close").addEventListener("click", closeDna);
+  dnaPieces.addEventListener("click", function (e) {
+    var btn = e.target.closest(".dna-piece");
+    if (!btn || dnaNext < 0) return;
+    var c = DNA_COLS[Number(btn.dataset.i)], r = dnaRungs[dnaNext];
+    if (c !== r.col) {
+      bleh(); btn.classList.remove("no"); void btn.offsetWidth; btn.classList.add("no");
+      $("dna-msg").textContent = "Not that one! Find the " + r.col[0] + " piece!";
+      say("Not that one! Find the " + r.col[0] + " piece!");
+      return;
+    }
+    r.fixed = true; dnaNext = nextGap(); drawHelix();
+    tone(520, 0, 0.12, "square", 0.08); tone(780, 0.1, 0.2, "triangle", 0.12);
+    if (dnaNext >= 0) {
+      $("dna-msg").textContent = "Click! Now find the " + dnaRungs[dnaNext].col[0] + " piece!";
+      say("Click! It fits! Now find the " + dnaRungs[dnaNext].col[0] + " piece!");
+    } else {
+      dnaHelix.classList.add("done"); chime();
+      dnaPieces.hidden = true; $("dna-go").hidden = false;
+      $("dna-msg").textContent = "The DNA is fixed! Tap COMBINE!";
+      say("You fixed the DNA! Now tap the big COMBINE button!");
+    }
+  });
+  $("dna-go").addEventListener("click", function () {
+    $("dna-go").hidden = true;
+    dnaHelix.classList.add("spin");
+    for (var i = 0; i < 12; i++) tone(200 + i * 60, i * 0.22, 0.24, "sawtooth", 0.05);
+    $("dna-msg").textContent = "Whirr... combining the DNA...";
+    say("Whirrrr! The DNA Combiner is working!");
+    var eggs = $("dna-eggs");
+    eggs.innerHTML = ["#4a86c8", "#5cc46a", "#f2c84a", "#e4572a", "#9b6fc4"].map(function (c) {
+      return '<svg viewBox="0 0 54 66" aria-hidden="true"><ellipse cx="27" cy="36" rx="22" ry="28" fill="#f4e8cc" stroke="#a8844f" stroke-width="3"/><circle cx="18" cy="30" r="5" fill="' + c + '"/><circle cx="34" cy="44" r="6" fill="' + c + '"/><circle cx="31" cy="22" r="3" fill="' + c + '"/></svg>';
+    }).join("");
+    eggs.classList.remove("pop");
+    setTimeout(function () { eggs.hidden = false; $("dna-msg").textContent = "Dinosaur eggs! They are hatching!"; tone(300, 0, 0.1, "square", 0.1); }, 2800);
+    setTimeout(function () {
+      eggs.classList.add("pop");
+      [0, 0.15, 0.3, 0.45, 0.6].forEach(function (t) { tone(900, t, 0.08, "square", 0.08, 400); });
+      chirp(); roar(0.6, 1.2);
+    }, 4600);
+    setTimeout(function () {
+      closeDna();
+      parkDead = false; state.parkDead = false; save(); document.body.classList.remove("park-dead");
+      updateNeeds(); fanfare();
+      say("Hooray! The DNA Combiner worked! All the dinosaurs are alive again, even the mystery dinosaurs! Watch out for meteors!");
+      if (!state.found.dna) {
+        state.found.dna = true; save();
+        addStar(starsEl);
+        setTimeout(function () { showBadge("DNA Scientist", "You fixed the DNA and brought the dinosaurs back!", DNA_BADGE); }, 600);
+      }
+    }, 5600);
+  });
   // count a minute while Roy is in the big park with the cages
   setInterval(function () {
-    var inPark = !viewMap.hidden && !parkDead && !bkActive && gm.hidden && !meteorOn && $("meteor-boom").hidden && !document.hidden;
+    var inPark = !viewMap.hidden && !parkDead && !dnaOn && !bkActive && gm.hidden && !meteorOn && $("meteor-boom").hidden && !document.hidden;
     if (!inPark) { if (viewMap.hidden) meteorWait = 0; return; }
     meteorWait += 1;
     if (meteorWait >= 60) { meteorWait = 0; startMeteor(); }
@@ -2745,7 +2905,7 @@ body.quake .app { animation: shake .4s ease; }
   // surprise! now and then a dinosaur breaks out of the screen anywhere in the game
   var playSecs = 0;
   setInterval(function () {
-    var busy = bkActive || meteorOn || lnOn || !gm.hidden || document.hidden || !viewSea.hidden || !viewChase.hidden || !$("meteor-boom").hidden;
+    var busy = bkActive || dnaOn || meteorOn || lnOn || !gm.hidden || document.hidden || !viewSea.hidden || !viewChase.hidden || !$("meteor-boom").hidden;
     if (busy) return;
     playSecs += 1;
     if (playSecs < 60) return;
@@ -2793,7 +2953,6 @@ body.quake .app { animation: shake .4s ease; }
   homeBtn.addEventListener("click", function () {
     clearMission(true); activeMission = null; gm.hidden = true;
     viewLab.hidden = true; viewMap.hidden = true; viewMission.hidden = true; viewBook.hidden = true; foundBox.hidden = true; viewShop.hidden = true; shopOpen = false; viewMemory.hidden = true; memoryLock = true; viewHouse.hidden = true; escTimers.forEach(clearTimeout); stopCamera(); viewPark.hidden = false; homeBtn.hidden = true;
-    if (reviveParkIfDead()) hatchedAgain = true;
     say("Welcome back to the park gate! Where shall we go?");
   });
 
@@ -3373,15 +3532,12 @@ body.quake .app { animation: shake .4s ease; }
   }
   buildWorld();
 
-  var hatchedAgain = false;
   function openMap(care) {
     viewPark.hidden = true; viewMap.hidden = false; homeBtn.hidden = false;
     boing();
     updateNeeds();
-    if (hatchedAgain) {
-      hatchedAgain = false;
-      chime();
-      say("Hooray! The rangers hatched new dinosaurs from their eggs! Your park is full of dinosaurs again! Watch out for meteors!");
+    if (parkDead) {
+      say("Oh no, the cages are full of bones! Tap the DNA button to bring the dinosaurs back!");
     } else if (care) {
       var h = DINOS.filter(isHungry).length, m = DINOS.filter(isDirty).length;
       say(h || m
@@ -3406,7 +3562,7 @@ body.quake .app { animation: shake .4s ease; }
     if (cage.dataset.mystery) { openMystery(Number(cage.dataset.mystery) - 1); return; }
     if (parkDead && DINOS[Number(cage.dataset.cage)]) {
       clunk();
-      say("Only bones are left. The meteor hit Dino Island! Go back to the park gate, and the rangers will hatch new dinosaurs from their eggs!");
+      say("Only bones are left. The meteor hit Dino Island! Tap the DNA button to bring the dinosaurs back!");
       return;
     }
     var d = DINOS[Number(cage.dataset.cage)];
@@ -3481,6 +3637,7 @@ body.quake .app { animation: shake .4s ease; }
       $("visit-name").textContent = m.name;
       $("visit-fact").textContent = m.fact;
       m.sound();
+      if (parkDead) { say("It's " + m.name + ", but the meteor turned it into bones! Tap the DNA button on the park map to bring it back!"); return; }
       say("You already found this mystery dinosaur today. It's " + m.name + "! " + (mysteriesLeft() ? "There are " + mysteriesLeft() + " more Mystery Cages to solve today!" : "You solved every Mystery Cage today! Come back tomorrow for new ones!"));
       return;
     }
