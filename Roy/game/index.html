@@ -496,6 +496,26 @@ body:not(.park-dead) .find-dna { display: none; }
   background: #7a2a14; border: 4px solid var(--bone); box-shadow: 0 0 20px rgba(242, 120, 40, .9); }
 .call-meteor svg { width: 100%; height: 100%; display: block; }
 body.park-dead .call-meteor { display: none; }
+/* 200 million Mystery Cages, each with a made-up dinosaur (Roy's idea) */
+.find-mega { position: absolute; top: 158px; right: 10px; z-index: 2; width: 64px; height: 64px; border-radius: 50%; padding: 4px;
+  background: #c9961e; border: 4px solid var(--bone); box-shadow: 0 0 20px rgba(249, 210, 122, .9); }
+.find-mega svg { width: 100%; height: 100%; display: block; }
+.mega-num { margin: 0; font-family: var(--font-sign); font-size: clamp(1.3rem, 5vw, 2rem); color: #fff3b0; text-align: center; }
+.mega-num small { display: block; font-family: inherit; font-size: .55em; color: var(--bone); opacity: .85; }
+.mega-cage { position: relative; width: 300px; height: 230px; max-width: 100%; border-radius: 22px;
+  background: radial-gradient(ellipse at 50% 85%, #6b8a3a, #2e4a1e 70%); border: 5px solid #6e4524; overflow: hidden; }
+.mega-cage .bars { position: absolute; inset: 0; pointer-events: none;
+  background: repeating-linear-gradient(90deg, transparent 0 34px, rgba(110, 69, 36, .9) 34px 40px); opacity: .55; }
+.mega-cage .bars.gone { opacity: 0; transition: opacity .6s; }
+.mega-dino { position: absolute; left: 6%; right: 6%; top: 10%; bottom: 4%; }
+.mega-dino svg { width: 100%; height: 100%; display: block; overflow: visible; }
+.mega-dino.shadow svg { filter: brightness(0) opacity(.85); }
+.mega-dino.reveal svg { animation: revealflash .9s ease; }
+.mega-dino.hop svg { animation: hop .55s cubic-bezier(.3, 1.4, .5, 1); }
+.mega-cloth { position: absolute; left: 8%; right: 8%; top: 6%; bottom: 0; transition: transform .6s ease-in, opacity .6s; animation: tarpwiggle 2.4s ease-in-out infinite; }
+.mega-cloth svg { width: 100%; height: 100%; display: block; }
+.mega-cloth.off { transform: translateY(-120%) rotate(-12deg); opacity: 0; animation: none; }
+.mega-fact { margin: 0; font-size: clamp(1rem, 2.8vw, 1.2rem); font-weight: 800; text-align: center; min-height: 2.4em; }
 /* after a meteor the mystery dinosaurs are bones too, but Roy can still open the Mystery Cages and solve them */
 body.park-dead .visit.mystery .visit-dino:not(.shadow) svg { filter: grayscale(1) sepia(.55) brightness(1.3) contrast(.85); }
 .dna-lab { position: fixed; inset: 0; z-index: 8; pointer-events: auto; background: rgba(5, 12, 20, .82);
@@ -1660,6 +1680,7 @@ body.quake .app { animation: shake .4s ease; }
     <div class="map-wrap">
       <button class="find-mystery" id="find-mystery" aria-label="Find the mystery cage">?</button>
       <button class="call-meteor" id="call-meteor" aria-label="Call a meteor"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M4 4 L22 16 M10 2 L26 12 M2 12 L18 22" stroke="#f9d27a" stroke-width="4" stroke-linecap="round"/><circle cx="26" cy="26" r="11" fill="#8a7a6a" stroke="#f2a93b" stroke-width="3"/><circle cx="23" cy="24" r="3" fill="#5b4a3e"/><circle cx="30" cy="30" r="2.5" fill="#5b4a3e"/></svg></button>
+      <button class="find-mega" id="find-mega" aria-label="200 million Mystery Cages"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M4 34 Q4 12 12 12 Q20 12 20 34 Z" fill="#6b4a9b"/><path d="M20 34 Q20 12 28 12 Q36 12 36 34 Z" fill="#2f7a7a"/><path d="M11 30 Q11 6 20 6 Q29 6 29 30 Z" fill="#a83a5a" stroke="#fff3b0" stroke-width="1.5"/><text x="20" y="25" text-anchor="middle" font-size="14" font-weight="900" fill="#f2d24b">?</text></svg></button>
       <button class="find-dna" id="find-dna" aria-label="DNA Combiner"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M12 2 Q36 12 20 20 Q4 28 28 38" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M28 2 Q4 12 20 20 Q36 28 12 38" stroke="#f9d27a" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M15 7 h10 M14 33 h12 M12 13 h16 M12 27 h16" stroke="#ff8a8a" stroke-width="3" stroke-linecap="round"/></svg></button>
       <div class="map-scroll" id="map-scroll">
         <div class="world" id="world"></div>
@@ -2015,6 +2036,18 @@ body.quake .app { animation: shake .4s ease; }
     <p class="mix-name" id="mix-name"></p>
     <div class="mix-btns"><button class="dna-go" id="mix-go" disabled>MIX!</button><button class="mix-swap" id="mix-swap" hidden>&#x21C4; Swap</button><button class="mix-swap" id="mix-rand">&#x2753; Surprise!</button></div>
     <div class="mix-grid" id="mix-grid"></div>
+  </div>
+</div>
+<div class="chick-lab" id="mega-lab" hidden>
+  <div class="chick-card" style="border-color:#c9961e;background:radial-gradient(ellipse at 50% 40%, #4a3270, #1e1430 75%)">
+    <button class="dna-close" id="mega-close" aria-label="Close">&#x2715;</button>
+    <h2>MYSTERY CAGE</h2>
+    <p class="mega-num" id="mega-num"></p>
+    <div class="mega-cage" id="mega-cage" role="button" aria-label="Mystery cage"><div class="mega-dino shadow" id="mega-dino"></div><div class="bars" id="mega-bars"></div><div class="mega-cloth" id="mega-cloth"></div></div>
+    <div class="clue-dots" id="mega-dots"><span></span><span></span><span></span></div>
+    <p class="mix-name" id="mega-name"></p>
+    <p class="mega-fact" id="mega-fact"></p>
+    <div class="mix-btns"><button class="mix-swap" id="mega-prev" aria-label="Cage before">&#x25C0;</button><button class="mix-swap" id="mega-rand">&#x1F3B2; Jump!</button><button class="mix-swap" id="mega-next" aria-label="Next cage">&#x25B6;</button></div>
   </div>
 </div>
 <div class="dna-lab" id="dna-lab" hidden>
@@ -4028,6 +4061,106 @@ body.quake .app { animation: shake .4s ease; }
       }, 2600);
     }
   }, true);
+  // ---------- 200 million Mystery Cages, each with a made-up dinosaur (Roy's idea) ----------
+  var MEGA_MAX = 200000000;
+  function rng(seed) { var a = seed >>> 0; return function () { a |= 0; a = a + 0x6D2B79F5 | 0; var t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+  function pickR(r, a) { return a[Math.floor(r() * a.length)]; }
+  var MEGA_COLS = [["#e4572a", "#b8401c", "#f6c3a0"], ["#4a86c8", "#3a6aa0", "#cfe2f6"], ["#7a4ac8", "#5a32a0", "#e0d0f6"], ["#3fae6a", "#2f8a50", "#d0f0d8"],
+    ["#f2c84a", "#c99a1e", "#fff3c0"], ["#e44a9a", "#b83478", "#f8d0e8"], ["#2ab0b8", "#1e8a90", "#c8f0f2"], ["#8a6a3a", "#6a4e28", "#e8d8b8"],
+    ["#6a7a8a", "#4e5a68", "#dde4ea"], ["#c84a4a", "#9a3434", "#f6d0d0"], ["#9ac83a", "#78a02a", "#eaf6c8"], ["#f28a2a", "#c86a1a", "#fde0c0"]];
+  var MEGA_START = ["Zappo", "Glimmer", "Rumble", "Spiky", "Fluffy", "Turbo", "Bonko", "Twinkle", "Mega", "Snorty", "Wiggle", "Thunder", "Bubble", "Crunchy",
+    "Sparkle", "Zoomy", "Giggle", "Rocket", "Pickle", "Stompy", "Noodle", "Banana", "Cosmo", "Pebble", "Blizzard", "Jelly", "Pizza", "Volcano", "Rainbow", "Biscuit",
+    "Tornado", "Marble", "Puddle", "Sizzle", "Waffle", "Comet", "Jumbo", "Squeaky", "Cactus", "Boom"];
+  var MEGA_END = ["saurus", "raptor", "ceratops", "don", "tops", "rex", "nyx", "mimus", "pteryx", "zilla", "osaurus", "odon", "tor", "spinus"];
+  var MEGA_FOOD = ["bananas", "pizza leaves", "jungle berries", "giant mushrooms", "fish sticks", "pinecones", "seaweed spaghetti", "coconuts", "crunchy carrots", "watermelons", "pancakes", "sparkly ferns"];
+  var MEGA_CAN = ["run as fast as a car", "jump over trees", "sneeze bubbles", "glow in the dark", "sing like a bird", "swim like a fish", "dig deep tunnels",
+    "do a backflip", "snore like thunder", "climb up volcanoes", "hide in the grass", "dance in the rain", "whistle a tune", "balance on one leg"];
+  var MEGA_BIG = ["as tall as a house", "as small as a cat", "as long as a bus", "as tall as a giraffe", "as small as a chicken", "as big as an elephant", "as tall as a door", "as long as a train"];
+  var MEGA_FEAT = [
+    { id: "horns", txt: "three horns on its head", x: function (b, hx, hy) { return '<path d="M' + (hx + (b ? 8 : 18)) + ' ' + (hy - 10) + ' l6 -26 l6 24 Z M' + (hx - 6) + ' ' + (hy - 12) + ' l2 -20 l8 18 Z M' + (hx + (b ? 30 : 30)) + ' ' + (hy - 4) + ' l10 -14 l2 14 Z" fill="#f4e8cc" stroke="#a8844f" stroke-width="2"/>'; } },
+    { id: "crest", txt: "a big round crest on its head", x: function (b, hx, hy, c) { return '<path d="M' + (hx - 16) + ' ' + (hy - 8) + ' Q' + (hx - 6) + ' ' + (hy - 50) + ' ' + (hx + 18) + ' ' + (hy - 12) + ' Z" fill="' + c[1] + '" stroke="#1d1d1b" stroke-width="2"/>'; } },
+    { id: "spikes", txt: "pointy spikes all along its back", x: function (b) { var o = ""; for (var i = 0; i < 6; i++) { var x = (b ? 66 : 56) + i * (b ? 13 : 16), y = b ? 74 + Math.abs(i - 2.5) * 3 : backTop(x + 7, 34) + 4; o += '<path d="M' + x + ' ' + y + ' l7 -18 l7 18 Z" fill="#f4e8cc" stroke="#a8844f" stroke-width="2"/>'; } return o; } },
+    { id: "sail", txt: "a giant sail on its back", pre: function (b, hx, hy, c) { return b ? '<path d="M62 86 Q100 10 140 80 Z" fill="' + c[1] + '" stroke="#1d1d1b" stroke-width="2"/>' : '<path d="M52 80 Q100 0 150 76 Z" fill="' + c[1] + '" stroke="#1d1d1b" stroke-width="2"/>'; } },
+    { id: "frill", txt: "a huge frill like a shield", pre: function (b, hx, hy, c) { return '<circle cx="' + (hx - 14) + '" cy="' + (hy - 6) + '" r="' + (b ? 28 : 32) + '" fill="' + c[2] + '" stroke="' + c[1] + '" stroke-width="5"/>'; } },
+    { id: "club", txt: "a club on the end of its tail", x: function (b) { return b ? '<circle cx="8" cy="60" r="12" fill="#a8844f" stroke="#6e4524" stroke-width="3"/>' : '<circle cx="8" cy="84" r="13" fill="#a8844f" stroke="#6e4524" stroke-width="3"/>'; } },
+    { id: "spots", txt: "big spots all over", x: function (b, hx, hy, c) { var o = ""; [[-20, -8], [4, -14], [24, 0], [-6, 6], [30, -16]].forEach(function (p) { o += '<circle cx="' + ((b ? 102 : 100) + p[0]) + '" cy="' + ((b ? 98 : 92) + p[1]) + '" r="7" fill="' + c[1] + '"/>'; }); return o; } },
+    { id: "stripes", txt: "zig-zag stripes", x: function (b, hx, hy, c) { var o = ""; for (var i = -2; i <= 2; i++) o += '<path d="M' + ((b ? 102 : 100) + i * 16) + ' ' + (b ? 74 : 66) + ' l-6 12 l8 8 l-6 12" stroke="' + c[1] + '" stroke-width="5" fill="none" stroke-linejoin="round"/>'; return o; } },
+    { id: "feathers", txt: "fluffy feathers on its head", x: function (b, hx, hy) { return '<path d="M' + (hx - 12) + ' ' + (hy - 12) + ' q-6 -18 4 -22 q2 12 4 18 q2 -16 10 -14 q-2 10 -2 16" fill="#f26a9a" stroke="#b8346a" stroke-width="2"/>'; } },
+    { id: "plates", txt: "tall plates on its back", pre: function (b) { if (!b) return plates(); var o = ""; for (var i = 0; i < 5; i++) { var x = 66 + i * 15; o += '<path d="M' + x + ' 80 L' + (x + 8) + ' ' + (52 - (i === 2 ? 8 : 0)) + ' L' + (x + 16) + ' 80 Z" fill="#e0763a" stroke="#a84a24" stroke-width="2"/>'; } return o; } }
+  ];
+  function megaDino(n) {
+    var r = rng(n * 7919 + 13), b = r() < 0.5, col = pickR(r, MEGA_COLS);
+    var feats = [], pool = MEGA_FEAT.slice();
+    for (var k = 0, cnt = 1 + Math.floor(r() * 3); k < cnt; k++) feats.push(pool.splice(Math.floor(r() * pool.length), 1)[0]);
+    var o = { c: col[0], d: col[1], b: col[2] };
+    if (b) { o.neck = Math.floor(r() * 3) * 8; o.snout = Math.floor(r() * 3) * 6 - 4; o.arm = 8 + Math.floor(r() * 3) * 4; }
+    else { o.neckUp = pickR(r, [-10, 4, 20, 44]); o.headR = 0.8 + r() * 0.3; }
+    o.pre = function (hx, hy) { return feats.map(function (f) { return f.pre ? f.pre(b, hx, hy, col) : ""; }).join(""); };
+    o.x = function (hx, hy) { return feats.map(function (f) { return f.x ? f.x(b, hx, hy, col) : ""; }).join(""); };
+    var name = pickR(r, MEGA_START) + pickR(r, MEGA_END);
+    var size = pickR(r, MEGA_BIG), food = pickR(r, MEGA_FOOD), can = pickR(r, MEGA_CAN);
+    var pitch = 0.5 + r() * 1.2, kind = Math.floor(r() * 3);
+    var list = feats.map(function (f) { return f.txt; });
+    var has = list.length > 1 ? list.slice(0, -1).join(", ") + " and " + list[list.length - 1] : list[0];
+    return { n: n, name: name, svg: b ? biped(o) : quad(o),
+      clue: "Here is a clue: I have " + feats[0].txt + ", and I am " + size + "!",
+      fact: name + " is a made-up dinosaur! It has " + has + ". It loves to eat " + food + ", and it can " + can + "!",
+      sound: function () { if (kind === 0) roar(pitch, 1); else if (kind === 1) { tone(400 * pitch, 0, 0.3, "square", 0.1, 700 * pitch); tone(600 * pitch, 0.3, 0.3, "square", 0.1, 300 * pitch); } else chirp(); } };
+  }
+  var megaN = 1, megaStep = 0, megaCur = null;
+  function megaSolved() { return state.found.megaSolved || []; }
+  function showMega(n) {
+    megaN = Math.max(1, Math.min(MEGA_MAX, n)); megaCur = megaDino(megaN);
+    var solved = megaSolved().indexOf(megaN) >= 0;
+    megaStep = solved ? 3 : 0;
+    $("mega-num").innerHTML = "Cage " + megaN.toLocaleString("en-US") + "<small>of 200,000,000</small>";
+    $("mega-dino").innerHTML = megaCur.svg;
+    $("mega-dino").className = "mega-dino" + (solved ? "" : " shadow");
+    $("mega-bars").className = "bars" + (solved ? " gone" : "");
+    var cloth = CLOTHS[megaN % CLOTHS.length];
+    $("mega-cloth").innerHTML = '<svg viewBox="0 0 160 140" preserveAspectRatio="none" aria-hidden="true"><path d="M10 140 Q4 40 30 20 Q80 -6 130 20 Q156 40 150 140 Z" fill="' + cloth + '"/>' +
+      '<path d="M40 140 Q36 60 50 30 M80 140 V24 M120 140 Q124 60 110 30" stroke="rgba(0,0,0,.25)" stroke-width="4" fill="none"/>' +
+      '<text x="80" y="92" text-anchor="middle" font-size="64" font-weight="900" fill="#f2d24b">?</text></svg>';
+    $("mega-cloth").className = "mega-cloth" + (solved ? " off" : "");
+    $("mega-dots").querySelectorAll("span").forEach(function (sp, i) { sp.classList.toggle("on", i < megaStep); });
+    $("mega-name").textContent = solved ? megaCur.name : "";
+    $("mega-fact").textContent = solved ? megaCur.fact : "Tap the cage to find out who is hiding!";
+  }
+  $("find-mega").addEventListener("click", function () {
+    $("mega-lab").hidden = false;
+    var s2 = megaSolved();
+    showMega(s2.length ? Math.min(MEGA_MAX, Math.max.apply(null, s2.slice(-50)) + 1) : 1);
+    tone(300, 0, 0.6, "sine", 0.2, 700);
+    say("Welcome to the 200 million Mystery Cages! Every cage has a brand new made-up dinosaur! Tap the cage to find out who is hiding, or tap the dice to jump to any cage!");
+  });
+  $("mega-close").addEventListener("click", function () { $("mega-lab").hidden = true; });
+  $("mega-prev").addEventListener("click", function () { boing(); showMega(megaN - 1); say("Cage " + megaN.toLocaleString("en-US") + "!"); });
+  $("mega-next").addEventListener("click", function () { boing(); showMega(megaN + 1); say("Cage " + megaN.toLocaleString("en-US") + "!"); });
+  $("mega-rand").addEventListener("click", function () {
+    rustle(); showMega(1 + Math.floor(Math.random() * MEGA_MAX));
+    say("Whoosh! Jump to cage " + megaN.toLocaleString("en-US") + "! Who is hiding in there?");
+  });
+  $("mega-cage").addEventListener("click", function () {
+    var m = megaCur, dino = $("mega-dino");
+    dino.classList.remove("hop"); void dino.offsetWidth; dino.classList.add("hop");
+    if (megaStep >= 3) { m.sound(); say(m.fact); return; }
+    megaStep += 1;
+    $("mega-dots").querySelectorAll("span").forEach(function (sp, i) { sp.classList.toggle("on", i < megaStep); });
+    if (megaStep === 1) { $("mega-cloth").classList.add("off"); rustle(); m.sound(); say("Whoosh, the cloth is off! Listen! That's how it sounds! Tap again for a clue."); $("mega-fact").textContent = "Tap again for a clue!"; return; }
+    if (megaStep === 2) { boing(); say(m.clue + " Tap again to see it!"); $("mega-fact").textContent = m.clue.replace("Here is a clue: ", ""); return; }
+    dino.classList.remove("shadow"); void dino.offsetWidth; dino.classList.add("reveal");
+    $("mega-bars").classList.add("gone");
+    fanfare(); m.sound();
+    $("mega-name").textContent = m.name;
+    $("mega-fact").textContent = m.fact;
+    say("Ta-da! It's " + m.name + "! " + m.fact);
+    var list = megaSolved(); list.push(megaN); if (list.length > 5000) list.shift(); state.found.megaSolved = list; save();
+    addStar(dino);
+    if (!state.found.megaMystery) {
+      state.found.megaMystery = true; save();
+      setTimeout(function () { showBadge("Mega Mystery", "You opened one of the 200 million Mystery Cages!", MYSTERY_BADGE.replace("#9b6fc4", "#c9961e")); }, 1500);
+    }
+  });
   $("find-mystery").addEventListener("click", function () {
     var pos = cagePos(mysteryIdx);
     mapScroll.scrollTo({ left: Math.max(0, pos.x - 120), top: Math.max(0, pos.y - 60), behavior: "smooth" });
