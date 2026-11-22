@@ -1042,6 +1042,7 @@ body.park-dead .cage:not(.empty)::after { content: ""; position: absolute; left:
 .mem-level svg { width: 100%; height: auto; display: block; }
 .mem-level b { color: var(--amber); letter-spacing: 3px; font-size: 1.3rem; }
 .mem-level:active { transform: scale(.95); }
+.mem-tools { display: flex; justify-content: center; padding: 6px; pointer-events: auto; }
 .mem-board {
   flex: 1; min-height: 0;
   display: grid; gap: 10px; padding: 10px;
@@ -1751,6 +1752,7 @@ body.quake .app { animation: shake .4s ease; }
         <div class="mem-level" role="button" tabindex="0" data-level="hard"><svg viewBox="0 0 200 130" aria-hidden="true"><rect x="10.0" y="10.0" width="37.5" height="20.0" rx="5" fill="#f2a93b" stroke="#3b2413" stroke-width="2.5"/><rect x="57.5" y="10.0" width="37.5" height="20.0" rx="5" fill="#f2a93b" stroke="#3b2413" stroke-width="2.5"/><rect x="105.0" y="10.0" width="37.5" height="20.0" rx="5" fill="#f2a93b" stroke="#3b2413" stroke-width="2.5"/><rect x="152.5" y="10.0" width="37.5" height="20.0" rx="5" fill="#f2a93b" stroke="#3b2413" stroke-width="2.5"/><rect x="10.0" y="40.0" width="37.5" height="20.0" rx="5" fill="#f2a93b" stroke="#3b2413" stroke-width="2.5"/><rect x="57.5" y="40.0" width="37.5" height="20.0" rx="5" fill="#f2a93b" stroke="#3b2413" stroke-width="2.5"/><rect x="105.0" y="40.0" width="37.5" height="20.0" rx="5" fill="#f2a93b" stroke="#3b2413" stroke-width="2.5"/><rect x="152.5" y="40.0" width="37.5" height="20.0" rx="5" fill="#f2a93b" stroke="#3b2413" stroke-width="2.5"/><rect x="10.0" y="70.0" width="37.5" height="20.0" rx="5" fill="#f2a93b" stroke="#3b2413" stroke-width="2.5"/><rect x="57.5" y="70.0" width="37.5" height="20.0" rx="5" fill="#f2a93b" stroke="#3b2413" stroke-width="2.5"/><rect x="105.0" y="70.0" width="37.5" height="20.0" rx="5" fill="#f2a93b" stroke="#3b2413" stroke-width="2.5"/><rect x="152.5" y="70.0" width="37.5" height="20.0" rx="5" fill="#f2a93b" stroke="#3b2413" stroke-width="2.5"/><rect x="10.0" y="100.0" width="37.5" height="20.0" rx="5" fill="#f2a93b" stroke="#3b2413" stroke-width="2.5"/><rect x="57.5" y="100.0" width="37.5" height="20.0" rx="5" fill="#f2a93b" stroke="#3b2413" stroke-width="2.5"/><rect x="105.0" y="100.0" width="37.5" height="20.0" rx="5" fill="#f2a93b" stroke="#3b2413" stroke-width="2.5"/><rect x="152.5" y="100.0" width="37.5" height="20.0" rx="5" fill="#f2a93b" stroke="#3b2413" stroke-width="2.5"/></svg>Big<b>&#9733;&#9733;&#9733;</b></div>
       </div>
       <div class="mem-board" id="mem-board" hidden></div>
+      <div class="mem-tools" id="mem-tools" hidden><button class="mix-swap" id="mem-mix"><svg viewBox="0 0 40 40" aria-hidden="true" style="width:30px;height:30px;vertical-align:middle"><path d="M6 12 h10 l12 16 h6 M6 28 h10 l12 -16 h6" stroke="#fff3b0" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M30 6 l6 6 -6 6 M30 22 l6 6 -6 6" stroke="#fff3b0" stroke-width="4" fill="none" stroke-linecap="round"/></svg> Mix!</button></div>
       <div class="blaster-shelf" id="blaster-shelf"></div>
     </div>
   </section>
@@ -2616,7 +2618,7 @@ body.quake .app { animation: shake .4s ease; }
     later(function () { bk.hidden = true; bkActive = false; bk.className = "breakout"; mixUpMemory(); }, 3300);
   }
   // the runaway dinosaur mixes up the face-down memory cards on its way out (Roy's idea)
-  function mixUpMemory() {
+  function mixUpMemory(line) {
     if (viewMemory.hidden || memBoard.hidden) return;
     var cards = Array.prototype.slice.call(memBoard.querySelectorAll(".mcard:not(.matched)"));
     if (cards.length < 2) return;
@@ -2634,7 +2636,7 @@ body.quake .app { animation: shake .4s ease; }
     rustle(); boing();
     memoryLock = true;
     setTimeout(function () { memoryLock = false; }, 950);
-    say("Whoosh! The dinosaur mixed up all your memory cards! All mixed up! Can you still find the pairs?");
+    say(line || "Whoosh! The dinosaur mixed up all your memory cards! All mixed up! Can you still find the pairs?");
   }
   function walkAbout() {
     if (!bkLoose) return;
@@ -5145,7 +5147,7 @@ body.quake .app { animation: shake .4s ease; }
   function showMemLevels() {
     renderShelf(); $("blaster-shelf").hidden = false;
     memoryLock = true;
-    memBoard.hidden = true; memLevels.hidden = false;
+    memBoard.hidden = true; memLevels.hidden = false; $("mem-tools").hidden = true;
   }
   memLevels.addEventListener("click", function (e) {
     var b = e.target.closest(".mem-level");
@@ -5154,7 +5156,7 @@ body.quake .app { animation: shake .4s ease; }
   function startMemory(level) {
     $("blaster-shelf").hidden = true;
     var L = MEM_LEVELS[level];
-    memLevel = level; memFirst = null; memMatched = 0; memoryLock = false;
+    memLevel = level; memFirst = null; memMatched = 0; memoryLock = false; memMagic = false;
     var picks = shuffle(DINOS.slice()).slice(0, L.pairs);
     memDeck = shuffle(picks.concat(picks));
     var upright = window.innerHeight > window.innerWidth;
@@ -5168,7 +5170,7 @@ body.quake .app { animation: shake .4s ease; }
         '<div class="mface" hidden>' + memFace(d) + '</div>' +
         '</div>';
     }).join("");
-    memLevels.hidden = true; memBoard.hidden = false;
+    memLevels.hidden = true; memBoard.hidden = false; $("mem-tools").hidden = false;
     rustle();
     say("Find the pairs! Tap a card.");
   }
@@ -5183,8 +5185,51 @@ body.quake .app { animation: shake .4s ease; }
       if (done) setTimeout(done, 160);
     }, 150);
   }
+  // Roy's finger magic: tap the same card 2 times fast and every card finds its partner
+  var memLastTap = { card: null, t: 0 }, memMagic = false;
+  function magicMatch() {
+    var L = MEM_LEVELS[memLevel];
+    if (memMatched >= L.pairs || memMagic) return;
+    memMagic = true; memoryLock = true; memFirst = null;
+    var left = Array.prototype.slice.call(memBoard.querySelectorAll(".mcard:not(.matched)"));
+    var groups = {};
+    left.forEach(function (c) { var d = memDeck[Number(c.dataset.i)]; (groups[d.id] = groups[d.id] || []).push(c); });
+    say("Magic double tap! Every card is finding its partner! Zip zip zip!");
+    Object.keys(groups).forEach(function (id, k) {
+      setTimeout(function () {
+        groups[id].forEach(function (c) {
+          c.classList.remove("miss");
+          if (!c.classList.contains("up")) flipCard(c, true);
+          setTimeout(function () { c.classList.add("matched"); }, 320);
+        });
+        tone(600 + k * 80, 0, 0.12, "triangle", 0.15);
+      }, k * 350);
+    });
+    // then the partners walk over and stand next to each other
+    var walk = Object.keys(groups).length * 350 + 600;
+    setTimeout(function () {
+      var ids = [];
+      memBoard.querySelectorAll(".mcard").forEach(function (c) { var id = memDeck[Number(c.dataset.i)].id; if (ids.indexOf(id) < 0) ids.push(id); });
+      memBoard.querySelectorAll(".mcard").forEach(function (c) {
+        c.style.order = ids.indexOf(memDeck[Number(c.dataset.i)].id);
+        c.style.setProperty("--mx", Math.round(Math.random() * 120 - 60) + "px"); c.style.setProperty("--my", Math.round(Math.random() * 80 - 40) + "px");
+        c.classList.remove("mixing"); void c.offsetWidth; c.classList.add("mixing");
+      });
+      rustle(); say("Look! Every dinosaur is standing next to its partner!");
+    }, walk);
+    setTimeout(function () { memMatched = L.pairs; chime(); memoryWin(L); }, walk + 1400);
+  }
+  $("mem-mix").addEventListener("click", function () {
+    if (memoryLock || memMagic || memMatched >= MEM_LEVELS[memLevel].pairs) return;
+    mixUpMemory("Whoosh! You mixed up all the cards! All mixed up! Can you find the pairs?");
+  });
   memBoard.addEventListener("click", function (e) {
     var card = e.target.closest(".mcard");
+    if (card && !card.classList.contains("matched")) {
+      var now = Date.now();
+      if (memLastTap.card === card && now - memLastTap.t < 450) { memLastTap.card = null; magicMatch(); return; }
+      memLastTap = { card: card, t: now };
+    }
     if (!card || memoryLock || card.classList.contains("up") || card.classList.contains("flipping")) return;
     var d = memDeck[Number(card.dataset.i)];
     tone(660, 0, 0.08, "triangle", 0.2);
@@ -5192,6 +5237,7 @@ body.quake .app { animation: shake .4s ease; }
     var first = memFirst, f = memDeck[Number(first.dataset.i)];
     memFirst = null; memoryLock = true;
     flipCard(card, true, function () {
+      if (memMagic) return;
       if (f === d) {
         first.classList.add("matched"); card.classList.add("matched");
         d.sound(); chime();
@@ -5208,6 +5254,7 @@ body.quake .app { animation: shake .4s ease; }
       first.classList.add("miss"); card.classList.add("miss");
       tone(330, 0, 0.18, "sine", 0.15, 250);
       setTimeout(function () {
+        if (memMagic) return;
         first.classList.remove("miss"); card.classList.remove("miss");
         flipCard(first, false); flipCard(card, false, function () { memoryLock = false; });
       }, 1100);
