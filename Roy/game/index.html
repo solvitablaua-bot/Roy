@@ -59,6 +59,12 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
 
 /* ---------- top bar ---------- */
 .topbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+/* the Star Button: 20 billion stars every press (Roy's idea) */
+.place.star-place { border-color: #f2c84a; box-shadow: 0 0 16px rgba(242, 200, 74, .7); }
+.stars.huge { font-size: 1.15rem; }
+@media (max-width: 480px) { .stars.huge { font-size: .75rem; padding: 4px 8px 4px 4px; gap: 4px; } .stars.huge svg { width: 26px; height: 26px; } }
+.star-rain { position: fixed; top: -60px; z-index: 330; width: 46px; height: 46px; pointer-events: none; animation: starfall 1.6s ease-in forwards; }
+@keyframes starfall { to { transform: translateY(115vh) rotate(540deg); } }
 .stars {
   display: flex; align-items: center; gap: 8px;
   background: rgba(14, 28, 22, .75);
@@ -1686,6 +1692,10 @@ body.quake .app { animation: shake .4s ease; }
       <svg viewBox="0 0 64 64"><rect x="6" y="10" width="52" height="36" rx="4" fill="#1d1d1b"/><rect x="10" y="14" width="44" height="28" fill="#2e5b3a"/><path d="M30 14 l4 10 l-8 6 l10 4 l-4 8 M34 24 l10 -4 M26 30 l-12 2" stroke="#cfe6ef" stroke-width="2.5" fill="none" stroke-linejoin="round"/><path d="M28 50 h8 l4 8 h-16 Z" fill="#5d625c"/><path d="M36 30 q8 -12 20 -6 q4 4 0 8 l-10 2 Z" fill="#7a8f3c" stroke="#3b2413" stroke-width="2"/><circle cx="48" cy="27" r="2" fill="#1d1d1b"/></svg>
       Dino Escape
 </button>
+    <button class="place star-place" data-place="stars" id="place-stars">
+      <svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="28" fill="#f2c84a" stroke="#a8741a" stroke-width="4"/><path d="M32 12l6 13 14 1-11 9 4 14-13-8-13 8 4-14-11-9 14-1z" fill="#fff3b0" stroke="#a8741a" stroke-width="2" stroke-linejoin="round"/></svg>
+      Star Button
+</button>
   </nav>
   </section>
 
@@ -2139,7 +2149,7 @@ body.quake .app { animation: shake .4s ease; }
 
   var $ = function (id) { return document.getElementById(id); };
   var gate = $("gate"), menu = $("menu"), starsEl = $("stars"), starCount = $("star-count");
-  starCount.textContent = state.stars;
+  showStars();
 
   // ---------- sound ----------
   var audio = null;
@@ -2300,9 +2310,34 @@ body.quake .app { animation: shake .4s ease; }
     chime();
     setTimeout(function () {
       b.remove();
-      starCount.textContent = state.stars;
+      showStars();
       starsEl.classList.remove("pop"); void starsEl.offsetWidth; starsEl.classList.add("pop");
     }, 950);
+  }
+  // the star counter shows big numbers with commas (Roy's Star Button gives billions)
+  function showStars() {
+    starCount.textContent = state.stars.toLocaleString("en-US");
+    starsEl.classList.toggle("huge", state.stars >= 1000000);
+  }
+  var STAR_GIFT = 20000000000;
+  function starButton(btn) {
+    state.stars += STAR_GIFT; save();
+    for (var i = 0; i < 40; i++) {
+      var st = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      st.setAttribute("viewBox", "0 0 40 40"); st.setAttribute("class", "star-rain");
+      st.innerHTML = '<path d="M20 3l5 11 12 1-9 8 3 12-11-6-11 6 3-12-9-8 12-1z" fill="#f2c84a" stroke="#a8741a" stroke-width="2" stroke-linejoin="round"/>';
+      st.style.left = (Math.random() * 96) + "vw"; st.style.animationDelay = (Math.random() * 1.2) + "s";
+      document.body.appendChild(st);
+      (function (el) { setTimeout(function () { el.remove(); }, 3000); })(st);
+    }
+    [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6].forEach(function (t, i) { tone(800 + i * 150, t, 0.2, "triangle", 0.15); });
+    fanfare();
+    setTimeout(function () { showStars(); starsEl.classList.remove("pop"); void starsEl.offsetWidth; starsEl.classList.add("pop"); }, 900);
+    say("WOW! 20 billion stars! Ka-ching! You have " + state.stars.toLocaleString("en-US") + " stars now!");
+    if (!state.found.starBillionaire) {
+      state.found.starBillionaire = true; save();
+      setTimeout(function () { showBadge("Star Billionaire", "You got 20 billion stars!", GATE_BADGE.replace("#f2a93b", "#f2c84a")); }, 1800);
+    }
   }
   var badgeEl = $("badge");
   function showBadge(title, text, art) {
@@ -2411,6 +2446,7 @@ body.quake .app { animation: shake .4s ease; }
     if (btn.dataset.place === "shop") { openShop(); return; }
     if (btn.dataset.place === "memory") { openMemory(); return; }
     if (btn.dataset.place === "escape") { openEscape(); return; }
+    if (btn.dataset.place === "stars") { starButton(btn); return; }
     clunk();
     btn.classList.remove("wiggle"); void btn.offsetWidth; btn.classList.add("wiggle");
     say(placeLines[btn.dataset.place]);
@@ -2546,7 +2582,7 @@ body.quake .app { animation: shake .4s ease; }
     roar(0.9, 1.2); stomp();
     var n = Math.min(BK_COST, state.stars);
     state.stars -= n; save();
-    starCount.textContent = state.stars;
+    showStars();
     var m = document.createElement("div"); m.className = "bk-minus"; m.textContent = "-" + n + " ★";
     if (n) { document.body.appendChild(m); setTimeout(m.remove.bind(m), 2300); bleh(); }
     say(n ? "Oh no! " + shortName(escDino) + " ran away and took " + n + " of your stars! Next time, shoot your sleepy darts faster!"
@@ -6066,7 +6102,7 @@ body.quake .app { animation: shake .4s ease; }
     setTimeout(function () { g.style.left = (t.left + t.width / 2) + "px"; g.style.top = (t.top + t.height / 2 + 10) + "px"; }, 900);
     setTimeout(function () {
       var n = Math.min(GHOST_COST, state.stars);
-      state.stars -= n; save(); starCount.textContent = state.stars;
+      state.stars -= n; save(); showStars();
       starsEl.classList.remove("pop"); void starsEl.offsetWidth; starsEl.classList.add("pop");
       var m = document.createElement("div"); m.className = "bk-minus"; m.textContent = "-" + n + " ★";
       if (n) { document.body.appendChild(m); setTimeout(m.remove.bind(m), 2300); }
