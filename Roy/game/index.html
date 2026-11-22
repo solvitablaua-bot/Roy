@@ -184,12 +184,33 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
 .moon { top: 8%; right: 8%; width: 70px; height: 70px; }
 .moon svg { width: 100%; height: 100%; }
 .volcano { right: 0; bottom: 8%; width: min(26vw, 260px); z-index: 0; }
+@media (max-aspect-ratio: 1/1) { .volcano { z-index: 2; } }
 .volcano svg { width: 100%; height: auto; display: block; overflow: visible; }
 .volcano.erupt .lava { animation: glow 1.6s ease; }
 .volcano .smoke { opacity: 0; transform-box: fill-box; transform-origin: center; }
 .volcano.erupt .smoke { animation: puff 1.8s ease-out; }
 .volcano.erupt .smoke:nth-of-type(2) { animation-delay: .2s; }
 .volcano.erupt .smoke:nth-of-type(3) { animation-delay: .4s; }
+/* Roy's volcano: tap it for a button, the button makes it erupt, 10 taps make a backwards explosion */
+.volcano-btn { position: absolute; z-index: 2; pointer-events: auto; right: calc(min(26vw, 260px) * .5 - 38px); bottom: calc(8% + min(26vw, 260px) * .654 + 14px);
+  width: 76px; height: 76px; border-radius: 50%; padding: 8px; background: radial-gradient(circle at 40% 35%, #ff8a5c, #c8301c);
+  border: 5px solid var(--bone); box-shadow: 0 6px 0 #3b2413, 0 0 20px rgba(228, 87, 42, .8); animation: rise .4s cubic-bezier(.3, 1.4, .5, 1); }
+.volcano-btn svg { width: 100%; height: 100%; display: block; }
+.volcano-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #3b2413; }
+.volcano.erupting svg { animation: vshake .12s linear infinite; }
+.volcano.erupting .lava { animation: glow .5s ease infinite; }
+.volcano.erupting .smoke { animation: puff 1.4s ease-out infinite; }
+@keyframes vshake { 50% { transform: translateX(2px) rotate(.4deg); } }
+.lava-blob { position: fixed; z-index: 40; width: 26px; height: 26px; margin: -13px 0 0 -13px; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(circle at 35% 35%, #ffd27a, #e4572a 60%, #9a2a10); box-shadow: 0 0 10px #f2a93b; animation: lavaarc 1.4s cubic-bezier(.2, .6, .6, 1) forwards; }
+@keyframes lavaarc { 0% { transform: translate(0, 0) scale(.6); } 45% { transform: translate(calc(var(--dx) * .5), var(--up)) scale(1.1); } 100% { transform: translate(var(--dx), 160px) scale(.7); opacity: 0; } }
+.implode-bit { position: fixed; z-index: 40; width: 26px; height: 26px; margin: -13px 0 0 -13px; border-radius: 50%; pointer-events: none;
+  transition: left .9s cubic-bezier(.6, 0, .9, .4), top .9s cubic-bezier(.6, 0, .9, .4), transform .9s ease-in, opacity .9s; }
+.implode-ring { position: fixed; z-index: 39; border-radius: 50%; pointer-events: none; border: 10px solid #f2a93b; box-shadow: 0 0 40px #e4572a;
+  transform: translate(-50%, -50%); animation: ringin 1s ease-in forwards; }
+@keyframes ringin { from { width: 120vmax; height: 120vmax; opacity: .2; } to { width: 0; height: 0; opacity: 1; } }
+.volcano.gulp svg { animation: gulp .6s ease; }
+@keyframes gulp { 40% { transform: scale(1.12, .85); } 70% { transform: scale(.95, 1.06); } }
 .bush { left: 0; bottom: -6px; width: min(20vw, 160px); z-index: 2; }
 .bush svg { width: 100%; height: auto; display: block; overflow: hidden; }
 .bush .eyes { animation: blink 4s infinite; transform-box: fill-box; transform-origin: center; }
@@ -1592,6 +1613,7 @@ body.quake .app { animation: shake .4s ease; }
 
   <section class="view" id="view-park" hidden>
   <main class="stage">
+    <button class="volcano-btn" id="volcano-btn" hidden aria-label="Make the volcano erupt"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M2 38 L14 16 Q20 12 26 16 L38 38 Z" fill="#3b2413"/><path d="M15 16 Q20 13 25 16 L22 22 L18 20 Z" fill="#ffd27a"/><circle cx="14" cy="8" r="3" fill="#ffd27a"/><circle cx="22" cy="4" r="3.5" fill="#ffd27a"/><circle cx="29" cy="9" r="2.5" fill="#ffd27a"/></svg></button>
     <button class="secret volcano" id="volcano" aria-label="Volcano">
   <svg viewBox="0 0 260 170">
     <circle class="smoke" cx="128" cy="30" r="22" fill="#6d6a66"/>
@@ -6168,12 +6190,81 @@ body.quake .app { animation: shake .4s ease; }
 
   // ---------- jungle secrets ----------
   var volcano = $("volcano");
+  // Roy's idea: tap the volcano for a button, the button makes it erupt, and 10 taps make a backwards explosion
+  var volcanoBtn = $("volcano-btn"), volErupting = false, volTaps = 0, volTimer = null, volImploding = false;
+  function craterPoint() { var r = volcano.getBoundingClientRect(); return { x: r.left + r.width * 0.5, y: r.top + r.height * 0.27 }; }
   volcano.addEventListener("click", function () {
+    if (volImploding) return;
+    if (volErupting) {
+      volTaps += 1;
+      tone(300 + volTaps * 60, 0, 0.12, "square", 0.1);
+      volcano.classList.remove("gulp"); void volcano.offsetWidth; volcano.classList.add("gulp");
+      if (volTaps >= 10) { volcanoImplode(); return; }
+      say(volTaps === 1 ? "1! Tap the volcano 10 times to stop it!" : volTaps + "!");
+      return;
+    }
     rumble();
     volcano.classList.remove("erupt"); void volcano.offsetWidth; volcano.classList.add("erupt");
-    discover("volcano", volcano, "Rumble rumble! The volcano is waking up! You found a secret!") ||
-      say("Rumble rumble! Hot lava!");
+    volcanoBtn.hidden = false;
+    discover("volcano", volcano, "Rumble rumble! The volcano is waking up! You found a secret! Now tap the red volcano button!") ||
+      say("Rumble rumble! Look, a volcano button! Tap it to make the volcano erupt!");
   });
+  function lavaBlob() {
+    var c = craterPoint(), b = document.createElement("div");
+    b.className = "lava-blob";
+    b.style.left = c.x + "px"; b.style.top = c.y + "px";
+    b.style.setProperty("--dx", Math.round(Math.random() * 240 - 120) + "px");
+    b.style.setProperty("--up", Math.round(-80 - Math.random() * 120) + "px");
+    document.body.appendChild(b);
+    setTimeout(function () { b.remove(); }, 1500);
+  }
+  volcanoBtn.addEventListener("click", function () {
+    if (volErupting || volImploding) return;
+    volErupting = true; volTaps = 0; volcanoBtn.hidden = true;
+    volcano.classList.add("erupting");
+    rumble(); roar(0.4, 2); quake();
+    volTimer = setInterval(function () {
+      if (viewPark.hidden) { stopEruption(); return; }
+      lavaBlob(); lavaBlob(); lavaBlob();
+      if (Math.random() < 0.15) rumble();
+    }, 260);
+    say("KA-BOOM! The volcano is ERUPTING! Hot lava everywhere! Tap the volcano 10 times to stop it!");
+  });
+  function stopEruption() { volErupting = false; clearInterval(volTimer); volcano.classList.remove("erupting"); }
+  function volcanoImplode() {
+    stopEruption(); volImploding = true;
+    var c = craterPoint();
+    say("10! Uh oh... the explosion is going BACKWARDS!");
+    var ring = document.createElement("div"); ring.className = "implode-ring";
+    ring.style.left = c.x + "px"; ring.style.top = c.y + "px";
+    document.body.appendChild(ring); setTimeout(function () { ring.remove(); }, 1100);
+    var bits = [];
+    for (var i = 0; i < 28; i++) {
+      var a = Math.random() * Math.PI * 2, d = 250 + Math.random() * 350;
+      var el = document.createElement("div"); el.className = "implode-bit";
+      el.style.background = ["#e4572a", "#f2a93b", "#ffd27a", "#6d6a66"][i % 4];
+      el.style.left = (c.x + Math.cos(a) * d) + "px"; el.style.top = (c.y + Math.sin(a) * d) + "px";
+      document.body.appendChild(el); bits.push(el);
+    }
+    // a backwards whoosh: the sound goes up instead of down
+    for (var k = 0; k < 10; k++) tone(80 + k * 60, k * 0.09, 0.12, "sawtooth", 0.06);
+    tone(60, 0, 1, "sine", 0.3, 900);
+    requestAnimationFrame(function () { requestAnimationFrame(function () {
+      bits.forEach(function (el) { el.style.left = c.x + "px"; el.style.top = c.y + "px"; el.style.transform = "scale(.2)"; });
+    }); });
+    setTimeout(function () {
+      bits.forEach(function (el) { el.remove(); });
+      volcano.classList.remove("gulp"); void volcano.offsetWidth; volcano.classList.add("gulp");
+      tone(900, 0, 0.08, "square", 0.15, 1400); boing();
+      say("GULP! Whoosh! It was a backwards explosion! All the lava and smoke got sucked back inside the volcano! The volcano is quiet now.");
+      volImploding = false;
+      if (!state.found.volcanoTamer) {
+        state.found.volcanoTamer = true; save();
+        addStar(volcano);
+        setTimeout(function () { showBadge("Volcano Tamer", "You made a backwards explosion!", EXPLORER_BADGE.replace("#6cc48a", "#e4572a")); }, 700);
+      }
+    }, 1000);
+  }
   var flyer = $("flyer"), moon = $("moon");
   moon.addEventListener("click", function () {
     screech();
