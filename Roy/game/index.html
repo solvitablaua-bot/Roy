@@ -571,6 +571,39 @@ body.ghosts .ln-pick svg {
 .meteor-boom { position: fixed; inset: 0; z-index: 275; display: flex; align-items: center; justify-content: center; pointer-events: auto;
   background: radial-gradient(circle at 50% 60%, rgba(242, 169, 59, .9), rgba(120, 60, 30, .92) 45%, rgba(30, 20, 15, .95) 80%); }
 .meteor-boom[hidden] { display: none; }
+/* the meteor hit: the island splits in half, the volcano erupts, and the whole island explodes (Roy's idea) */
+.island-boom { position: fixed; inset: 0; z-index: 272; pointer-events: auto; background: #0e2a3a; }
+.island-boom[hidden] { display: none; }
+.island-boom > svg { width: 100%; height: 100%; display: block; overflow: visible; }
+.island-boom g { transform-box: fill-box; transform-origin: 50% 100%; }
+.ib-half { transition: transform 1.4s cubic-bezier(.3, .1, .3, 1); }
+.ib-crack { opacity: 0; transition: opacity .3s; }
+.island-boom.crack .ib-crack { opacity: 1; animation: crackglow .4s ease-in-out infinite alternate; }
+@keyframes crackglow { to { opacity: .5; } }
+.island-boom.split .ib-left { transform: translate(-46px, 8px) rotate(-7deg); }
+.island-boom.split .ib-right { transform: translate(46px, 8px) rotate(7deg); }
+.island-boom.split .ib-crack { opacity: 0; animation: none; }
+.ib-dino { animation: ibwobble .5s ease-in-out infinite alternate; }
+@keyframes ibwobble { from { transform: rotate(-6deg); } to { transform: rotate(6deg); } }
+.ib-lava { opacity: 0; transform-box: fill-box; transform-origin: 50% 50%; }
+.island-boom.erupt .ib-lava { animation: lavafly 1.3s ease-out infinite; }
+@keyframes lavafly { 0% { opacity: 1; transform: translate(0, 0) scale(.6); } 100% { opacity: 0; transform: translate(var(--lx), var(--ly)) scale(1.3); } }
+.ib-smoke { opacity: 0; transform-box: fill-box; transform-origin: 50% 100%; }
+.island-boom.erupt .ib-smoke { opacity: .85; animation: smokeup 2s ease-out forwards; }
+@keyframes smokeup { from { transform: scale(.2); } to { transform: scale(1.6) translateY(-20px); } }
+.island-boom.erupt .ib-volcano { animation: ibshake .12s linear infinite; }
+@keyframes ibshake { 50% { transform: translateX(2px); } }
+.ib-burst { opacity: 0; transform-origin: 50% 50%; transform-box: fill-box; }
+.island-boom.explode .ib-burst { animation: ibburst 1.6s ease-out forwards; }
+@keyframes ibburst { 0% { opacity: 1; transform: scale(.1); } 40% { opacity: 1; transform: scale(1.5); } 100% { opacity: 0; transform: scale(2.4); } }
+.island-boom.explode .ib-half { transition: transform 1.3s ease-in; }
+.island-boom.explode .ib-left { transform: translate(-260px, 120px) rotate(-60deg); }
+.island-boom.explode .ib-right { transform: translate(260px, 120px) rotate(60deg); }
+.island-boom.explode .ib-dino { animation: ibfly 1.4s ease-in forwards; }
+@keyframes ibfly { to { transform: translateY(-260px) rotate(720deg) scale(.4); } }
+.ib-word { opacity: 0; font-family: var(--font-sign); }
+.island-boom.explode .ib-word { animation: ibword 1.6s ease-out forwards; }
+@keyframes ibword { 0% { opacity: 0; transform: scale(.2); } 30% { opacity: 1; transform: scale(1.2); } 100% { opacity: 1; transform: scale(1); } }
 /* after a meteor hit, the dinosaurs in the cages are only bones (Roy's idea) */
 body.park-dead .world { filter: sepia(.5) brightness(.75); }
 body.park-dead .needs { display: none; }
@@ -1997,10 +2030,11 @@ body.quake .app { animation: shake .4s ease; }
     <div class="dna-eggs" id="dna-eggs" hidden></div>
   </div>
 </div>
+<div class="island-boom" id="island-boom" hidden></div>
 <div class="meteor-boom" id="meteor-boom" hidden>
   <div class="caught-card" style="position:relative;left:auto;top:auto;transform:none">
     <strong>KABOOM!</strong>
-    <span>Oh no! The meteor hit Dino Island! All the dinosaurs turned into bones! Tap the DNA button to bring them back!</span>
+    <span>The island split in half and exploded! All the dinosaurs turned into bones! Tap the DNA button to bring them back!</span>
     <button id="meteor-again">OK</button>
   </div>
 </div>
@@ -2882,8 +2916,57 @@ body.quake .app { animation: shake .4s ease; }
     parkDead = true; state.parkDead = true; save(); document.body.classList.add("park-dead");
     var f = document.createElement("div"); f.className = "meteor-flash"; document.body.appendChild(f); setTimeout(f.remove.bind(f), 1300);
     roar(0.4, 2.5); rumble(); splash(); quake();
-    $("meteor-boom").hidden = false;
-    say("KABOOM! Oh no! The meteor hit Dino Island! All the dinosaurs turned into bones! Even the mystery dinosaurs!");
+    islandSplit();
+  }
+  // Roy's idea: the island splits in half (a dinosaur on each side), the volcano erupts, then the whole island explodes
+  function islandSplit() {
+    var live = DINOS.filter(function (d) { return !d.bones; });
+    var a = live[Math.floor(Math.random() * live.length)], b;
+    do { b = live[Math.floor(Math.random() * live.length)]; } while (b === a && live.length > 1);
+    function put(d, x, y) { return '<g class="ib-dino">' + d.svg.replace(/^<svg\b/, '<svg x="' + x + '" y="' + y + '" width="64" height="54" preserveAspectRatio="xMidYMax meet"') + '</g>'; }
+    var lava = "";
+    [[-60, -90], [-30, -120], [0, -130], [30, -115], [55, -85], [-45, -60], [45, -55]].forEach(function (v, i) {
+      lava += '<circle class="ib-lava" cx="262" cy="118" r="' + (5 + i % 3 * 2) + '" fill="' + (i % 2 ? "#f2a93b" : "#e4372a") + '" style="--lx:' + v[0] + 'px;--ly:' + v[1] + 'px;animation-delay:' + (i * 0.17) + 's"/>';
+    });
+    var el = $("island-boom");
+    el.innerHTML = '<svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid meet" aria-hidden="true">' +
+      '<defs><linearGradient id="ib-sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a1a2a"/><stop offset="1" stop-color="#e4572a"/></linearGradient></defs>' +
+      '<rect x="-2000" y="-2000" width="4400" height="2000" fill="#3a1a2a"/><rect x="-2000" width="4400" height="190" fill="url(#ib-sky)"/><rect x="-2000" y="185" width="4400" height="2000" fill="#1f5f7a"/>' +
+      '<path d="M0 200 q20 -6 40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0" stroke="#7fc6e0" stroke-width="3" fill="none" opacity=".6"/>' +
+      '<g class="ib-half ib-left"><path d="M70 205 Q72 176 120 168 L190 162 L200 172 L192 184 L204 196 L196 214 Q130 226 70 205 Z" fill="#e8cf96"/>' +
+        '<path d="M86 196 Q100 176 140 172 L188 170 L194 184 L186 198 Q130 206 86 196 Z" fill="#5fb37c"/>' +
+        '<path d="M108 182 Q104 150 112 128" stroke="#6e4524" stroke-width="5" fill="none"/><path d="M112 128 q-22 -2 -28 12 M112 128 q20 -8 30 6 M112 128 q-8 -16 -24 -14 M112 128 q12 -14 26 -10" stroke="#3f8a4a" stroke-width="7" fill="none" stroke-linecap="round"/>' +
+        put(a, 126, 126) + '</g>' +
+      '<g class="ib-half ib-right"><path d="M200 172 L190 162 L262 160 Q320 164 330 200 Q270 224 196 214 L204 196 L192 184 Z" fill="#e8cf96"/>' +
+        '<g class="ib-volcano"><path d="M222 190 L252 120 L272 120 L304 190 Z" fill="#6e4a3a"/><path d="M252 120 L272 120 L266 132 L258 132 Z" fill="#e4372a"/><path d="M258 132 q-4 20 -10 30 M266 132 q6 18 14 28" stroke="#f2a93b" stroke-width="4" fill="none"/></g>' +
+        '<ellipse class="ib-smoke" cx="262" cy="96" rx="34" ry="22" fill="#5d5a5a"/>' + lava +
+        put(b, 200, 146) + '</g>' +
+      '<polyline class="ib-crack" points="190,160 200,172 192,184 204,196 196,214 200,224" fill="none" stroke="#f2a93b" stroke-width="5" stroke-linejoin="round"/>' +
+      '<path class="ib-burst" d="M200 100 l18 -50 l10 46 l46 -26 l-24 42 l52 6 l-48 22 l40 36 l-52 -8 l6 52 l-32 -40 l-26 46 l-6 -50 l-48 22 l30 -42 l-50 -16 l52 -12 l-34 -40 l46 18 Z" fill="#f9d27a" stroke="#f2a93b" stroke-width="6"/>' +
+      '<text class="ib-word" x="200" y="160" text-anchor="middle" font-size="44" fill="#fff" stroke="#e4372a" stroke-width="3">KABOOM!</text>' +
+      '</svg>';
+    el.className = "island-boom"; el.hidden = false;
+    say("CRACK! The island is splitting in half!");
+    setTimeout(function () { el.classList.add("crack"); rumble(); }, 300);
+    setTimeout(function () {
+      el.classList.add("split"); quake(); stomp();
+      say("The island split in half! " + shortName(a) + " is on this side, and " + shortName(b) + " is on that side!");
+      a.sound(); setTimeout(b.sound, 700);
+    }, 1400);
+    setTimeout(function () {
+      el.classList.add("erupt"); rumble(); roar(0.5, 2);
+      say("Oh no! The volcano is erupting! Hot lava!");
+    }, 4600);
+    setTimeout(function () {
+      el.classList.add("explode"); quake(); roar(0.3, 2.5); splash(); rumble();
+      var f2 = document.createElement("div"); f2.className = "meteor-flash"; document.body.appendChild(f2); setTimeout(f2.remove.bind(f2), 1300);
+      say("KABOOM! The whole island exploded!");
+    }, 7400);
+    setTimeout(function () {
+      el.hidden = true; el.innerHTML = "";
+      $("meteor-boom").hidden = false;
+      say("Oh no! The island split in half and exploded! All the dinosaurs turned into bones! Even the mystery dinosaurs! Tap the DNA button to bring them back!");
+    }, 9800);
   }
   $("meteor-again").addEventListener("click", function () {
     // Roy doesn't want the game to start over: the park just stays full of bones until he leaves it
@@ -2994,7 +3077,7 @@ body.quake .app { animation: shake .4s ease; }
       closeDna();
       parkDead = false; state.parkDead = false; save(); document.body.classList.remove("park-dead");
       updateNeeds(); fanfare();
-      say("Hooray! The DNA Combiner worked! All the dinosaurs are alive again, even the mystery dinosaurs! Watch out for meteors!");
+      say("Hooray! The DNA Combiner worked! The island is back together, and all the dinosaurs are alive again, even the mystery dinosaurs! Watch out for meteors!");
       if (!state.found.dna) {
         state.found.dna = true; save();
         addStar(starsEl);
