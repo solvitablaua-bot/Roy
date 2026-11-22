@@ -983,6 +983,9 @@ body.park-dead .cage:not(.empty)::after { content: ""; position: absolute; left:
 .mcard.matched .mface { border-color: #3f8a4a; box-shadow: 0 0 0 4px #5fb37c, 0 0 20px #5fb37c; }
 .mcard.matched { animation: hop .55s cubic-bezier(.3, 1.4, .5, 1); }
 .mcard.miss .mface { border-color: var(--ember); }
+/* a runaway dinosaur mixes up the memory cards (Roy's idea) */
+.mcard.mixing { animation: memmix .9s ease-in-out; }
+@keyframes memmix { 0% { transform: none; } 30% { transform: translate(var(--mx), var(--my)) rotate(200deg) scale(.6); } 70% { transform: translate(calc(var(--mx) * -1), var(--my)) rotate(320deg) scale(.7); } 100% { transform: rotate(360deg); } }
 
 /* ---------- Pet Shop: people buy baby pet dinosaurs (Roy's idea) ---------- */
 .shop {
@@ -1189,7 +1192,7 @@ body.park-dead .cage:not(.empty)::after { content: ""; position: absolute; left:
 @keyframes bk-shard { from { transform: translate(0, 0) scale(.6) rotate(0); opacity: 1; } to { transform: translate(var(--dx), var(--dy)) scale(3.2) rotate(var(--r)); opacity: 0; } }
 body.quake .app { animation: shake .4s ease; }
 /* sleepy darts: shoot the escaped dinosaur so it falls asleep and goes back in (Roy's idea) */
-/* the escape timer: put the dinosaur to sleep before it runs out, or it runs off with 3 stars (Roy's idea) */
+/* the escape timer: put the dinosaur to sleep before it runs out, or it runs off with 10 stars (Roy's idea) */
 .bk-timer { position: absolute; left: 0; right: 0; top: 0; height: 16px; z-index: 3; background: rgba(29, 29, 27, .6); pointer-events: none; }
 .bk-timer[hidden] { display: none; }
 .bk-timer span { position: absolute; left: 0; top: 0; bottom: 0; width: 100%; background: linear-gradient(90deg, #e4372a, #f2a93b 40%, #5fb37c); }
@@ -2443,7 +2446,7 @@ body.quake .app { animation: shake .4s ease; }
       if (!fromMenu) startBkTimer();
     }, 3600);
   }
-  var BK_LIMIT = 15000, bkTimer = null;
+  var BK_COST = 10, BK_LIMIT = 15000, bkTimer = null;
   function startBkTimer() {
     var f = $("bk-timer-fill");
     f.style.transition = "none"; f.style.width = "100%";
@@ -2452,7 +2455,7 @@ body.quake .app { animation: shake .4s ease; }
     clearTimeout(bkTimer); bkTimer = setTimeout(runAway, BK_LIMIT);
   }
   function stopBkTimer() { clearTimeout(bkTimer); $("bk-timer").hidden = true; }
-  // too slow: the dinosaur runs away with 3 stars (Roy's idea)
+  // too slow: the dinosaur runs away with 10 stars and mixes up the memory cards (Roy's idea)
   function runAway() {
     if (!bkLoose) return;
     bkLoose = false; clearInterval(bkWalk); stopBkTimer();
@@ -2460,7 +2463,7 @@ body.quake .app { animation: shake .4s ease; }
     bkDino.classList.remove("left");
     bkDino.style.left = (window.innerWidth + 500) + "px";
     roar(0.9, 1.2); stomp();
-    var n = Math.min(3, state.stars);
+    var n = Math.min(BK_COST, state.stars);
     state.stars -= n; save();
     starCount.textContent = state.stars;
     var m = document.createElement("div"); m.className = "bk-minus"; m.textContent = "-" + n + " ★";
@@ -2471,7 +2474,28 @@ body.quake .app { animation: shake .4s ease; }
       bkDino.classList.remove("loose", "hop"); bkDino.querySelectorAll(".stuck").forEach(function (x) { x.remove(); });
       bk.classList.add("healing");
     }, 2200);
-    later(function () { bk.hidden = true; bkActive = false; bk.className = "breakout"; }, 3300);
+    later(function () { bk.hidden = true; bkActive = false; bk.className = "breakout"; mixUpMemory(); }, 3300);
+  }
+  // the runaway dinosaur mixes up the face-down memory cards on its way out (Roy's idea)
+  function mixUpMemory() {
+    if (viewMemory.hidden || memBoard.hidden) return;
+    var cards = Array.prototype.slice.call(memBoard.querySelectorAll(".mcard:not(.matched)"));
+    if (cards.length < 2) return;
+    memFirst = null;
+    var faces = shuffle(cards.map(function (c) { return memDeck[Number(c.dataset.i)]; }));
+    cards.forEach(function (c, k) {
+      c.classList.remove("up", "miss", "flipping");
+      c.querySelector(".mback").hidden = false; c.querySelector(".mface").hidden = true;
+      memDeck[Number(c.dataset.i)] = faces[k];
+      c.querySelector(".mface").innerHTML = memFace(faces[k]);
+      c.style.setProperty("--mx", Math.round(Math.random() * 120 - 60) + "px");
+      c.style.setProperty("--my", Math.round(Math.random() * 80 - 40) + "px");
+      c.classList.remove("mixing"); void c.offsetWidth; c.classList.add("mixing");
+    });
+    rustle(); boing();
+    memoryLock = true;
+    setTimeout(function () { memoryLock = false; }, 950);
+    say("Whoosh! The dinosaur mixed up all your memory cards! All mixed up! Can you still find the pairs?");
   }
   function walkAbout() {
     if (!bkLoose) return;
@@ -2989,7 +3013,9 @@ body.quake .app { animation: shake .4s ease; }
   // surprise! now and then a dinosaur breaks out of the screen anywhere in the game
   var playSecs = 0;
   setInterval(function () {
-    var busy = bkActive || dnaOn || meteorOn || lnOn || !gm.hidden || document.hidden || !viewSea.hidden || !viewChase.hidden || !$("meteor-boom").hidden;
+    // Roy asked for the breakouts to happen only while a memory game is being played
+    var inMemory = !viewMemory.hidden && !memBoard.hidden && memLevel && memMatched < MEM_LEVELS[memLevel].pairs;
+    var busy = !inMemory || bkActive || document.hidden;
     if (busy) return;
     playSecs += 1;
     if (playSecs < 60) return;
@@ -4849,13 +4875,14 @@ body.quake .app { animation: shake .4s ease; }
     memBoard.innerHTML = memDeck.map(function (d, i) {
       return '<div class="mcard" role="button" tabindex="0" data-i="' + i + '" aria-label="Card">' +
         '<div class="mback">' + CARD_BACK + '</div>' +
-        '<div class="mface" hidden><svg preserveAspectRatio="xMidYMid meet"' + d.svg.slice(4) + '<span>' + shortName(d) + '</span></div>' +
+        '<div class="mface" hidden>' + memFace(d) + '</div>' +
         '</div>';
     }).join("");
     memLevels.hidden = true; memBoard.hidden = false;
     rustle();
     say("Find the pairs! Tap a card.");
   }
+  function memFace(d) { return '<svg preserveAspectRatio="xMidYMid meet"' + d.svg.slice(4) + '<span>' + shortName(d) + '</span>'; }
   function flipCard(card, up, done) {
     card.classList.add("flipping");
     setTimeout(function () {
