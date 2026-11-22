@@ -1017,7 +1017,9 @@ body.park-dead .cage:not(.empty)::after { content: ""; position: absolute; left:
 /* ---------- Memory Game: find two of the same dinosaur (Roy's idea) ---------- */
 .memory { flex: 1; min-height: 0; position: relative; pointer-events: auto; display: flex; flex-direction: column; }
 /* sleepy dart blasters you win in the memory game (Roy's idea) */
-.blaster-shelf { flex: 0 0 auto; display: flex; gap: 8px; justify-content: center; align-items: stretch; padding: 8px; overflow-x: auto;
+.blaster-shelf > :first-child { margin-left: auto; }
+.blaster-shelf > :last-child { margin-right: auto; }
+.blaster-shelf { flex: 0 0 auto; display: flex; gap: 8px; justify-content: flex-start; -webkit-overflow-scrolling: touch; align-items: stretch; padding: 8px; overflow-x: auto;
   background: rgba(29, 29, 27, .45); border-radius: 18px; margin: 0 8px 8px; }
 .blaster-shelf[hidden] { display: none; }
 .blaster-shelf .shelf-title { align-self: center; color: var(--bone); font-weight: 800; font-size: 1rem; padding: 0 6px; flex: 0 0 auto; }
@@ -5295,6 +5297,22 @@ body.quake .app { animation: shake .4s ease; }
     { id: "sea", name: "Sea Blaster", barrel: "#5a86a2", mid: "#2a8f88", grip: "#0d2a3d", line: "#7fe0d0", pom: "#7fe0d0" },
     { id: "golden", name: "Golden Blaster", barrel: "#b07d16", mid: "#f2c84a", grip: "#f2c84a", line: "#fff3b0", pom: "#f2a93b" }
   ];
+  // Roy asked for 100 more blasters: made from two word lists and seeded colours, each one a memory game prize.
+  // Every 10th one is a special triple-barrel blaster (2 sleepy darts are enough, like the Mega Rainbow).
+  (function () {
+    var A = ["Super", "Turbo", "Thunder", "Sparkly", "Crystal", "Zoomy", "Glowing", "Royal", "Sleepy", "Giga"];
+    var N = ["Star", "Moon", "Dragon", "Rocket", "Comet", "Bubble", "Dino", "Galaxy", "Candy", "Robot"];
+    var r = rng(2024), n = 0;
+    N.forEach(function (noun) {
+      A.forEach(function (adj) {
+        n += 1;
+        var h = Math.floor(r() * 360), h2 = (h + 40 + Math.floor(r() * 200)) % 360, h3 = Math.floor(r() * 360);
+        BLASTERS.push({ id: "bl" + n, name: adj + " " + noun + " Blaster",
+          barrel: "hsl(" + h + ",35%,32%)", mid: "hsl(" + h2 + ",75%,55%)", grip: "hsl(" + h3 + ",50%,40%)",
+          line: "hsl(" + h2 + ",80%,82%)", pom: "hsl(" + Math.floor(r() * 360) + ",90%,72%)", mega: n % 10 === 0 });
+      });
+    });
+  })();
   // Roy asked for the Mega Rainbow Blaster when dinosaurs break out, so Ranger and Rainbow are owned from the start
   function blastersOwned() { return Math.min(BLASTERS.length, 2 + (state.found.memoryWins || 0)); }
   function myBlaster() {
@@ -5329,6 +5347,9 @@ body.quake .app { animation: shake .4s ease; }
       return '<div class="blaster' + (locked ? " locked" : "") + (b.id === on ? " on" : "") + '" role="button" tabindex="0" data-id="' + b.id + '">' +
         '<div class="gunbox">' + blasterSvg(b) + '</div><span>' + (locked ? "Win to get!" : b.name.replace(" Blaster", "")) + '</span></div>';
     }).join("");
+    // show the chosen blaster, and the next one to win
+    var shelf = $("blaster-shelf"), cur = shelf.querySelector(".blaster.on");
+    if (cur) setTimeout(function () { shelf.scrollLeft = Math.max(0, cur.offsetLeft - shelf.clientWidth / 2 + cur.offsetWidth / 2); }, 0);
   }
   $("blaster-shelf").addEventListener("click", function (e) {
     var el = e.target.closest(".blaster");
