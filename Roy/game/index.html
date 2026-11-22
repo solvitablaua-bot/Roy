@@ -70,6 +70,14 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
 }
 .stars svg { width: 40px; height: 40px; }
 .stars.pop { animation: pop .5s ease; }
+/* skip the intro (boat, jungle, raptor run) and go straight to the park gate (Roy's idea) */
+.skip-intro { position: fixed; right: 16px; bottom: 16px; z-index: 60; pointer-events: auto;
+  display: flex; align-items: center; gap: 6px; background: var(--amber); color: var(--wood-dark);
+  border: 4px solid var(--wood-dark); border-radius: 999px; padding: 8px 20px 8px 14px;
+  font-family: var(--font-sign); font-size: 1.5rem; box-shadow: 0 6px 20px rgba(0, 0, 0, .5); }
+.skip-intro svg { width: 36px; height: 36px; }
+.skip-intro.left { right: auto; left: 16px; }
+.skip-intro:active { transform: scale(.94); }
 .icon-btn {
   width: 60px; height: 60px; border-radius: 50%;
   background: rgba(14, 28, 22, .75);
@@ -2068,6 +2076,7 @@ body.quake .app { animation: shake .4s ease; }
     <div class="dna-eggs" id="dna-eggs" hidden></div>
   </div>
 </div>
+<button class="skip-intro" id="skip-intro" aria-label="Skip to the park gate"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M4 8 L18 20 L4 32 Z M18 8 L32 20 L18 32 Z" fill="#3b2413"/><rect x="32" y="8" width="5" height="24" rx="2" fill="#3b2413"/></svg>Skip</button>
 <div class="island-boom" id="island-boom" hidden></div>
 <div class="meteor-boom" id="meteor-boom" hidden>
   <div class="caught-card" style="position:relative;left:auto;top:auto;transform:none">
@@ -5465,6 +5474,7 @@ body.quake .app { animation: shake .4s ease; }
   }
   $("try-again").addEventListener("click", function (e) { e.stopPropagation(); boing(); startChase(); });
   function startChase() {
+    if (introSkipped) return;
     $("chomp-cloud").hidden = true; $("caught-card").hidden = true;
     viewChase.hidden = false;
     chase.classList.remove("shut", "running");
@@ -5624,6 +5634,7 @@ body.quake .app { animation: shake .4s ease; }
     say("GLUG GLUG! Oh no! The Mosasaurus sank the boat!");
     setTimeout(function () { mosaEl.classList.remove("up", "lunge", "hit"); mosaEl.classList.add("dive"); splash(); }, 1200);
     setTimeout(function () {
+      if (introSkipped) return;
       boat.classList.add("sunk");
       $("sink-card").hidden = false;
     }, 2500);
@@ -5636,6 +5647,7 @@ body.quake .app { animation: shake .4s ease; }
     setTimeout(mosaAttacks, 900);
   });
   function mosaAttacks() {
+    if (introSkipped) return;
     mosaAttack = true; mosaHits = 0; boatDmg = 0; boat.dataset.dmg = 0;
     mosaEl.classList.remove("dive", "hit", "lunge");
     rumble();
@@ -5701,8 +5713,22 @@ body.quake .app { animation: shake .4s ease; }
     }, 1200);
   });
 
+  // the Skip button jumps over the boat trip, the jungle and the raptor run (Roy's idea)
+  var introSkipped = false, skipBtn = $("skip-intro");
+  setInterval(function () { skipBtn.hidden = introSkipped || (viewSea.hidden && viewJungle.hidden && viewChase.hidden); skipBtn.classList.toggle("left", !viewChase.hidden); }, 300);
+  skipBtn.addEventListener("click", function () {
+    introSkipped = true; skipBtn.hidden = true;
+    mosaAttack = false; clearInterval(mosaTimer);
+    chaseOn = false; cancelAnimationFrame(chaseRaf);
+    ["sink-card", "caught-card", "chomp-cloud"].forEach(function (id) { $(id).hidden = true; });
+    viewSea.hidden = true; viewJungle.hidden = true; viewChase.hidden = true;
+    viewPark.hidden = false; moonBtn.hidden = false;
+    boing(); tone(500, 0.1, 0.3, "sine", 0.15, 900);
+    say("Zoom! We skipped the trip! You are at Roy's Dino Park! Tap the big gate to open it!");
+  });
   var layersLeft = 3;
   function goJungle() {
+    if (introSkipped) return;
     viewSea.hidden = true; viewJungle.hidden = false;
     say("Now we walk through the jungle. Tap the leaves to push them out of the way!");
   }
