@@ -496,7 +496,7 @@ body:not(.park-dead) .find-dna { display: none; }
   background: #7a2a14; border: 4px solid var(--bone); box-shadow: 0 0 20px rgba(242, 120, 40, .9); }
 .call-meteor svg { width: 100%; height: 100%; display: block; }
 body.park-dead .call-meteor { display: none; }
-/* 200 million Mystery Cages, each with a made-up dinosaur (Roy's idea) */
+/* the Never-Ending Mystery Cages, each with a made-up dinosaur (Roy's idea) */
 .find-mega { position: absolute; top: 158px; right: 10px; z-index: 2; width: 64px; height: 64px; border-radius: 50%; padding: 4px;
   background: #c9961e; border: 4px solid var(--bone); box-shadow: 0 0 20px rgba(249, 210, 122, .9); }
 .find-mega svg { width: 100%; height: 100%; display: block; }
@@ -1680,7 +1680,7 @@ body.quake .app { animation: shake .4s ease; }
     <div class="map-wrap">
       <button class="find-mystery" id="find-mystery" aria-label="Find the mystery cage">?</button>
       <button class="call-meteor" id="call-meteor" aria-label="Call a meteor"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M4 4 L22 16 M10 2 L26 12 M2 12 L18 22" stroke="#f9d27a" stroke-width="4" stroke-linecap="round"/><circle cx="26" cy="26" r="11" fill="#8a7a6a" stroke="#f2a93b" stroke-width="3"/><circle cx="23" cy="24" r="3" fill="#5b4a3e"/><circle cx="30" cy="30" r="2.5" fill="#5b4a3e"/></svg></button>
-      <button class="find-mega" id="find-mega" aria-label="200 million Mystery Cages"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M4 34 Q4 12 12 12 Q20 12 20 34 Z" fill="#6b4a9b"/><path d="M20 34 Q20 12 28 12 Q36 12 36 34 Z" fill="#2f7a7a"/><path d="M11 30 Q11 6 20 6 Q29 6 29 30 Z" fill="#a83a5a" stroke="#fff3b0" stroke-width="1.5"/><text x="20" y="25" text-anchor="middle" font-size="14" font-weight="900" fill="#f2d24b">?</text></svg></button>
+      <button class="find-mega" id="find-mega" aria-label="Never-Ending Mystery Cages"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M4 34 Q4 12 12 12 Q20 12 20 34 Z" fill="#6b4a9b"/><path d="M20 34 Q20 12 28 12 Q36 12 36 34 Z" fill="#2f7a7a"/><path d="M11 30 Q11 6 20 6 Q29 6 29 30 Z" fill="#a83a5a" stroke="#fff3b0" stroke-width="1.5"/><text x="20" y="25" text-anchor="middle" font-size="14" font-weight="900" fill="#f2d24b">?</text></svg></button>
       <button class="find-dna" id="find-dna" aria-label="DNA Combiner"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M12 2 Q36 12 20 20 Q4 28 28 38" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M28 2 Q4 12 20 20 Q36 28 12 38" stroke="#f9d27a" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M15 7 h10 M14 33 h12 M12 13 h16 M12 27 h16" stroke="#ff8a8a" stroke-width="3" stroke-linecap="round"/></svg></button>
       <div class="map-scroll" id="map-scroll">
         <div class="world" id="world"></div>
@@ -4061,8 +4061,9 @@ body.quake .app { animation: shake .4s ease; }
       }, 2600);
     }
   }, true);
-  // ---------- 200 million Mystery Cages, each with a made-up dinosaur (Roy's idea) ----------
-  var MEGA_MAX = 200000000;
+  // ---------- the Never-Ending Mystery Cages, each with a made-up dinosaur (Roy's idea) ----------
+  // Roy first asked for 200 million, then for cages that never end. The cage number can go up forever (until numbers get too big for the iPad, about a trillion cages).
+  var MEGA_MAX = 1000000000000;
   function rng(seed) { var a = seed >>> 0; return function () { a |= 0; a = a + 0x6D2B79F5 | 0; var t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
   function pickR(r, a) { return a[Math.floor(r() * a.length)]; }
   var MEGA_COLS = [["#e4572a", "#b8401c", "#f6c3a0"], ["#4a86c8", "#3a6aa0", "#cfe2f6"], ["#7a4ac8", "#5a32a0", "#e0d0f6"], ["#3fae6a", "#2f8a50", "#d0f0d8"],
@@ -4113,7 +4114,7 @@ body.quake .app { animation: shake .4s ease; }
     megaN = Math.max(1, Math.min(MEGA_MAX, n)); megaCur = megaDino(megaN);
     var solved = megaSolved().indexOf(megaN) >= 0;
     megaStep = solved ? 3 : 0;
-    $("mega-num").innerHTML = "Cage " + megaN.toLocaleString("en-US") + "<small>of 200,000,000</small>";
+    $("mega-num").innerHTML = "Cage " + megaN.toLocaleString("en-US") + "<small>never-ending!</small>";
     $("mega-dino").innerHTML = megaCur.svg;
     $("mega-dino").className = "mega-dino" + (solved ? "" : " shadow");
     $("mega-bars").className = "bars" + (solved ? " gone" : "");
@@ -4131,13 +4132,14 @@ body.quake .app { animation: shake .4s ease; }
     var s2 = megaSolved();
     showMega(s2.length ? Math.min(MEGA_MAX, Math.max.apply(null, s2.slice(-50)) + 1) : 1);
     tone(300, 0, 0.6, "sine", 0.2, 700);
-    say("Welcome to the 200 million Mystery Cages! Every cage has a brand new made-up dinosaur! Tap the cage to find out who is hiding, or tap the dice to jump to any cage!");
+    say("Welcome to the Never-Ending Mystery Cages! They go on and on forever! Every cage has a brand new made-up dinosaur! Tap the cage to find out who is hiding, or tap the dice to jump far, far away!");
   });
   $("mega-close").addEventListener("click", function () { $("mega-lab").hidden = true; });
   $("mega-prev").addEventListener("click", function () { boing(); showMega(megaN - 1); say("Cage " + megaN.toLocaleString("en-US") + "!"); });
   $("mega-next").addEventListener("click", function () { boing(); showMega(megaN + 1); say("Cage " + megaN.toLocaleString("en-US") + "!"); });
   $("mega-rand").addEventListener("click", function () {
-    rustle(); showMega(1 + Math.floor(Math.random() * MEGA_MAX));
+    var digits = 1 + Math.floor(Math.random() * 12);
+    rustle(); showMega(1 + Math.floor(Math.random() * Math.pow(10, digits)));
     say("Whoosh! Jump to cage " + megaN.toLocaleString("en-US") + "! Who is hiding in there?");
   });
   $("mega-cage").addEventListener("click", function () {
@@ -4158,7 +4160,7 @@ body.quake .app { animation: shake .4s ease; }
     addStar(dino);
     if (!state.found.megaMystery) {
       state.found.megaMystery = true; save();
-      setTimeout(function () { showBadge("Mega Mystery", "You opened one of the 200 million Mystery Cages!", MYSTERY_BADGE.replace("#9b6fc4", "#c9961e")); }, 1500);
+      setTimeout(function () { showBadge("Mega Mystery", "You opened one of the Never-Ending Mystery Cages!", MYSTERY_BADGE.replace("#9b6fc4", "#c9961e")); }, 1500);
     }
   });
   $("find-mystery").addEventListener("click", function () {
