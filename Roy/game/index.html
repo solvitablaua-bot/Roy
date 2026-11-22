@@ -324,7 +324,7 @@ button:focus-visible { outline: 4px solid var(--amber); outline-offset: 4px; }
 .mix-out.hop svg { animation: hop .55s cubic-bezier(.3, 1.4, .5, 1); }
 .mix-out.ghosty svg { filter: grayscale(1) sepia(1) hue-rotate(150deg) saturate(4) brightness(1.25) drop-shadow(0 0 10px #6ee6ff); opacity: .75; }
 .mix-name { margin: 0; font-family: var(--font-sign); font-size: clamp(1.4rem, 5vw, 2.2rem); color: #f9d27a; text-align: center; min-height: 1.2em; }
-.mix-grid { display: grid; grid-template-columns: repeat(9, minmax(0, 1fr)); gap: 6px; width: 100%; }
+.mix-grid { display: grid; grid-template-columns: repeat(9, minmax(0, 1fr)); gap: 6px; width: 100%; max-height: min(30vh, 250px); overflow-y: auto; padding: 4px; box-sizing: border-box; -webkit-overflow-scrolling: touch; }
 .mix-pick { aspect-ratio: 1; border-radius: 14px; border: 3px solid var(--bone); background: rgba(255, 255, 255, .1); padding: 4px; min-width: 0; }
 .mix-pick svg { width: 100%; height: 100%; display: block; }
 .mix-pick.picked { border-color: #7dff7a; background: #2f6b3a; box-shadow: 0 0 10px #7dff7a; }
@@ -1977,7 +1977,7 @@ body.quake .app { animation: shake .4s ease; }
     </div>
     <div class="mix-out" id="mix-out"></div>
     <p class="mix-name" id="mix-name"></p>
-    <div class="mix-btns"><button class="dna-go" id="mix-go" disabled>MIX!</button><button class="mix-swap" id="mix-swap" hidden>&#x21C4; Swap</button></div>
+    <div class="mix-btns"><button class="dna-go" id="mix-go" disabled>MIX!</button><button class="mix-swap" id="mix-swap" hidden>&#x21C4; Swap</button><button class="mix-swap" id="mix-rand">&#x2753; Surprise!</button></div>
     <div class="mix-grid" id="mix-grid"></div>
   </div>
 </div>
@@ -5621,7 +5621,110 @@ body.quake .app { animation: shake .4s ease; }
     var d = dinoById(it.id);
     it.svg = function () { return d.svg; }; it.sound = function () { d.sound(); };
   });
-  function mixItem(id) { return MIX_ITEMS.filter(function (x) { return x.id === id; })[0]; }
+  // all sorts of animals from the world (Roy's idea): drawn with one shared four-legged shape plus a few special ones
+  function mammal(o) {
+    var c = o.c, d = o.d, L = o.legs || 40, ny = o.neck || 0, hx = 150, hy = 78 - ny, h = '<svg viewBox="0 0 200 180">';
+    var by = 150 - L - 24, rx = o.rx || 48, ry = o.ry || 26;
+    // tail
+    h += o.tail === "curly" ? '<path d="M' + (98 - rx) + ' ' + by + ' q-14 -4 -10 -14 q8 -4 8 6 q0 8 -12 6" stroke="' + d + '" stroke-width="4" fill="none" stroke-linecap="round"/>'
+      : '<path d="M' + (98 - rx) + ' ' + (by - 6) + ' Q' + (82 - rx) + ' ' + (by + 10) + ' ' + (86 - rx) + ' ' + (by + 30) + '" stroke="' + d + '" stroke-width="4" fill="none" stroke-linecap="round"/>' +
+        (o.tuft ? '<ellipse cx="' + (86 - rx) + '" cy="' + (by + 32) + '" rx="5" ry="8" fill="' + o.tuft + '"/>' : '');
+    // legs
+    [-0.7, -0.4, 0.35, 0.65].forEach(function (f, i) {
+      h += '<rect x="' + (98 + f * rx - 7) + '" y="' + by + '" width="14" height="' + (L + 24) + '" rx="6" fill="' + (i % 2 ? d : c) + '"/>' +
+        '<rect x="' + (98 + f * rx - 7) + '" y="' + (150 - 6) + '" width="14" height="8" rx="3" fill="' + (o.hoof || d) + '"/>';
+    });
+    // body
+    h += '<ellipse cx="98" cy="' + by + '" rx="' + rx + '" ry="' + ry + '" fill="' + c + '"/>';
+    if (o.belly) h += '<ellipse cx="102" cy="' + (by + ry * 0.45) + '" rx="' + (rx * 0.6) + '" ry="' + (ry * 0.4) + '" fill="' + o.belly + '"/>';
+    if (o.stripes) for (var i = -3; i <= 3; i++) h += '<path d="M' + (98 + i * 12) + ' ' + (by - ry + 2) + ' q6 ' + ry + ' 0 ' + (ry * 1.8) + '" stroke="' + o.stripes + '" stroke-width="5" fill="none"/>';
+    if (o.spots) [[-25, -8], [0, -12], [22, 2], [-8, 10], [30, -14]].forEach(function (p) { h += '<ellipse cx="' + (98 + p[0]) + '" cy="' + (by + p[1]) + '" rx="9" ry="7" fill="' + o.spots + '"/>'; });
+    // neck and head
+    h += '<path d="M' + (98 + rx * 0.6) + ' ' + (by - ry * 0.6) + ' L' + (hx - 12) + ' ' + (hy + 6) + ' L' + (hx + 6) + ' ' + (hy + 10) + ' L' + (98 + rx * 0.95) + ' ' + (by + 4) + ' Z" fill="' + c + '"/>';
+    if (o.neckSpots) for (var k = 1; k < 4; k++) h += '<ellipse cx="' + (98 + rx * 0.7 + (hx - 98 - rx * 0.7) * k / 4) + '" cy="' + (by - ry * 0.4 + (hy - by) * k / 4) + '" rx="5" ry="4" fill="' + o.spots + '"/>';
+    if (o.stripes && ny) for (var k2 = 1; k2 < 4; k2++) h += '<path d="M' + (98 + rx * 0.75 + (hx - 98 - rx * 0.75) * k2 / 4 - 8) + ' ' + (by - ry * 0.4 + (hy - by) * k2 / 4) + ' l14 4" stroke="' + o.stripes + '" stroke-width="4"/>';
+    if (o.mane) h += '<circle cx="' + hx + '" cy="' + hy + '" r="32" fill="' + o.mane + '"/>';
+    if (o.ears === "pointy") h += '<path d="M' + (hx - 14) + ' ' + (hy - 10) + ' l2 -20 l10 14 Z M' + (hx + 2) + ' ' + (hy - 14) + ' l6 -18 l6 16 Z" fill="' + d + '"/>';
+    if (o.ears === "round") h += '<circle cx="' + (hx - 12) + '" cy="' + (hy - 16) + '" r="8" fill="' + d + '"/><circle cx="' + (hx + 8) + '" cy="' + (hy - 18) + '" r="8" fill="' + d + '"/>';
+    if (o.ears === "floppy") h += '<ellipse cx="' + (hx - 12) + '" cy="' + (hy + 4) + '" rx="7" ry="16" fill="' + d + '" transform="rotate(20 ' + (hx - 12) + ' ' + (hy + 4) + ')"/>';
+    if (o.ears === "big") h += '<ellipse cx="' + (hx - 14) + '" cy="' + (hy + 4) + '" rx="20" ry="26" fill="' + d + '"/>';
+    if (o.horns) h += '<path d="M' + (hx - 8) + ' ' + (hy - 16) + ' q-8 -10 -2 -16 M' + (hx + 8) + ' ' + (hy - 16) + ' q8 -10 2 -16" stroke="' + o.horns + '" stroke-width="5" fill="none" stroke-linecap="round"/>';
+    if (o.ossicones) h += '<path d="M' + (hx - 6) + ' ' + (hy - 16) + ' v-12 M' + (hx + 6) + ' ' + (hy - 16) + ' v-12" stroke="' + d + '" stroke-width="5" stroke-linecap="round"/><circle cx="' + (hx - 6) + '" cy="' + (hy - 29) + '" r="4" fill="' + d + '"/><circle cx="' + (hx + 6) + '" cy="' + (hy - 29) + '" r="4" fill="' + d + '"/>';
+    if (o.hairTuft) h += '<path d="M' + (hx - 20) + ' ' + (hy - 8) + ' Q' + (hx - 40) + ' ' + (hy + 30) + ' ' + (98 + rx * 0.5) + ' ' + (by - ry) + '" stroke="' + o.hairTuft + '" stroke-width="9" fill="none" stroke-linecap="round"/>';
+    h += '<circle cx="' + hx + '" cy="' + hy + '" r="20" fill="' + c + '"/>';
+    // snout
+    if (o.snout === "pig") h += '<ellipse cx="' + (hx + 20) + '" cy="' + (hy + 4) + '" rx="9" ry="11" fill="' + (o.nose || d) + '"/><circle cx="' + (hx + 20) + '" cy="' + hy + '" r="2" fill="#7a3a4a"/><circle cx="' + (hx + 20) + '" cy="' + (hy + 8) + '" r="2" fill="#7a3a4a"/>';
+    else if (o.snout === "trunk") h += '<path d="M' + (hx + 14) + ' ' + (hy + 2) + ' Q' + (hx + 40) + ' ' + (hy + 10) + ' ' + (hx + 34) + ' ' + (hy + 50) + '" stroke="' + c + '" stroke-width="12" fill="none" stroke-linecap="round"/><path d="M' + (hx + 10) + ' ' + (hy + 14) + ' q10 8 18 2" stroke="#fffaf0" stroke-width="5" fill="none" stroke-linecap="round"/>';
+    else if (o.snout === "long") h += '<path d="M' + (hx + 4) + ' ' + (hy - 6) + ' Q' + (hx + 36) + ' ' + (hy - 2) + ' ' + (hx + 38) + ' ' + (hy + 10) + ' Q' + (hx + 34) + ' ' + (hy + 20) + ' ' + (hx + 4) + ' ' + (hy + 16) + ' Z" fill="' + (o.muzzle || c) + '"/><circle cx="' + (hx + 34) + '" cy="' + (hy + 4) + '" r="3" fill="#1d1d1b"/>';
+    else h += '<ellipse cx="' + (hx + 14) + '" cy="' + (hy + 8) + '" rx="12" ry="9" fill="' + (o.muzzle || c) + '"/><path d="M' + (hx + 20) + ' ' + (hy + 3) + ' l5 0 l-2.5 4 Z" fill="#1d1d1b"/>' +
+      (o.whiskers ? '<path d="M' + (hx + 22) + ' ' + (hy + 9) + ' l14 -3 M' + (hx + 22) + ' ' + (hy + 11) + ' l14 3" stroke="#3b2413" stroke-width="1.5"/>' : '');
+    h += '<circle cx="' + (hx + 6) + '" cy="' + (hy - 5) + '" r="5" fill="#fff"/><circle cx="' + (hx + 7) + '" cy="' + (hy - 5) + '" r="3" fill="#1d1d1b"/>';
+    return h + '</svg>';
+  }
+  function moo(f1, f2, len, type) { return function () { tone(f1, 0, len, type || "sawtooth", 0.14, f2); }; }
+  var ANIMALS = [
+    { id: "pig", name: "Pig", pre: "Pig", suf: "pig", sound: function () { tone(320, 0, 0.15, "square", 0.12, 200); tone(320, 0.2, 0.15, "square", 0.12, 200); },
+      svg: mammal({ c: "#f4a7b9", d: "#e48aa0", legs: 26, rx: 46, ry: 30, tail: "curly", ears: "pointy", snout: "pig", nose: "#e48aa0" }) },
+    { id: "zebra", name: "Zebra", pre: "Zeb", suf: "bra", sound: moo(500, 900, 0.5),
+      svg: mammal({ c: "#f7f7f2", d: "#1d1d1b", legs: 46, neck: 18, stripes: "#1d1d1b", ears: "pointy", snout: "long", muzzle: "#3b3b3b", tuft: "#1d1d1b", hairTuft: "#1d1d1b" }) },
+    { id: "giraffe", name: "Giraffe", pre: "Giraf", suf: "raffe", sound: moo(180, 240, 0.6, "sine"),
+      svg: mammal({ c: "#f2c057", d: "#a8741a", legs: 52, neck: 58, rx: 40, ry: 22, spots: "#a8741a", neckSpots: true, ossicones: true, ears: "pointy", snout: "long", tuft: "#6e4a0c" }) },
+    { id: "elephant", name: "Elephant", pre: "Ele", suf: "phant", sound: moo(400, 750, 0.9),
+      svg: mammal({ c: "#9aa3ad", d: "#7d8590", legs: 36, rx: 56, ry: 36, ears: "big", snout: "trunk", tuft: "#5d636b" }) },
+    { id: "lion", name: "Lion", pre: "Lion", suf: "lion", sound: function () { roar(0.9, 1.2); },
+      svg: mammal({ c: "#e8b44a", d: "#c48a2a", legs: 38, mane: "#b5651d", ears: "round", whiskers: true, muzzle: "#f6dca0", tuft: "#b5651d" }) },
+    { id: "cow", name: "Cow", pre: "Cow", suf: "moo", sound: moo(160, 120, 0.9),
+      svg: mammal({ c: "#fafafa", d: "#3b3b3b", legs: 36, rx: 52, ry: 30, spots: "#3b3b3b", horns: "#f4e8cc", ears: "floppy", snout: "pig", nose: "#f4a7b9", tuft: "#3b3b3b" }) },
+    { id: "horse", name: "Horse", pre: "Horsey", suf: "horse", sound: moo(600, 1000, 0.6),
+      svg: mammal({ c: "#9a5a2e", d: "#6e3a1a", legs: 48, neck: 20, ears: "pointy", snout: "long", hairTuft: "#3b2413", tuft: "#3b2413" }) },
+    { id: "dog", name: "Dog", pre: "Doggy", suf: "dog", sound: function () { tone(380, 0, 0.12, "sawtooth", 0.15, 260); tone(380, 0.22, 0.12, "sawtooth", 0.15, 260); },
+      svg: mammal({ c: "#c9894a", d: "#8a5a2a", legs: 30, rx: 40, ry: 22, ears: "floppy", muzzle: "#f0d0a8" }) },
+    { id: "cat", name: "Cat", pre: "Kitty", suf: "cat", sound: function () { tone(700, 0, 0.5, "sine", 0.15, 950); tone(950, 0.4, 0.3, "sine", 0.12, 650); },
+      svg: mammal({ c: "#8a8f99", d: "#5d626b", legs: 26, rx: 36, ry: 20, stripes: "#5d626b", ears: "pointy", whiskers: true, muzzle: "#c8ccd2" }) },
+    { id: "monkey", name: "Monkey", pre: "Monk", suf: "monkey", sound: function () { [0, 0.2, 0.4].forEach(function (t) { tone(500, t, 0.15, "sine", 0.15, 900); }); },
+      svg: '<svg viewBox="0 0 200 180"><path d="M70 120 Q30 120 34 80 Q36 60 50 66" stroke="#7a4a2a" stroke-width="6" fill="none" stroke-linecap="round"/>' +
+        '<path d="M84 128 l-8 30 M112 128 l8 30" stroke="#7a4a2a" stroke-width="12" stroke-linecap="round"/><ellipse cx="98" cy="110" rx="28" ry="32" fill="#7a4a2a"/><ellipse cx="100" cy="116" rx="16" ry="20" fill="#d9a877"/>' +
+        '<path d="M122 96 q22 10 28 34" stroke="#7a4a2a" stroke-width="10" fill="none" stroke-linecap="round"/><path d="M76 96 q-18 14 -16 34" stroke="#7a4a2a" stroke-width="10" fill="none" stroke-linecap="round"/>' +
+        '<circle cx="74" cy="54" r="11" fill="#d9a877" stroke="#7a4a2a" stroke-width="5"/><circle cx="126" cy="54" r="11" fill="#d9a877" stroke="#7a4a2a" stroke-width="5"/><circle cx="100" cy="54" r="26" fill="#7a4a2a"/>' +
+        '<ellipse cx="100" cy="62" rx="18" ry="15" fill="#d9a877"/><circle cx="92" cy="50" r="4" fill="#1d1d1b"/><circle cx="108" cy="50" r="4" fill="#1d1d1b"/><path d="M92 66 q8 6 16 0" stroke="#3b2413" stroke-width="3" fill="none"/></svg>' },
+    { id: "penguin", name: "Penguin", pre: "Pengu", suf: "guin", sound: function () { tone(900, 0, 0.2, "square", 0.1, 600); tone(800, 0.25, 0.25, "square", 0.1, 500); },
+      svg: '<svg viewBox="0 0 200 180"><ellipse cx="100" cy="104" rx="36" ry="52" fill="#1d2433"/><ellipse cx="106" cy="114" rx="24" ry="40" fill="#fff"/>' +
+        '<path d="M68 96 q-16 24 -6 40 M132 96 q16 24 6 40" stroke="#1d2433" stroke-width="10" fill="none" stroke-linecap="round"/><path d="M86 156 l-10 8 h18 Z M114 156 l-4 8 h18 Z" fill="#f2a93b"/>' +
+        '<circle cx="112" cy="70" r="5" fill="#fff"/><circle cx="114" cy="70" r="3" fill="#1d1d1b"/><path d="M124 76 l18 4 l-18 4 Z" fill="#f2a93b"/></svg>' },
+    { id: "shark", name: "Shark", pre: "Shark", suf: "shark", sound: function () { tone(60, 0, 0.5, "sine", 0.3, 40); tone(200, 0.3, 0.1, "square", 0.12); },
+      svg: '<svg viewBox="0 0 200 180"><path d="M30 100 L4 74 L14 104 L6 132 Z" fill="#5f7d95"/><path d="M24 104 Q80 70 150 84 Q192 92 196 108 Q170 124 120 124 Q60 126 24 104 Z" fill="#7a9ab0"/>' +
+        '<path d="M60 116 Q110 128 180 114 Q150 126 100 126 Z" fill="#e8eef2"/><path d="M96 80 L110 46 L124 84 Z" fill="#5f7d95"/><path d="M110 120 l12 20 l6 -18 Z" fill="#5f7d95"/>' +
+        '<path d="M160 110 l4 6 l4 -6 l4 6 l4 -6 l4 6 l4 -6" fill="#fff" stroke="#fff"/><circle cx="168" cy="96" r="4" fill="#1d1d1b"/><path d="M140 96 v12 M146 96 v12 M152 96 v12" stroke="#5f7d95" stroke-width="2"/></svg>' },
+    { id: "frog", name: "Frog", pre: "Froggy", suf: "frog", sound: function () { tone(220, 0, 0.12, "square", 0.12, 160); tone(260, 0.16, 0.16, "square", 0.12, 180); },
+      svg: '<svg viewBox="0 0 200 180"><path d="M50 150 Q30 120 60 112 Q80 140 66 152 Z M150 150 Q170 120 140 112 Q120 140 134 152 Z" fill="#3f9a3a"/>' +
+        '<ellipse cx="100" cy="122" rx="54" ry="32" fill="#5cc46a"/><ellipse cx="104" cy="130" rx="34" ry="18" fill="#d8f0a0"/><circle cx="80" cy="90" r="16" fill="#5cc46a"/><circle cx="124" cy="90" r="16" fill="#5cc46a"/>' +
+        '<circle cx="82" cy="88" r="8" fill="#fff"/><circle cx="126" cy="88" r="8" fill="#fff"/><circle cx="84" cy="88" r="4" fill="#1d1d1b"/><circle cx="128" cy="88" r="4" fill="#1d1d1b"/><path d="M76 116 Q104 132 132 116" stroke="#2e6b2a" stroke-width="3" fill="none"/></svg>' }
+  ];
+  var HUMAN_P = null;
+  ANIMALS.splice(0, 0, { id: "human", name: "Human", pre: "Human", suf: "man",
+    sound: function () { tone(520, 0, 0.18, "sine", 0.15, 640); tone(660, 0.22, 0.25, "sine", 0.15, 520); },
+    svg: function () { if (!HUMAN_P) { HUMAN_P = newPerson(); HUMAN_P.kind = "grownup"; } return personSvg(HUMAN_P, true); } });
+  ANIMALS.forEach(function (a) { if (typeof a.svg === "string") { var v = a.svg; a.svg = function () { return v; }; } });
+  function autoParts(name) {
+    var n = name.replace(" the Raptor", "").replace(/[^A-Za-z-]/g, "");
+    var m = n.match(/^(.+?)(saurus|ceratops|raptor|pteryx|cephalus|odon|onyx|ops|us|a)$/);
+    var pre = m && m[1].length > 2 ? m[1] : n.slice(0, Math.ceil(n.length / 2));
+    var suf = m ? (m[2].length > 3 ? m[2] : n.slice(-5)) : n.slice(Math.floor(n.length / 2));
+    return { pre: pre, suf: suf.toLowerCase() };
+  }
+  var mixAll = [];
+  function buildMixList() {
+    var seen = {}, list = [];
+    function add(it) { if (!seen[it.id]) { seen[it.id] = true; list.push(it); } }
+    MIX_ITEMS.forEach(add); ANIMALS.forEach(add);
+    DINOS.concat(MYSTERY).forEach(function (d) {
+      if (d.bones || seen[d.id]) return;
+      var parts = autoParts(d.name);
+      add({ id: d.id, name: shortName(d), pre: parts.pre, suf: parts.suf, svg: function () { return d.svg; }, sound: function () { d.sound(); } });
+    });
+    mixAll = list;
+  }
+  function mixItem(id) { return mixAll.filter(function (x) { return x.id === id; })[0]; }
   function inner(svg, cls) {
     return svg.replace(/^<svg\b/, '<svg x="0" y="0" width="200" height="180" preserveAspectRatio="xMidYMax meet"' + (cls ? ' class="' + cls + '"' : ''));
   }
@@ -5639,7 +5742,12 @@ body.quake .app { animation: shake .4s ease; }
     h += '<polyline points="' + zig + '" fill="none" stroke="#9ff3e4" stroke-width="2" stroke-dasharray="4 5" opacity=".7"/>';
     return h + '</svg>';
   }
-  function mixName(a, b) { return a.pre + b.suf; }
+  function mixName(a, b) {
+    var n = a.pre + b.suf;
+    // a mix should never sound like a real animal, so try another way to join the names
+    var real = mixAll.some(function (x) { return x.name.toLowerCase().replace(/[^a-z]/g, "") === n.toLowerCase().replace(/[^a-z]/g, ""); });
+    return real ? a.pre + b.pre.toLowerCase() : n;
+  }
   function drawMixSlots() {
     ["mix-a", "mix-b"].forEach(function (sid, i) {
       var it = mixPicked[i] && mixItem(mixPicked[i]), el = $(sid);
@@ -5670,14 +5778,14 @@ body.quake .app { animation: shake .4s ease; }
     }
   }
   $("open-mix").addEventListener("click", function () {
-    mixPicked = []; mixFlip = false;
-    $("mix-grid").innerHTML = MIX_ITEMS.map(function (it) {
+    mixPicked = []; mixFlip = false; buildMixList();
+    $("mix-grid").innerHTML = mixAll.map(function (it) {
       return '<button class="mix-pick" data-id="' + it.id + '" aria-label="' + it.name + '">' + it.svg() + '</button>';
     }).join("");
     mixOut.innerHTML = ""; $("mix-name").textContent = ""; $("mix-swap").hidden = true;
     drawMixSlots(); mixLab.hidden = false;
     tone(200, 0, 0.4, "sine", 0.15, 800);
-    say("This is the DNA Mixer! Pick two animals, then tap MIX to mix their DNA!");
+    say("This is the DNA Mixer! There are " + mixAll.length + " animals and dinosaurs! Pick two, then tap MIX to mix their DNA! Swipe the pictures to see more.");
   });
   $("mix-close").addEventListener("click", function () { mixLab.hidden = true; });
   $("mix-grid").addEventListener("click", function (e) {
@@ -5698,6 +5806,12 @@ body.quake .app { animation: shake .4s ease; }
     $("mix-name").textContent = "Mixing...";
     mixFlip = false;
     setTimeout(function () { mixOut.classList.remove("hop"); showMix(true); $("mix-go").disabled = false; }, 1000);
+  });
+  $("mix-rand").addEventListener("click", function () {
+    var a = Math.floor(Math.random() * mixAll.length), b;
+    do { b = Math.floor(Math.random() * mixAll.length); } while (b === a);
+    mixPicked = [mixAll[a].id, mixAll[b].id]; drawMixSlots(); boing();
+    $("mix-go").click();
   });
   $("mix-swap").addEventListener("click", function () { mixFlip = !mixFlip; showMix(false); });
   mixOut.addEventListener("click", function () {
