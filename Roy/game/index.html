@@ -5194,7 +5194,7 @@ body.quake .app { animation: shake .4s ease; }
     var left = Array.prototype.slice.call(memBoard.querySelectorAll(".mcard:not(.matched)"));
     var groups = {};
     left.forEach(function (c) { var d = memDeck[Number(c.dataset.i)]; (groups[d.id] = groups[d.id] || []).push(c); });
-    say("Magic double tap! Every card is finding its partner! Zip zip zip!");
+    say("Magic! The cards are finding their partners all by themselves! Zip zip zip!");
     Object.keys(groups).forEach(function (id, k) {
       setTimeout(function () {
         groups[id].forEach(function (c) {
@@ -5219,7 +5219,11 @@ body.quake .app { animation: shake .4s ease; }
     }, walk);
     setTimeout(function () { memMatched = L.pairs; chime(); memoryWin(L); }, walk + 1400);
   }
+  var mixLastTap = 0;
   $("mem-mix").addEventListener("click", function () {
+    // Roy's idea: tap Mix! 2 times fast and the cards find all their partners by themselves
+    var now = Date.now(), dbl = now - mixLastTap < 500; mixLastTap = dbl ? 0 : now;
+    if (dbl) { magicMatch(); return; }
     if (memoryLock || memMagic || memMatched >= MEM_LEVELS[memLevel].pairs) return;
     mixUpMemory("Whoosh! You mixed up all the cards! All mixed up! Can you find the pairs?");
   });
